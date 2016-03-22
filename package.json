@@ -1,0 +1,12 @@
+{
+  "name": "kanColle wiki spider",
+  "version": "0.0.1",
+  "description": "data scrape from kanColle wiki",
+  "main": "main.js",
+  "author": "selear",
+  "dependencies": {
+    "express": "latest",
+    "request": "latest",
+    "cheerio": "latest"
+  }
+}
