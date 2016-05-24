@@ -1,77 +1,87 @@
 var fs = require('fs'),
-	request = require('request'),
-	cheerio = require('cheerio'),
-	HttpProxyAgent = require('http-proxy-agent');
+  request = require('request'),
+  cheerio = require('cheerio'),
+  HttpProxyAgent = require('http-proxy-agent');
 
 var shadowSocks = 'http://127.0.0.1:1080',
-	agent = new HttpProxyAgent(shadowSocks);
+  agent = new HttpProxyAgent(shadowSocks);
 
 request({
-	uri: "http://wikiwiki.jp/kancolle/?%B2%FE%BD%A4%B9%A9%BE%B3",
-	method: "GET",
-	agent: agent,
-	encoding: null,
-	timeout: 10000
+  uri: "http://wikiwiki.jp/kancolle/?%B2%FE%BD%A4%B9%A9%BE%B3",
+  method: "GET",
+  agent: agent,
+  encoding: null,
+  timeout: 10000
 }, function(error, response, body) {
 
-	var utf8html;
-	if (!error) {
+  var categoryArr = [];
 
-		var iconv = require('iconv-lite'),
-			decoded = iconv.decode(body, 'eucjp'),
-			utf8html = iconv.encode(decoded, 'utf8');
+  if (!error) {
 
-		var $ = cheerio.load(utf8html);
+    var iconv = require('iconv-lite'),
+      decoded = iconv.decode(body, 'eucjp'),
+      utf8html = iconv.encode(decoded, 'utf8');
 
-		var $kaisyuTable = $('#kaisyu').parent().next().next().find('table'),
-			$kaisyuTbody = $kaisyuTable.find('tbody');
+    var $ = cheerio.load(utf8html);
 
-		var removedTr = 0;
-		$kaisyuTbody.find('tr').each(function() {
-			var $tr = $(this);
-			if ($tr.find('th').length > 1) {
-				$tr.remove();
-				removedTr++;
-			}
-		});
+    //获取改修表格
+    var $kaisyuTable = $('#kaisyu').parent().next().next().find('table'),
+      //获取改修表实体
+      $kaisyuTbody = $kaisyuTable.find('tbody');
 
-		var kaisyuTable = '<table><tbody>' + $kaisyuTbody.html() + '</tbody></table>';
+    $cleaned = cleanInvalidTH($kaisyuTbody);
+    analyseTable($cleaned.clone());
 
-		console.log('removedTr.length : ' + removedTr);
-	}
+    var kaisyuTable = '<table><tbody>' + $cleaned.html() + '</tbody></table>';
 
-	fs.writeFile('output.html', kaisyuTable, function(err) {
+    function cleanInvalidTH($tbody) {
 
-		console.log('File successfully written! - Check your project directory for the output.html file');
+      var removedTrs = 0;
+      $tbody.find('tr').each(function() {
+        var $tr = $(this);
+        if ($tr.find('th').length > 1) {
+          $tr.remove();
+          removedTrs++;
+        }
+      });
 
-	});
+      console.log('tr remains [after] ---------> ' + $tbody.find('tr').length);
+      console.log('tr totally removed ---------> ' + removedTrs);
 
-	//console.log("Error" + error);
-	//console.log("Response: " + response);
-	//console.log("Body: " + html);
+      return $tbody;
+    }
+
+    function analyseTable($cleanedTable) {
+
+      $cleanedTable.find('tr').each(function() {
+
+        var $category = $(this).find('th');
+
+        if ($category.length == 1) {
+          categoryArr.push($category.text());
+
+          var $record = $(this).find('td'),
+            attrs = ['name', 'phase', 'fuel', 'ammo', 'steel', 'bauxite', 'develop', 'improve', 'cost', '', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'assist', 'remarks'],
+            data = {};
+
+          var i;
+          for (i in attrs) {
+            data[attrs[i]] = $record.eq(i).text();
+          }
+
+          console.log(data);
+        }
+
+        if ($category.length == 0) {
+
+        }
+
+      });
+    }
+  }
+
+  fs.writeFile('output.html', kaisyuTable, function(err) {
+    console.log('File successfully written! - Check your project directory for the output.html file');
+  });
+
 });
-
-
-// app.get('/scrape', function(req, res) {
-
-// 	url = 'http://wikiwiki.jp/kancolle/?%B2%FE%BD%A4%B9%A9%BE%B3';
-
-// 	request(url, function(error, response, html) {
-
-// 		var table;
-
-// 		if (!error) {
-
-// 			var $ = cheerio.load(html);
-
-// 			table = $('#h3_content_1_6').next().next().html();
-
-// 			console.log(table);
-// 		}
-
-// 		fs.writeFile('output.html', table, function(err) {
-// 			console.log('File successfully written! - Check your project directory for the output.json file');
-// 		});
-
-// 	});
-// });
