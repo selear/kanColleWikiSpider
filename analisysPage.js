@@ -5,6 +5,7 @@ var fs = require('fs'),
 var TARGET_FILE = 'fixedKaisyu.html';
 
 fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
+
     if(err) throw err;
     $ = cheerio.load(utf8html);
 
@@ -44,7 +45,6 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
     });
 
     console.log(categories.join());
-    //console.log(equipNames.join(',\n'));
     console.log('可改修total : ' + equipNames.length);
     console.log('间隔栏total : ' + fenceLength);
 });
@@ -58,9 +58,12 @@ Category.prototype = {
   addEquip : function(equip) {
     this.equipArr.push(equip);
   },
+  countEquips : function() {
+    return this.equipArr.length;
+  },
   toString : function() {
     var keys = Object.keys(this.equipArr),
-        result = this.name + '\n';
+        result = this.name + '[' + this.countEquips() + ']' + '\n';
     for(var i = 0, len = keys.length; i < len; i++) {
       result += '  + ' + this.equipArr[keys[i]] + '\n';
     }
@@ -78,16 +81,16 @@ Equip.prototype = {
   }
 }
 
-function delimit(title) {
+function banner(bannerText) {
   var DELIMITER = '-',
       SPACES = 6;
       PRE_SPACES = SPACES/2 + 1;
 
-  var titleLen = title.length,
-      fixedTitle = new Array(PRE_SPACES).join(' ') + title, 
-      delimiterLen = titleLen + SPACES,
-      lineArr = new Array(delimiterLen),
-      line = lineArr.join(DELIMITER);
+  var bannerLen = bannerText.length,
+      fullLen = SPACES + bannerLen,
+      lineGen = new Array(fullLen),
+      line = lineGen.join(DELIMITER),
+      fixed = new Array(PRE_SPACES).join(' ') + bannerText;
 
-  console.log([line, fixedTitle, line].join('\n'));
+  console.log([line, fixed, line].join('\n'));
 }

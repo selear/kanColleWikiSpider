@@ -6,6 +6,8 @@ var fs = require('fs'),
 var shadowSocks = 'http://127.0.0.1:1080',
     agent = new HttpProxyAgent(shadowSocks);
 
+
+
 request({
   uri: "http://wikiwiki.jp/kancolle/?%B2%FE%BD%A4%B9%A9%BE%B3",
   method: "GET",
@@ -38,3 +40,17 @@ request({
   });
 
 });
+
+function banner(bannerText) {
+  var DELIMITER = '-',
+      SPACES = 6;
+      PRE_SPACES = SPACES/2 + 1;
+
+  var bannerLen = bannerText.length,
+      fullLen = SPACES + bannerLen,
+      lineGen = new Array(fullLen),
+      line = lineGen.join(DELIMITER),
+      fixed = new Array(PRE_SPACES).join(' ') + bannerText;
+
+  console.log([line, fixed, line].join('\n'));
+}
