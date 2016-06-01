@@ -6,7 +6,7 @@ var fs = require('fs'),
 var shadowSocks = 'http://127.0.0.1:1080',
     agent = new HttpProxyAgent(shadowSocks);
 
-
+banner('Requesting target webpage');
 
 request({
   uri: "http://wikiwiki.jp/kancolle/?%B2%FE%BD%A4%B9%A9%BE%B3",
@@ -16,7 +16,8 @@ request({
   timeout: 10000
 }, function(error, response, body) {
 
-  var categoryArr = [];
+  var categoryArr = [],
+      removedTrs = 0;
 
   if (!error) {
 
@@ -31,12 +32,25 @@ request({
         //获取改修表实体
         $kaisyuTbody = $kaisyuTable.find('tbody');
 
+    cleanInvalidTH($kaisyuTbody);
+
     var fixedTable = '<table><tbody>' + $kaisyuTbody.html() + '</tbody></table>';
 
+    function cleanInvalidTH($tbody) {
+      $tbody.find('tr').each(function() {
+        var $tr = $(this);
+        if ($tr.find('th').length > 1) {
+          $tr.remove();
+          removedTrs++;
+        }
+      });
+      return removedTrs;
+    }
   }
 
   fs.writeFile('fixedKaisyu.html', fixedTable, function(err) {
-    console.log('File successfully written! - Check your project directory for the output.html file');
+    console.log('页面抓取处理完毕.');
+    console.log('移除间隔数 : ' + removedTrs);
   });
 
 });
@@ -47,7 +61,7 @@ function banner(bannerText) {
       PRE_SPACES = SPACES/2 + 1;
 
   var bannerLen = bannerText.length,
-      fullLen = SPACES + bannerLen,
+      fullLen = SPACES + bannerLen + 1,
       lineGen = new Array(fullLen),
       line = lineGen.join(DELIMITER),
       fixed = new Array(PRE_SPACES).join(' ') + bannerText;

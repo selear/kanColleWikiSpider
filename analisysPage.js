@@ -2,7 +2,9 @@ var fs = require('fs'),
     cheerio = require('cheerio'),
     $ = null;
 
-var TARGET_FILE = 'fixedKaisyu.html';
+var TARGET_FILE = 'fixedKaisyu.html',
+    IMPROVABLE = '〇',
+    DISPROVABLE = '×';
 
 fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
 
@@ -13,6 +15,7 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
 
     var categories = [],
         currCategory = null,
+        currEquip = null,
         equipNames = [],
         fenceLength = 0;
 
@@ -32,19 +35,50 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         fenceLength++;
       }
 
+      var fuel, ammo, steel, bauxite,
+          develop, improve, cost,
+          sun, mon, tue, wed, thu, fri, sat,
+          assist, remarks;
+
       // 2016.05.24
       // 对于每个装备
       // 每个装备的第一个td如果包含a, 则该td中包含了equipName
-      if($curr.find('td').first().find('a').length > 0) {
-        var eName = $curr.find('td').first().text();
+      //     如果不包含, 则 //TODO
+      var $tds = $curr.find('td');
+      if($tds.first().find('a').length > 0) {
+        var eName = $tds.first().text();
         equipNames.push(eName);
 
+        fuel = $tds.eq(3).text();
+        ammo = $tds.eq(4).text();
+        steel = $tds.eq(5).text();
+        bauxite = $tds.eq(6).text();
+
+        develop = $tds.eq(7).text();
+        improve = $tds.eq(8).text();
+        cost = $tds.eq(9).text();
+
+        // cheerio在读取本地文件后, 忽略了原有结构中的第10个td(该td内没有文字);
+        // 由此, 计数按顺序增加即可
+        sun = ($tds.eq(10).text() === IMPROVABLE) ? true : false;
+        mon = ($tds.eq(11).text() === IMPROVABLE) ? true : false;
+        tue = ($tds.eq(12).text() === IMPROVABLE) ? true : false;
+        wed = ($tds.eq(13).text() === IMPROVABLE) ? true : false;
+        thu = ($tds.eq(14).text() === IMPROVABLE) ? true : false;
+        fri = ($tds.eq(15).text() === IMPROVABLE) ? true : false;
+        sat = ($tds.eq(16).text() === IMPROVABLE) ? true : false;
+
+        assist = $tds.eq(17).text();
+        remarks = $tds.eq(18).text();
+
         currCategory.addEquip(new Equip(eName));
+      } else {
+
       }
 
     });
 
-    console.log(categories.join());
+    //console.log(categories.join());
     console.log('可改修total : ' + equipNames.length);
     console.log('间隔栏total : ' + fenceLength);
 });
