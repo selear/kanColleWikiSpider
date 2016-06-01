@@ -29,10 +29,10 @@ request({
       //获取改修表实体
       $kaisyuTbody = $kaisyuTable.find('tbody');
 
-    $cleaned = cleanInvalidTH($kaisyuTbody);
-    analyseTable($cleaned.clone());
+    //$cleaned = cleanInvalidTH($kaisyuTbody);
+    //analyseTable($cleaned.clone());
 
-    var kaisyuTable = '<table><tbody>' + $cleaned.html() + '</tbody></table>';
+    var kaisyuTable = '<table><tbody>' + $kaisyuTbody.html() + '</tbody></table>';
 
     function cleanInvalidTH($tbody) {
 

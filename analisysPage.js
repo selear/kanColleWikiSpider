@@ -1,40 +1,21 @@
-// proxy编写
-var HttpProxyAgent = require('http-proxy-agent'),
-    localProxy = 'http://127.0.0.1:1080',
-    agent = new HttpProxyAgent(localProxy);
-
-// node模块需求
-var request = require('request'),
-    iconv = require('iconv-lite'),
-    fs = require('fs'),
+var fs = require('fs'),
     cheerio = require('cheerio'),
-    Buffer = require('buffer').Buffer;
+    $ = null;
 
-console.log('---------------------\n  Requesting TARGET\n---------------------');
+var TARGET_FILE = 'fixedKaisyu.html';
 
-request({
-    uri: "http://wikiwiki.jp/kancolle/?%B2%FE%BD%A4%B9%A9%BE%B3",
-    method: "GET",
-    agent: agent,
-    encoding: null, // encoding强制为null, 会返回Buffer, 而非utf-8解码后的页面, 后续使用iconv进行转码工作
-    timeout: 10000,
-}, function(err, res, body) {
+fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
+    if(err) throw err;
+    $ = cheerio.load(utf8html);
 
-    var iconv = require('iconv-lite'),
-        decoded = iconv.decode(body, 'eucjp'),
-        utf8html = iconv.encode(decoded, 'utf8');
-
-    var $ = cheerio.load(utf8html);
-
-    var $kaisyuTable = $('#kaisyu').parent().next().next().find('table'),
-      $kaisyuTbody = $kaisyuTable.find('tbody');
+    var $tbody = $('tbody');
 
     var categories = [],
         currCategory = null,
         equipNames = [],
         fenceLength = 0;
 
-    $kaisyuTbody.find('tr').each(function() {
+    $tbody.find('tr').each(function() {
 
       var $curr = $(this);
 
@@ -66,8 +47,6 @@ request({
     //console.log(equipNames.join(',\n'));
     console.log('可改修total : ' + equipNames.length);
     console.log('间隔栏total : ' + fenceLength);
-
-    //var kaisyuTable = '<table><tbody>' + $kaisyuTbody.html() + '</tbody></table>';
 });
 
 function Category(cName) {
@@ -97,4 +76,18 @@ Equip.prototype = {
   toString : function() {
     return this.name;
   }
+}
+
+function delimit(title) {
+  var DELIMITER = '-',
+      SPACES = 6;
+      PRE_SPACES = SPACES/2 + 1;
+
+  var titleLen = title.length,
+      fixedTitle = new Array(PRE_SPACES).join(' ') + title, 
+      delimiterLen = titleLen + SPACES,
+      lineArr = new Array(delimiterLen),
+      line = lineArr.join(DELIMITER);
+
+  console.log([line, fixedTitle, line].join('\n'));
 }
