@@ -1,12 +1,16 @@
+// proxy编写
 var HttpProxyAgent = require('http-proxy-agent'),
-    proxySS = 'http://127.0.0.1:1080',
-    agent = new HttpProxyAgent(proxySS);
+    localProxy = 'http://127.0.0.1:1080',
+    agent = new HttpProxyAgent(localProxy);
 
+// node模块需求
 var request = require('request'),
     iconv = require('iconv-lite'),
-    fs = require('fs');
+    fs = require('fs'),
+    cheerio = require('cheerio'),
+    Buffer = require('buffer').Buffer;
 
-var Buffer = require('buffer').Buffer;
+console.log('---------------------\n  Requesting TARGET\n---------------------');
 
 request({
     uri: "http://wikiwiki.jp/kancolle/?%B2%FE%BD%A4%B9%A9%BE%B3",
@@ -16,11 +20,81 @@ request({
     timeout: 10000,
 }, function(err, res, body) {
 
-    var html = iconv.decode(body, 'eucjp');
+    var iconv = require('iconv-lite'),
+        decoded = iconv.decode(body, 'eucjp'),
+        utf8html = iconv.encode(decoded, 'utf8');
 
-    console.log("Body: " + html);
+    var $ = cheerio.load(utf8html);
 
-    // fs.writeFile('output.html', html, function(err) {
-    //   console.log('File successfully written! - Check your project directory for the output.json file');
-    // });
+    var $kaisyuTable = $('#kaisyu').parent().next().next().find('table'),
+      $kaisyuTbody = $kaisyuTable.find('tbody');
+
+    var categories = [],
+        currCategory = null,
+        equipNames = [],
+        fenceLength = 0;
+
+    $kaisyuTbody.find('tr').each(function() {
+
+      var $curr = $(this);
+
+      // 2016.05.24
+      // 对各个类别来说：
+      // 每个类别均包含category, 当tr中仅包含一个th时, 该th中包含了categoryName
+      if($curr.find('th').length === 1) {
+        var cName = $curr.find('th').text();
+
+        currCategory = new Category(cName);
+        categories.push(currCategory);
+      } else if($curr.find('th').length > 1) {
+        fenceLength++;
+      }
+
+      // 2016.05.24
+      // 对于每个装备
+      // 每个装备的第一个td如果包含a, 则该td中包含了equipName
+      if($curr.find('td').first().find('a').length > 0) {
+        var eName = $curr.find('td').first().text();
+        equipNames.push(eName);
+
+        currCategory.addEquip(new Equip(eName));
+      }
+
+    });
+
+    console.log(categories.join());
+    //console.log(equipNames.join(',\n'));
+    console.log('可改修total : ' + equipNames.length);
+    console.log('间隔栏total : ' + fenceLength);
+
+    //var kaisyuTable = '<table><tbody>' + $kaisyuTbody.html() + '</tbody></table>';
 });
+
+function Category(cName) {
+  this.name = cName;
+  this.equipArr = [];
+}
+
+Category.prototype = {
+  addEquip : function(equip) {
+    this.equipArr.push(equip);
+  },
+  toString : function() {
+    var keys = Object.keys(this.equipArr),
+        result = this.name + '\n';
+    for(var i = 0, len = keys.length; i < len; i++) {
+      result += '  + ' + this.equipArr[keys[i]] + '\n';
+    }
+    return result;
+  }
+}
+
+function Equip(eName) {
+  this.name = eName;
+}
+
+Equip.prototype = {
+  toString : function() {
+    return this.name;
+  }
+}
