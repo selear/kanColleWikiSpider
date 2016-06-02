@@ -19,6 +19,7 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         equipNames = [],
         fenceLength = 0;
 
+
     $tbody.find('tr').each(function() {
 
       var $curr = $(this);
@@ -41,9 +42,26 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
           assist, remarks;
 
       // 2016.05.24
-      // 对于每个装备
-      // 每个装备的第一个td如果包含a, 则该td中包含了equipName
-      //     如果不包含, 则 //TODO
+      // 每个装备的第一个td如果包含a, 则该td中包含了equipName, $tds.length = 19
+      //    如果不包含, 分成多种情况:
+      //    + $tds.length = 4   - [develop, improve, cost]
+      //
+      //    + $tds.length = 8   - [sun, mon, tue, wed, thu, fri, sat, assist]
+      //
+      //    + $tds.length = 12  - [develop, improve, cost]
+      //                          [sun, mon, tue, wed, thu, fri, sat]
+      //                          [assist]
+      //
+      //    + $tds.length = 17  - [fuel, ammo, steel, bauxite]
+      //                          [develop, improve, cost]
+      //                          [sun, mon, tue, wed, thu, fri, sat]
+      //                          [assist, remarks]
+      //
+      //    + $tds.length = 18  - [fuel, ammo, steel, bauxite]
+      //                          [develop, improve, cost]
+      //                          [sun, mon, tue, wed, thu, fri, sat]
+      //                          [assist, remarks]
+      // TODO 编写一个数组, 如果出现不同于上述数量的tr, 抛出错误, 并给予提示
       var $tds = $curr.find('td');
       if($tds.first().find('a').length > 0) {
         var eName = $tds.first().text();
@@ -72,13 +90,32 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         remarks = $tds.eq(18).text();
 
         currCategory.addEquip(new Equip(eName));
-      } else {
-
       }
+
+      if(countMap[$tds.length]) {
+        var val = countMap[$tds.length] + 1;
+        countMap[$tds.length] = val;
+      } else {
+        countMap[$tds.length] = 1;
+        countMap[$tds.length + 'th'] = equipNames[equipNames.length - 1];
+      }
+
+      // else if($tds.length === 4) {
+      //   console.log(4);
+      // } else if($tds.length === 8) {
+      //   console.log(8);
+      // } else if($tds.length === 12) {
+      //   console.log(12)
+      // } else if($tds.length === 18) {
+      //   console.log(18)
+      // } else {
+      //   console.log($tds.length);
+      // }
 
     });
 
     //console.log(categories.join());
+    console.log(countMap);
     console.log('可改修total : ' + equipNames.length);
     console.log('间隔栏total : ' + fenceLength);
 });
