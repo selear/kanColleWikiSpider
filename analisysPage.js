@@ -19,6 +19,8 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         equipNames = [],
         fenceLength = 0;
 
+
+
     //  TODO countMap目前用于统计每个tr的td, 可以在后续更新中用于新改修数据的校验
     //  如果数据不对就抛出异常
     var countMap = { };
@@ -108,7 +110,56 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         remarks = $tds.eq(18).text();
 
         currCategory.addEquip(currEquip);
-      } 
+      } else if($tds.length === 4) {
+
+        var tar = currEquip.getImproveTarget();
+
+        var phaseStr = $tds.eq(0).text();
+        develop = $tds.eq(1).text();
+        improve = $tds.eq(2).text();
+        cost = $tds.eq(3).text();
+        
+        var phase = ImproveCost.whichPhase(phaseStr);
+        var iCost = new ImproveCost();
+        iCost.merge(new ImproveDetail(phase, develop, improve, cost));
+
+        tar.setImproveCost(iCost);
+      } else if($tds.length === 8) {
+
+      } else if($tds.length === 12) {
+        var tar = currEquip.getImproveTarget();
+
+        var phaseStr = $tds.eq(0).text();
+        develop = $tds.eq(1).text();
+        improve = $tds.eq(2).text();
+        cost = $tds.eq(3).text();
+        
+        var phase = ImproveCost.whichPhase(phaseStr);
+        var iCost = new ImproveCost();
+        iCost.merge(new ImproveDetail(phase, develop, improve, cost));
+      } else if($tds.length === 17) {
+        var tar = currEquip.getImproveTarget();
+
+        var phaseStr = $tds.eq(0).text();
+        develop = $tds.eq(5).text();
+        improve = $tds.eq(6).text();
+        cost = $tds.eq(7).text();
+        
+        var phase = ImproveCost.whichPhase(phaseStr);
+        var iCost = new ImproveCost();
+        iCost.merge(new ImproveDetail(phase, develop, improve, cost));
+      } else if($tds.length === 18) {
+        var tar = currEquip.getImproveTarget();
+
+        var phaseStr = $tds.eq(0).text();
+        develop = $tds.eq(5).text();
+        improve = $tds.eq(6).text();
+        cost = $tds.eq(7).text();
+        
+        var phase = ImproveCost.whichPhase(phaseStr);
+        var iCost = new ImproveCost();
+        iCost.merge(new ImproveDetail(phase, develop, improve, cost));
+      }
 
       if(countMap[$tds.length]) {
         var val = countMap[$tds.length] + 1;
@@ -133,7 +184,7 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
     });
 
     console.log(countMap);
-    console.log(categories.join());
+    //console.log(categories.join());
     console.log('可改修total : ' + equipNames.length);
     console.log('间隔栏total : ' + fenceLength);
 });
@@ -175,6 +226,9 @@ Equip.prototype = {
       this.improveTarget = target;
     else
       throw new Error();
+  },
+  getImproveTarget : function() {
+    return this.improveTarget;
   },
   toString : function() {
     return this.name + ' - ' + this.improveTarget.toString();
@@ -238,6 +292,8 @@ ImproveCost.prototype = {
       this.cost[detail.phase] = detail;
     else
       throw new Error();
+
+    console.log(this.cost[detail.phase]);
   },
   toString : function() {
     return this.cost.join();
