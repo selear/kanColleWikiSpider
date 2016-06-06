@@ -13,16 +13,17 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
 
     var $tbody = $('tbody');
 
+    // TODO countMap目前用于统计每个tr的td, 可以在后续更新中用于新改修数据的校验
+    // 如果数据不对就抛出异常
+    var countMap = { };
+
+    // TODO 可以考虑创建一个对象来将这些信息全数包含
     var categories = [],
         currCategory = null,
         currEquip = null,
+        currImproveTarget = null,
         equipNames = [],
         fenceLength = 0;
-
-    //  TODO countMap目前用于统计每个tr的td, 可以在后续更新中用于新改修数据的校验
-    //  如果数据不对就抛出异常
-    var countMap = { };
-
     $tbody.find('tr').each(function() {
 
       var $curr = $(this);
@@ -76,12 +77,7 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         ammo = $tds.eq(3).text();
         steel = $tds.eq(4).text();
         bauxite = $tds.eq(5).text();
-
-        var rCost = new ResourceCost(fuel, ammo, steel, bauxite),
-            tar = new ImproveTarget();
-        tar.setResourceCost(rCost);
-
-        currEquip.setImproveTarget(tar);
+        var rCost = new ResourceCost(fuel, ammo, steel, bauxite);
 
         // 改修消耗
         var phaseStr = $tds.eq(1).text();
@@ -90,10 +86,15 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         cost = $tds.eq(8).text();
         
         var phase = ImproveCost.whichPhase(phaseStr);
+        if(phase === 0) {
+          currImproveTarget = new ImproveTarget();
+          currImproveTarget.setResourceCost(rCost);
+        }
         var iCost = new ImproveCost();
         iCost.merge(new ImproveDetail(phase, develop, improve, cost));
 
-        tar.setImproveCost(iCost);
+        currImproveTarget.setImproveCost(iCost);
+        currEquip.addImproveTarget(currImproveTarget);
 
         // cheerio在读取本地文件时, index是zero based, 忽略.eq(9), 此td为空
         sun = ($tds.eq(10).text() === IMPROVABLE) ? true : false;
@@ -110,20 +111,23 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         currCategory.addEquip(currEquip);
       } else if($tds.length === 4) {
 
-        var tar = currEquip.getImproveTarget();
-
         var phaseStr = $tds.eq(0).text();
         develop = $tds.eq(1).text();
         improve = $tds.eq(2).text();
         cost = $tds.eq(3).text();
         
         var phase = ImproveCost.whichPhase(phaseStr);
-        tar.getImproveCost().merge(new ImproveDetail(phase, develop, improve, cost));
+        currImproveTarget.getImproveCost().merge(new ImproveDetail(phase, develop, improve, cost));
+
+        // length === 4时, 几乎确定不需要新的ImproveTarget实例, 因此一下代码理应永久不生效
+        // if(phase === 0) {
+        //   console.log('new Target @ $tds.length = 4 --> ' + currEquip.getEquipName());
+        //   currImproveTarget = new ImproveTarget();
+        // }
 
       } else if($tds.length === 8) {
 
       } else if($tds.length === 12) {
-        var tar = currEquip.getImproveTarget();
 
         var phaseStr = $tds.eq(0).text();
         develop = $tds.eq(1).text();
@@ -131,21 +135,41 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         cost = $tds.eq(3).text();
         
         var phase = ImproveCost.whichPhase(phaseStr);
-        tar.getImproveCost().merge(new ImproveDetail(phase, develop, improve, cost));
+        currImproveTarget.getImproveCost().merge(new ImproveDetail(phase, develop, improve, cost));
 
-      } else if($tds.length === 17) { // 17与18最主要的区别是在.eq(9)的位置是否有一个空td标签
-        var tar = currEquip.getImproveTarget();
+        // length === 12时, 几乎确定不需要新的ImproveTarget实例, 因此一下代码理应永久不生效
+        // if(phase === 0) {
+        //   console.log('new Target @ $tds.length = 12 --> ' + currEquip.getEquipName());
+        // }
 
+      } else if($tds.length === 17) {
+        // 17与18最主要的区别是在.eq(9)的位置是否有一个空td标签
+        // 与$tds.length === 19下包含的信息几乎相同, 需要新的ImproveTarget来存放信息
         var phaseStr = $tds.eq(0).text();
         develop = $tds.eq(5).text();
         improve = $tds.eq(6).text();
         cost = $tds.eq(7).text();
         
         var phase = ImproveCost.whichPhase(phaseStr);
-        tar.getImproveCost().merge(new ImproveDetail(phase, develop, improve, cost));
+        if(phase === 0) {
+          currImproveTarget = new ImproveTarget();
+          currImproveTarget.setImproveCost(new ImproveCost());
+
+          currEquip.addImproveTarget(currImproveTarget);
+          console.log('new Target @ $tds.length = 17 --> ' + currEquip.getEquipName());
+        }
+
+        // 获取资源消耗并生成新的实例
+        fuel = $tds.eq(1).text();
+        ammo = $tds.eq(2).text()
+        steel = $tds.eq(3).text();
+        bauxite = $tds.eq(4).text();
+        var rCost = new ResourceCost(fuel, ammo, steel, bauxite);
+        currImproveTarget.setResourceCost(rCost);
+
+        currImproveTarget.getImproveCost().merge(new ImproveDetail(phase, develop, improve, cost));
 
       } else if($tds.length === 18) {
-        var tar = currEquip.getImproveTarget();
 
         var phaseStr = $tds.eq(0).text();
         develop = $tds.eq(5).text();
@@ -153,7 +177,23 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         cost = $tds.eq(7).text();
         
         var phase = ImproveCost.whichPhase(phaseStr);
-        tar.getImproveCost().merge(new ImproveDetail(phase, develop, improve, cost));
+        if(phase === 0) {
+          currImproveTarget = new ImproveTarget();
+          currImproveTarget.setImproveCost(new ImproveCost());
+
+          currEquip.addImproveTarget(currImproveTarget);
+          console.log('new Target @ $tds.length = 18 --> ' + currEquip.getEquipName());
+        }
+
+        // 获取资源消耗并生成新的实例
+        fuel = $tds.eq(1).text();
+        ammo = $tds.eq(2).text()
+        steel = $tds.eq(3).text();
+        bauxite = $tds.eq(4).text();
+        var rCost = new ResourceCost(fuel, ammo, steel, bauxite);
+        currImproveTarget.setResourceCost(rCost);
+
+        currImproveTarget.getImproveCost().merge(new ImproveDetail(phase, develop, improve, cost));
       }
 
       if(countMap[$tds.length]) {
@@ -212,21 +252,21 @@ Category.prototype = {
 // + ImproveTarget
 function Equip(eName) {
   this.name = eName;
-  this.improveTarget = null;
+  this.improveTarget = [];
 }
 
 Equip.prototype = {
-  setImproveTarget : function(target) {
-    if(target instanceof ImproveTarget)
-      this.improveTarget = target;
+  addImproveTarget : function(tar) {
+    if(tar instanceof ImproveTarget)
+      this.improveTarget.push(tar);
     else
       throw new Error();
   },
-  getImproveTarget : function() {
-    return this.improveTarget;
+  getEquipName : function() {
+    return this.name;
   },
   toString : function() {
-    return this.name + '\n     - ' + this.improveTarget.toString();
+    return this.name + this.improveTarget.toString();
   }
 }
 
@@ -238,7 +278,6 @@ Equip.prototype = {
 function ImproveTarget() {
   this.improveCost = null;
   this.resourceCost = null;
-  this.remark = null;
 }
 
 ImproveTarget.prototype = {
@@ -258,7 +297,7 @@ ImproveTarget.prototype = {
       throw new Error();
   },
   toString : function() {
-    return this.improveCost.toString() + '\n     - ' + this.resourceCost.toString();
+    return '\n     - ' + this.improveCost.toString() + '\n     - ' + this.resourceCost.toString();
   }
 };
 
