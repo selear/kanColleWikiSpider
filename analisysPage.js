@@ -85,7 +85,7 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         improve = $tds.eq(7).text();
         cost = $tds.eq(8).text();
         
-        var phase = ImproveCost.whichPhase(phaseStr);
+        var phase = ImproveDetail.whichPhase(phaseStr);
         if(phase === 0) {
           currImproveTarget = new ImproveTarget();
           currImproveTarget.setResourceCost(rCost);
@@ -116,7 +116,7 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         improve = $tds.eq(2).text();
         cost = $tds.eq(3).text();
         
-        var phase = ImproveCost.whichPhase(phaseStr);
+        var phase = ImproveDetail.whichPhase(phaseStr);
         currImproveTarget.getImproveCost().merge(new ImproveDetail(phase, develop, improve, cost));
 
         // length === 4时, 几乎确定不需要新的ImproveTarget实例, 因此一下代码理应永久不生效
@@ -134,7 +134,7 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         improve = $tds.eq(2).text();
         cost = $tds.eq(3).text();
         
-        var phase = ImproveCost.whichPhase(phaseStr);
+        var phase = ImproveDetail.whichPhase(phaseStr);
         currImproveTarget.getImproveCost().merge(new ImproveDetail(phase, develop, improve, cost));
 
         // length === 12时, 几乎确定不需要新的ImproveTarget实例, 因此一下代码理应永久不生效
@@ -150,7 +150,7 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         improve = $tds.eq(6).text();
         cost = $tds.eq(7).text();
         
-        var phase = ImproveCost.whichPhase(phaseStr);
+        var phase = ImproveDetail.whichPhase(phaseStr);
         if(phase === 0) {
           currImproveTarget = new ImproveTarget();
           currImproveTarget.setImproveCost(new ImproveCost());
@@ -176,7 +176,7 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         improve = $tds.eq(6).text();
         cost = $tds.eq(7).text();
         
-        var phase = ImproveCost.whichPhase(phaseStr);
+        var phase = ImproveDetail.whichPhase(phaseStr);
         if(phase === 0) {
           currImproveTarget = new ImproveTarget();
           currImproveTarget.setImproveCost(new ImproveCost());
@@ -306,23 +306,6 @@ function ImproveCost() {
   this.cost = [];
 }
 
-ImproveCost.whichPhase = function(phaseStr) {
-  switch(phaseStr) {
-    case '初期':
-      return 0;
-      break;
-    case '★6':
-      return 1;
-      break;
-    case '★max':
-      return 2;
-      break;
-    default:
-      throw new Error(phaseStr);
-      break;
-  }
-}
-
 ImproveCost.prototype = {
   merge : function(detail) {
     if(detail instanceof ImproveDetail)
@@ -339,6 +322,32 @@ function ImproveDetail(phase, improve, develop, cost) {
   this.phase = phase
   this.cost = [improve, develop, cost]
 }
+
+ImproveDetail.whichPhase = function(phaseStr) {
+  switch(phaseStr) {
+    case '初期':
+      return 0;
+      break;
+    case '★6':
+      return 1;
+      break;
+    case '★max':
+      return 2;
+      break;
+    default:
+      throw new Error(phaseStr);
+      break;
+  }
+};
+
+ImproveDetail.create = function($tds, idxArr) {
+  var phaseStr = $tds.eq(idxArr[0]),
+      develop = $tds.eq(idxArr[1]),
+      improve = $tds.eq(idxArr[2]),
+      cost = $tds.eq(idxArr[3]);
+
+  var phase = Improve
+};
 
 ImproveDetail.prototype = {
   toString : function() {
