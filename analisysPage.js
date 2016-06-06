@@ -40,9 +40,7 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         fenceLength++;
       }
 
-      var fuel, ammo, steel, bauxite,
-          develop, improve, cost,
-          sun, mon, tue, wed, thu, fri, sat,
+      var sun, mon, tue, wed, thu, fri, sat,
           assist, remarks;
 
       // 2016.05.24
@@ -72,28 +70,21 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
 
         currEquip = new Equip(eName);
 
-        // 油弹钢铝
-        fuel = $tds.eq(2).text();
-        ammo = $tds.eq(3).text();
-        steel = $tds.eq(4).text();
-        bauxite = $tds.eq(5).text();
-        var rCost = new ResourceCost(fuel, ammo, steel, bauxite);
+        // 油弹钢铝 - 消耗
+        // rCost --> resourceCost
+        var rCost = ResourceCost.create($tds, [2, 3, 4, 5]);
 
-        // 改修消耗
-        var phaseStr = $tds.eq(1).text();
-        develop = $tds.eq(6).text();
-        improve = $tds.eq(7).text();
-        cost = $tds.eq(8).text();
-        
-        var phase = ImproveDetail.whichPhase(phaseStr);
-        if(phase === 0) {
+        // 其他物资 - 消耗
+        // iDetal --> improveDetail
+        var iDetail = ImproveDetail.create($tds, [1, 6, 7, 8]);
+
+        if(iDetail.getPhase() === 0) {
           currImproveTarget = new ImproveTarget();
-          currImproveTarget.setResourceCost(rCost);
         }
-        var iCost = new ImproveCost();
-        iCost.merge(new ImproveDetail(phase, develop, improve, cost));
+        currImproveTarget.setResourceCost(rCost);
 
-        currImproveTarget.setImproveCost(iCost);
+        currImproveTarget.getImproveCost().merge(iDetail);
+
         currEquip.addImproveTarget(currImproveTarget);
 
         // cheerio在读取本地文件时, index是zero based, 忽略.eq(9), 此td为空
@@ -111,13 +102,8 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         currCategory.addEquip(currEquip);
       } else if($tds.length === 4) {
 
-        var phaseStr = $tds.eq(0).text();
-        develop = $tds.eq(1).text();
-        improve = $tds.eq(2).text();
-        cost = $tds.eq(3).text();
-        
-        var phase = ImproveDetail.whichPhase(phaseStr);
-        currImproveTarget.getImproveCost().merge(new ImproveDetail(phase, develop, improve, cost));
+        var iDetail = ImproveDetail.create($tds, [0, 1, 2, 3]);
+        currImproveTarget.getImproveCost().merge(iDetail);
 
         // length === 4时, 几乎确定不需要新的ImproveTarget实例, 因此一下代码理应永久不生效
         // if(phase === 0) {
@@ -129,13 +115,8 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
 
       } else if($tds.length === 12) {
 
-        var phaseStr = $tds.eq(0).text();
-        develop = $tds.eq(1).text();
-        improve = $tds.eq(2).text();
-        cost = $tds.eq(3).text();
-        
-        var phase = ImproveDetail.whichPhase(phaseStr);
-        currImproveTarget.getImproveCost().merge(new ImproveDetail(phase, develop, improve, cost));
+        var iDetail = ImproveDetail.create($tds, [0, 1, 2, 3]);
+        currImproveTarget.getImproveCost().merge(iDetail);
 
         // length === 12时, 几乎确定不需要新的ImproveTarget实例, 因此一下代码理应永久不生效
         // if(phase === 0) {
@@ -145,55 +126,34 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
       } else if($tds.length === 17) {
         // 17与18最主要的区别是在.eq(9)的位置是否有一个空td标签
         // 与$tds.length === 19下包含的信息几乎相同, 需要新的ImproveTarget来存放信息
-        var phaseStr = $tds.eq(0).text();
-        develop = $tds.eq(5).text();
-        improve = $tds.eq(6).text();
-        cost = $tds.eq(7).text();
-        
-        var phase = ImproveDetail.whichPhase(phaseStr);
-        if(phase === 0) {
+        var iDetail = ImproveDetail.create($tds, [0, 5, 6, 7]);
+        if(iDetail.getPhase() === 0) {
           currImproveTarget = new ImproveTarget();
-          currImproveTarget.setImproveCost(new ImproveCost());
 
           currEquip.addImproveTarget(currImproveTarget);
           console.log('new Target @ $tds.length = 17 --> ' + currEquip.getEquipName());
         }
+        currImproveTarget.getImproveCost().merge(iDetail);
 
         // 获取资源消耗并生成新的实例
-        fuel = $tds.eq(1).text();
-        ammo = $tds.eq(2).text()
-        steel = $tds.eq(3).text();
-        bauxite = $tds.eq(4).text();
-        var rCost = new ResourceCost(fuel, ammo, steel, bauxite);
+        var rCost = ResourceCost.create($tds, [1, 2, 3, 4]);
         currImproveTarget.setResourceCost(rCost);
-
-        currImproveTarget.getImproveCost().merge(new ImproveDetail(phase, develop, improve, cost));
 
       } else if($tds.length === 18) {
 
-        var phaseStr = $tds.eq(0).text();
-        develop = $tds.eq(5).text();
-        improve = $tds.eq(6).text();
-        cost = $tds.eq(7).text();
-        
-        var phase = ImproveDetail.whichPhase(phaseStr);
-        if(phase === 0) {
+        var iDetail = ImproveDetail.create($tds, [0, 5, 6, 7]);
+        if(iDetail.getPhase() === 0) {
           currImproveTarget = new ImproveTarget();
-          currImproveTarget.setImproveCost(new ImproveCost());
 
           currEquip.addImproveTarget(currImproveTarget);
           console.log('new Target @ $tds.length = 18 --> ' + currEquip.getEquipName());
         }
+        currImproveTarget.getImproveCost().merge(iDetail);
 
         // 获取资源消耗并生成新的实例
-        fuel = $tds.eq(1).text();
-        ammo = $tds.eq(2).text()
-        steel = $tds.eq(3).text();
-        bauxite = $tds.eq(4).text();
-        var rCost = new ResourceCost(fuel, ammo, steel, bauxite);
+        var rCost = ResourceCost.create($tds, [1, 2, 3, 4]);
         currImproveTarget.setResourceCost(rCost);
 
-        currImproveTarget.getImproveCost().merge(new ImproveDetail(phase, develop, improve, cost));
       }
 
       if(countMap[$tds.length]) {
@@ -276,17 +236,11 @@ Equip.prototype = {
 // + ResourceCost resourceCost
 // + AssistShip assistShip
 function ImproveTarget() {
-  this.improveCost = null;
+  this.improveCost = new ImproveCost();
   this.resourceCost = null;
 }
 
 ImproveTarget.prototype = {
-  setImproveCost : function(iCost) {
-    if(iCost instanceof ImproveCost)
-      this.improveCost = iCost;
-    else
-      throw new Error();
-  },
   getImproveCost : function() {
     return this.improveCost;
   },
@@ -341,15 +295,19 @@ ImproveDetail.whichPhase = function(phaseStr) {
 };
 
 ImproveDetail.create = function($tds, idxArr) {
-  var phaseStr = $tds.eq(idxArr[0]),
-      develop = $tds.eq(idxArr[1]),
-      improve = $tds.eq(idxArr[2]),
-      cost = $tds.eq(idxArr[3]);
+  var phaseStr = $tds.eq(idxArr[0]).text(),
+      develop = $tds.eq(idxArr[1]).text(),
+      improve = $tds.eq(idxArr[2]).text(),
+      cost = $tds.eq(idxArr[3]).text();
 
-  var phase = Improve
+  var phase = ImproveDetail.whichPhase(phaseStr);
+  return new ImproveDetail(phase, improve, develop, cost);
 };
 
 ImproveDetail.prototype = {
+  getPhase : function() {
+    return this.phase;
+  },
   toString : function() {
     return '[' + this.cost.join(', ') + ']';
   }
@@ -359,6 +317,15 @@ ImproveDetail.prototype = {
 function ResourceCost(fuel, ammo, steel, bauxite) {
   this.cost = [fuel, ammo, steel, bauxite];
 }
+
+ResourceCost.create = function($tds, idxArr) {
+  var fuel = $tds.eq(idxArr[0]).text(),
+      ammo = $tds.eq(idxArr[1]).text(),
+      steel = $tds.eq(idxArr[2]).text(),
+      bauxite = $tds.eq(idxArr[3]).text();
+
+  return new ResourceCost(fuel, ammo, steel, bauxite);
+};
 
 ResourceCost.prototype = {
   toString : function() {
@@ -379,4 +346,3 @@ function banner(bannerText) {
 
   console.log([line, fixed, line].join('\n'));
 }
-
