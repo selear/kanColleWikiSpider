@@ -8,7 +8,7 @@ var STATIC = {
   DISPROVABLE : '×'
 };
 
-fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
+fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8' }, function(err, utf8html) {
 
     if(err) throw err;
     $ = cheerio.load(utf8html);
@@ -90,15 +90,8 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         currEquip.addImproveTarget(currImproveTarget);
 
         // cheerio读取本地文件时, INDEX is ZERO BASED, 忽略$tds.eq(9), 此td为空
-        sun = ($tds.eq(10).text() === STATIC.IMPROVABLE) ? true : false;
-        mon = ($tds.eq(11).text() === STATIC.IMPROVABLE) ? true : false;
-        tue = ($tds.eq(12).text() === STATIC.IMPROVABLE) ? true : false;
-        wed = ($tds.eq(13).text() === STATIC.IMPROVABLE) ? true : false;
-        thu = ($tds.eq(14).text() === STATIC.IMPROVABLE) ? true : false;
-        fri = ($tds.eq(15).text() === STATIC.IMPROVABLE) ? true : false;
-        sat = ($tds.eq(16).text() === STATIC.IMPROVABLE) ? true : false;
+        currImproveTarget.addImproveAssist(ImproveAssist.create($tds, [10, 11, 12, 13, 14, 15, 16, 17]));
 
-        assist = $tds.eq(17).text();
         remarks = $tds.eq(18).text();
 
         currCategory.addEquip(currEquip);
@@ -115,10 +108,14 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
 
       } else if($tds.length === 8) {
 
+        currImproveTarget.addImproveAssist(ImproveAssist.create($tds, [0, 1, 2, 3, 4, 5, 6, 7]));
+
       } else if($tds.length === 12) {
 
         var iDetail = ImproveDetail.create($tds, [0, 1, 2, 3]);
         currImproveTarget.getImproveCost().merge(iDetail);
+
+        currImproveTarget.addImproveAssist(ImproveAssist.create($tds, [4, 5, 6, 7, 8, 9, 10, 11]));
 
         // length === 12时, 几乎确定不需要新的ImproveTarget实例, 因此一下代码理应永久不生效
         // if(phase === 0) {
@@ -141,6 +138,8 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         var rCost = ResourceCost.create($tds, [1, 2, 3, 4]);
         currImproveTarget.setResourceCost(rCost);
 
+        currImproveTarget.addImproveAssist(ImproveAssist.create($tds, [8, 9, 10, 11, 12, 13, 14, 15]));
+
       } else if($tds.length === 18) {
 
         var iDetail = ImproveDetail.create($tds, [0, 5, 6, 7]);
@@ -156,6 +155,8 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         var rCost = ResourceCost.create($tds, [1, 2, 3, 4]);
         currImproveTarget.setResourceCost(rCost);
 
+        currImproveTarget.addImproveAssist(ImproveAssist.create($tds, [9, 10, 11, 12, 13, 14, 15, 16]));
+
       }
 
       if(countMap[$tds.length]) {
@@ -165,18 +166,6 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
         countMap[$tds.length] = 1;
         countMap[$tds.length + 'th'] = equipNames[equipNames.length - 1];
       }
-
-      // else if($tds.length === 4) {
-      //   console.log(4);
-      // } else if($tds.length === 8) {
-      //   console.log(8);
-      // } else if($tds.length === 12) {
-      //   console.log(12)
-      // } else if($tds.length === 18) {
-      //   console.log(18)
-      // } else {
-      //   console.log($tds.length);
-      // }
 
     });
 
@@ -240,7 +229,7 @@ Equip.prototype = {
 function ImproveTarget() {
   this.improveCost = new ImproveCost();
   this.resourceCost = null;
-  this.improveAssist = null;
+  this.improveAssist = [];
 }
 
 ImproveTarget.prototype = {
@@ -253,16 +242,16 @@ ImproveTarget.prototype = {
     else
       throw new Error();
   },
-  setImproveAssist : function(assistShips) {
+  addImproveAssist : function(assistShips) {
     if(assistShips instanceof ImproveAssist)
-      this.improveAssist = assistShips;
+      this.improveAssist.push(assistShips);
     else
       throw new Error();
   },
   toString : function() {
     return '\n     - ' + this.improveCost.toString()
             + '\n     - ' + this.resourceCost.toString()
-            + '\n     - ' + this.improveAssist.toString();
+            + '\n     - ' + this.improveAssist.join('\n     - ');
   }
 };
 
@@ -366,8 +355,8 @@ ResourceCost.prototype = {
       个人认为使用native code能够提升效率
  */
 function ImproveAssist(assistName, enableDays) {
-  this.name = null;
-  this.improvableDays = [];
+  this.name = assistName;
+  this.improvableDays = enableDays;
 }
 
 ImproveAssist.create = function($tds, idxArr) {
@@ -375,10 +364,11 @@ ImproveAssist.create = function($tds, idxArr) {
   if(idxArr.length != 8)
     throw new Error();
 
-  var assist, enableDays = [];
+  var assist,
+      enableDays = [];
   assist = $tds.eq(idxArr.pop()).text();
 
-  idxArr.foreach(function(elem, idx) {
+  idxArr.forEach(function(elem, idx) {
     if($tds.eq(elem).text() === STATIC.IMPROVABLE)
       enableDays.push(idx);
   });
@@ -401,7 +391,7 @@ ImproveAssist.prototype = {
       this.improvableDays.push(weekday);
   },
   toString : function() {
-    return this.shipName + ' : ' + this.improvableDays.toString();
+    return '< ' + this.name + ' > [' + this.improvableDays.join() + ']';
   }
 };
 
