@@ -2,11 +2,13 @@ var fs = require('fs'),
     cheerio = require('cheerio'),
     $ = null;
 
-var TARGET_FILE = 'fixedKaisyu.html',
-    IMPROVABLE = '〇',
-    DISPROVABLE = '×';
+var STATIC = {
+  TARGET_FILE : 'fixedKaisyu.html',
+  IMPROVABLE : '〇',
+  DISPROVABLE : '×'
+};
 
-fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
+fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
 
     if(err) throw err;
     $ = cheerio.load(utf8html);
@@ -87,14 +89,14 @@ fs.readFile(TARGET_FILE, { encoding: 'utf8'}, function(err, utf8html) {
 
         currEquip.addImproveTarget(currImproveTarget);
 
-        // cheerio在读取本地文件时, index是zero based, 忽略.eq(9), 此td为空
-        sun = ($tds.eq(10).text() === IMPROVABLE) ? true : false;
-        mon = ($tds.eq(11).text() === IMPROVABLE) ? true : false;
-        tue = ($tds.eq(12).text() === IMPROVABLE) ? true : false;
-        wed = ($tds.eq(13).text() === IMPROVABLE) ? true : false;
-        thu = ($tds.eq(14).text() === IMPROVABLE) ? true : false;
-        fri = ($tds.eq(15).text() === IMPROVABLE) ? true : false;
-        sat = ($tds.eq(16).text() === IMPROVABLE) ? true : false;
+        // cheerio读取本地文件时, INDEX is ZERO BASED, 忽略$tds.eq(9), 此td为空
+        sun = ($tds.eq(10).text() === STATIC.IMPROVABLE) ? true : false;
+        mon = ($tds.eq(11).text() === STATIC.IMPROVABLE) ? true : false;
+        tue = ($tds.eq(12).text() === STATIC.IMPROVABLE) ? true : false;
+        wed = ($tds.eq(13).text() === STATIC.IMPROVABLE) ? true : false;
+        thu = ($tds.eq(14).text() === STATIC.IMPROVABLE) ? true : false;
+        fri = ($tds.eq(15).text() === STATIC.IMPROVABLE) ? true : false;
+        sat = ($tds.eq(16).text() === STATIC.IMPROVABLE) ? true : false;
 
         assist = $tds.eq(17).text();
         remarks = $tds.eq(18).text();
@@ -238,6 +240,7 @@ Equip.prototype = {
 function ImproveTarget() {
   this.improveCost = new ImproveCost();
   this.resourceCost = null;
+  this.improveAssist = null;
 }
 
 ImproveTarget.prototype = {
@@ -250,8 +253,16 @@ ImproveTarget.prototype = {
     else
       throw new Error();
   },
+  setImproveAssist : function(assistShips) {
+    if(assistShips instanceof ImproveAssist)
+      this.improveAssist = assistShips;
+    else
+      throw new Error();
+  },
   toString : function() {
-    return '\n     - ' + this.improveCost.toString() + '\n     - ' + this.resourceCost.toString();
+    return '\n     - ' + this.improveCost.toString()
+            + '\n     - ' + this.resourceCost.toString()
+            + '\n     - ' + this.improveAssist.toString();
   }
 };
 
@@ -330,6 +341,67 @@ ResourceCost.create = function($tds, idxArr) {
 ResourceCost.prototype = {
   toString : function() {
     return '[' + this.cost.join('\/') + ']';
+  }
+};
+
+/*
+    类ImproveAssist - 设计思路
+    - String name
+    - Array  improvableDays
+      sample [0, 1, 2, 3, 4, 5, 6], or [2, 3, 6, 0] etc.
+      improvableDays曾考虑使用单独类表示, 数据结构如下:
+        ImprovableWeekdays {
+          SUN: false,
+          MON: false,
+          TUE: false,
+          WED: false,
+          THU: false,
+          FRI: false,
+          SAT: false
+        }
+        instance.update(index, true/false)
+        instance.canImprove(weekday)
+      但老数据结构仅在更新时相对不方便
+      利用Array.prototype.indexOf(val) != -1的方式判断某天是否能够改修
+      个人认为使用native code能够提升效率
+ */
+function ImproveAssist(assistName, enableDays) {
+  this.name = null;
+  this.improvableDays = [];
+}
+
+ImproveAssist.create = function($tds, idxArr) {
+
+  if(idxArr.length != 8)
+    throw new Error();
+
+  var assist, enableDays = [];
+  assist = $tds.eq(idxArr.pop()).text();
+
+  idxArr.foreach(function(elem, idx) {
+    if($tds.eq(elem).text() === STATIC.IMPROVABLE)
+      enableDays.push(idx);
+  });
+
+  return new ImproveAssist(assist, enableDays);
+};
+
+ImproveAssist.prototype = {
+  contains : function(weekday) {
+    var intVal = parseInt(weekday, 10);
+    if(intVal != NaN)
+      if(intVal >= 0 && intVal <= 6)
+        return (this.improvableDays.indexOf(intVal) != -1 ? true : false);
+  },
+  canImprove : function(weekday) {
+    return this.contains(weekday);
+  },
+  merge : function(weekday) {
+    if(!this.contains(weekday))
+      this.improvableDays.push(weekday);
+  },
+  toString : function() {
+    return this.shipName + ' : ' + this.improvableDays.toString();
   }
 };
 
