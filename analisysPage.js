@@ -43,7 +43,7 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8' }, function(err, utf8html) {
       }
 
       var sun, mon, tue, wed, thu, fri, sat,
-          assist, remarks;
+          assist, remark;
 
       // 2016.05.24
       // 每个装备的第一个td如果包含a, 则该td中包含了equipName, $tds.length = 19
@@ -58,12 +58,12 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8' }, function(err, utf8html) {
       //    + $tds.length = 17  - [fuel, ammo, steel, bauxite]
       //                          [develop, improve, cost]
       //                          [sun, mon, tue, wed, thu, fri, sat, assist]
-      //                          [remarks]
+      //                          [remark]
       //
       //    + $tds.length = 18  - [fuel, ammo, steel, bauxite]
       //                          [develop, improve, cost]
       //                          [sun, mon, tue, wed, thu, fri, sat, assist]
-      //                          [remarks]
+      //                          [remark]
       // TODO 编写一个数组, 如果出现不同于上述数量的tr, 抛出错误, 并给予提示
       var $tds = $curr.find('td');
       if($tds.first().find('a').length > 0) {
@@ -89,10 +89,10 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8' }, function(err, utf8html) {
 
         currEquip.addImproveTarget(currImproveTarget);
 
-        // cheerio读取本地文件时, INDEX is ZERO BASED, 忽略$tds.eq(9), 此td为空
+        // cheerio读取本地文件时, INDEX is ZERO BASED, 忽略$tds.eq(9), 此td不具备有效数据
         currImproveTarget.addImproveAssist(ImproveAssist.create($tds, [10, 11, 12, 13, 14, 15, 16, 17]));
 
-        remarks = $tds.eq(18).text();
+        currImproveTarget.setRemark($tds.eq(18).text());
 
         currCategory.addEquip(currEquip);
       } else if($tds.length === 4) {
@@ -123,7 +123,7 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8' }, function(err, utf8html) {
         // }
 
       } else if($tds.length === 17) {
-        // 17与18最主要的区别是在.eq(9)的位置是否有一个空td标签
+        // 17与18最主要的区别是在.eq(9)的位置是否存在不包含数据td标签
         // 与$tds.length === 19下包含的信息几乎相同, 需要新的ImproveTarget来存放信息
         var iDetail = ImproveDetail.create($tds, [0, 5, 6, 7]);
         if(iDetail.getPhase() === 0) {
@@ -139,6 +139,8 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8' }, function(err, utf8html) {
         currImproveTarget.setResourceCost(rCost);
 
         currImproveTarget.addImproveAssist(ImproveAssist.create($tds, [8, 9, 10, 11, 12, 13, 14, 15]));
+
+        currImproveTarget.setRemark($tds.eq(16).text());
 
       } else if($tds.length === 18) {
 
@@ -157,6 +159,8 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8' }, function(err, utf8html) {
 
         currImproveTarget.addImproveAssist(ImproveAssist.create($tds, [9, 10, 11, 12, 13, 14, 15, 16]));
 
+        currImproveTarget.setRemark($tds.eq(17).text());
+
       }
 
       if(countMap[$tds.length]) {
@@ -171,7 +175,7 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8' }, function(err, utf8html) {
 
     //console.log(countMap);
     console.log(categories.join());
-    //console.log('可改修total : ' + equipNames.length);
+    console.log('可改修total : ' + equipNames.length);
     //console.log('间隔栏total : ' + fenceLength);
 });
 
@@ -230,6 +234,7 @@ function ImproveTarget() {
   this.improveCost = new ImproveCost();
   this.resourceCost = null;
   this.improveAssist = [];
+  this.remark = null;
 }
 
 ImproveTarget.prototype = {
@@ -248,10 +253,14 @@ ImproveTarget.prototype = {
     else
       throw new Error();
   },
+  setRemark : function(remark) {
+    this.remark = remark || '[Remark data NOT FOUND here]';
+  },
   toString : function() {
     return '\n     - ' + this.improveCost.toString()
             + '\n     - ' + this.resourceCost.toString()
-            + '\n     - ' + this.improveAssist.join('\n     - ');
+            + '\n     - ' + this.improveAssist.join('\n     - ')
+            + '\n     > ' + this.remark;
   }
 };
 
@@ -366,6 +375,7 @@ ImproveAssist.create = function($tds, idxArr) {
 
   var assist,
       enableDays = [];
+
   assist = $tds.eq(idxArr.pop()).text();
 
   idxArr.forEach(function(elem, idx) {
