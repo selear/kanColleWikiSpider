@@ -89,12 +89,28 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8' }, function(err, utf8html) {
 
         currEquip.addImproveTarget(currImproveTarget);
 
-        // cheerio读取本地文件时, INDEX is ZERO BASED, 忽略$tds.eq(9), 此td不具备有效数据
-        currImproveTarget.addImproveAssist(ImproveAssist.create($tds, [10, 11, 12, 13, 14, 15, 16, 17]));
+        // cheerio读取本地文件时, INDEX is ZERO BASED
+        //MK7 + 六联装鱼雷 + 数种战斗机加入改修后, $tds.eq(9)在表格中, 有的是空节点, 有的不是, 因此通过.text().length来判断后续数据提取
+        var idxArr = [10, 11, 12, 13, 14, 15, 16, 17],
+            remarkIdx = 18,
+            nodeLength = $tds.eq(9).text().length;
+        if(nodeLength === 0) {
+          //do nothing
+        } else if(nodeLength === 1) {
+          idxArr = idxArr.map(function(x) {
+            return x - 1;
+          });
+          remarkIdx = remarkIdx - 1;
+        } else {
+          throw new Error('$tds.eq(9).text().length has some Error, equipName --> ' + eName);
+        }
 
-        currImproveTarget.setRemark($tds.eq(18).text());
+        currImproveTarget.addImproveAssist(ImproveAssist.create($tds, idxArr));
+
+        currImproveTarget.setRemark($tds.eq(remarkIdx).text());
 
         currCategory.addEquip(currEquip);
+        
       } else if($tds.length === 4) {
 
         var iDetail = ImproveDetail.create($tds, [0, 1, 2, 3]);
