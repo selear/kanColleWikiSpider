@@ -190,8 +190,8 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8' }, function(err, utf8html) {
     });
 
     //console.log(countMap);
-    console.log(categories.join());
-    //console.log(JSON.stringify(categories, null, '  '));
+    //console.log(categories.join());
+    console.log(JSON.stringify(categories, null, '  '));
     console.log('可改修total : ' + equipNames.length);
     //console.log('间隔栏total : ' + fenceLength);
 });
@@ -271,7 +271,7 @@ ImproveTarget.prototype = {
       throw new Error();
   },
   setRemark : function(remark) {
-    this.remark = remark || '[Remark data NOT FOUND here]';
+    this.remark = remark || '[ Remark data NOT FOUND here ]';
   },
   toString : function() {
     return '\n     - ' + this.improveCost.toString()
@@ -298,9 +298,11 @@ ImproveCost.prototype = {
   }
 };
 
-function ImproveDetail(phase, develop, improve, cost) {
-  this.phase = phase;
-  this.cost = [develop, improve, cost];
+function ImproveDetail(dataArr) {
+  this.phase = dataArr[0];
+  this.develop = dataArr[1];
+  this.improve = dataArr[2];
+  this.equipCost = dataArr[3];
 }
 
 ImproveDetail.whichPhase = function(phaseStr) {
@@ -327,21 +329,27 @@ ImproveDetail.create = function($tds, idxArr) {
       cost = $tds.eq(idxArr[3]).text();
 
   var phase = ImproveDetail.whichPhase(phaseStr);
-  return new ImproveDetail(phase, develop, improve, cost);
+  return new ImproveDetail([phase, develop, improve, cost]);
 };
 
 ImproveDetail.prototype = {
   getPhase : function() {
     return this.phase;
   },
+  toArray : function() {
+    return [this.phase, this.develop, this.improve, this.equipCost];
+  },
   toString : function() {
-    return '[' + this.cost.join(', ') + ']';
+    return '[' + this.toArray().join(', ') + ']';
   }
 };
 
 // Model - ResourceCost
-function ResourceCost(fuel, ammo, steel, bauxite) {
-  this.cost = [fuel, ammo, steel, bauxite];
+function ResourceCost(dataArr) {
+  this.fuel = dataArr[0];
+  this.ammo = dataArr[1];
+  this.steel = dataArr[2];
+  this.bauxite = dataArr[3];
 }
 
 ResourceCost.create = function($tds, idxArr) {
@@ -350,12 +358,15 @@ ResourceCost.create = function($tds, idxArr) {
       steel = $tds.eq(idxArr[2]).text(),
       bauxite = $tds.eq(idxArr[3]).text();
 
-  return new ResourceCost(fuel, ammo, steel, bauxite);
+  return new ResourceCost([fuel, ammo, steel, bauxite]);
 };
 
 ResourceCost.prototype = {
+  toArray : function() {
+    return [this.fuel, this.ammo, this.steel, this.bauxite];
+  },
   toString : function() {
-    return '[' + this.cost.join('\/') + ']';
+    return '[' + this.toArray().join('\/') + ']';
   }
 };
 
