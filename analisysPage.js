@@ -110,7 +110,7 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8' }, function(err, utf8html) {
         currImproveTarget.setRemark($tds.eq(remarkIdx).text());
 
         currCategory.addEquip(currEquip);
-        
+
       } else if($tds.length === 4) {
 
         var iDetail = ImproveDetail.create($tds, [0, 1, 2, 3]);
@@ -191,6 +191,7 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8' }, function(err, utf8html) {
 
     //console.log(countMap);
     console.log(categories.join());
+    //console.log(JSON.stringify(categories, null, '  '));
     console.log('可改修total : ' + equipNames.length);
     //console.log('间隔栏total : ' + fenceLength);
 });
@@ -297,9 +298,9 @@ ImproveCost.prototype = {
   }
 };
 
-function ImproveDetail(phase, improve, develop, cost) {
-  this.phase = phase
-  this.cost = [improve, develop, cost]
+function ImproveDetail(phase, develop, improve, cost) {
+  this.phase = phase;
+  this.cost = [develop, improve, cost];
 }
 
 ImproveDetail.whichPhase = function(phaseStr) {
@@ -326,7 +327,7 @@ ImproveDetail.create = function($tds, idxArr) {
       cost = $tds.eq(idxArr[3]).text();
 
   var phase = ImproveDetail.whichPhase(phaseStr);
-  return new ImproveDetail(phase, improve, develop, cost);
+  return new ImproveDetail(phase, develop, improve, cost);
 };
 
 ImproveDetail.prototype = {
