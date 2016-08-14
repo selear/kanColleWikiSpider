@@ -26,6 +26,7 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8' }, function(err, utf8html) {
         currImproveTarget = null,
         equipNames = [],
         fenceLength = 0;
+
     $tbody.find('tr').each(function() {
 
       var $curr = $(this);
@@ -189,15 +190,27 @@ fs.readFile(STATIC.TARGET_FILE, { encoding: 'utf8' }, function(err, utf8html) {
 
     });
 
+    var i = 0;
+    var jsonContent = '';
+    for(i = 0; i < categories.length; i++) {
+      var category = categories[i];
+      jsonContent = jsonContent + JSON.stringify(category, null, '') + '\n';      
+    }
+
+    fs.writeFile('kaisyu-table-fixed.json', jsonContent, function(err) {
+      console.log('改修数据json保存完毕');
+    });
+    
     //console.log(countMap);
     //console.log(categories.join());
     console.log(JSON.stringify(categories, null, '  '));
     console.log('可改修total : ' + equipNames.length);
     //console.log('间隔栏total : ' + fenceLength);
+
 });
 
 function Category(cName) {
-  this.name = cName;
+  this.cName = cName;
   this.equipArr = [];
 }
 
@@ -210,7 +223,7 @@ Category.prototype = {
   },
   toString : function() {
     var keys = Object.keys(this.equipArr),
-        result = this.name + '[' + this.countEquips() + ']' + '\n';
+        result = this.cName + '[' + this.countEquips() + ']' + '\n';
     for(var i = 0, len = keys.length; i < len; i++) {
       result += '  + ' + this.equipArr[keys[i]] + '\n';
     }
