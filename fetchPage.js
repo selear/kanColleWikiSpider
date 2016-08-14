@@ -48,7 +48,7 @@ request({
     }
   }
 
-  fs.writeFile('fixedKaisyu.html', fixedTable, function(err) {
+  fs.writeFile('kaisyu-table-fixed.html', fixedTable, function(err) {
     console.log('页面抓取处理完毕.');
     console.log('移除间隔数 : ' + removedTrs);
   });

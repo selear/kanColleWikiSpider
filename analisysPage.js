@@ -3,7 +3,7 @@ var fs = require('fs'),
     $ = null;
 
 var STATIC = {
-  TARGET_FILE : 'fixedKaisyu.html',
+  TARGET_FILE : 'kaisyu-table-fixed.html',
   IMPROVABLE : '〇',
   DISPROVABLE : '×'
 };
