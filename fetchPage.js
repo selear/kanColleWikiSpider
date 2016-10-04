@@ -1,12 +1,13 @@
 var fs = require('fs'),
     request = require('request'),
     cheerio = require('cheerio'),
-    HttpProxyAgent = require('http-proxy-agent');
+    HttpProxyAgent = require('http-proxy-agent'),
+    util = require('./consoleUtil');
 
 var shadowSocks = 'http://127.0.0.1:1080',
     agent = new HttpProxyAgent(shadowSocks);
 
-banner('Requesting target webpage');
+util.banner('Requesting page --> [改修工廠]');
 
 request({
   uri: "http://wikiwiki.jp/kancolle/?%B2%FE%BD%A4%B9%A9%BE%B3",
@@ -16,11 +17,11 @@ request({
   timeout: 10000
 }, function(error, response, body) {
 
-  var categoryArr = [],
-      removedTrs = 0;
+  var categoryArr = [];
 
-  if (!error) {
-
+  if (error) {
+    console.log(error);
+  } else {
     var iconv = require('iconv-lite'),
         decoded = iconv.decode(body, 'eucjp'),
         utf8html = iconv.encode(decoded, 'utf8');
@@ -32,39 +33,29 @@ request({
         //获取改修表实体
         $kaisyuTbody = $kaisyuTable.find('tbody');
 
-    cleanInvalidTH($kaisyuTbody);
+    var removedCount = cleanInvalidTH($kaisyuTbody, $);
 
-    var fixedTable = '<table><tbody>' + $kaisyuTbody.html() + '</tbody></table>';
+    var entireTable = '<table><tbody>' + $kaisyuTbody.html() + '</tbody></table>';
 
-    function cleanInvalidTH($tbody) {
-      $tbody.find('tr').each(function() {
-        var $tr = $(this);
-        if ($tr.find('th').length > 1) {
-          $tr.remove();
-          removedTrs++;
-        }
-      });
-      return removedTrs;
-    }
+    fs.writeFile('kaisyu-table-fixed.html', entireTable, function(err) {
+      console.log('页面抓取处理完毕.');
+      if(removedCount === 0) {
+        console.log('表格未能抓取成功，可能是页面结构改动');
+      } else {
+        console.log('移除间隔数 : ' + removedCount);
+      }
+    });
   }
-
-  fs.writeFile('kaisyu-table-fixed.html', fixedTable, function(err) {
-    console.log('页面抓取处理完毕.');
-    console.log('移除间隔数 : ' + removedTrs);
-  });
-
 });
 
-function banner(bannerText) {
-  var DELIMITER = '-',
-      SPACES = 6;
-      PRE_SPACES = SPACES/2 + 1;
+function cleanInvalidTH($tbody, $) {
 
-  var bannerLen = bannerText.length,
-      fullLen = SPACES + bannerLen + 1,
-      lineGen = new Array(fullLen),
-      line = lineGen.join(DELIMITER),
-      fixed = new Array(PRE_SPACES).join(' ') + bannerText;
 
-  console.log([line, fixed, line].join('\n'));
+  $tbody.find('tr').each(function() {
+    var $tr = $(this);
+    if ($tr.find('th').length > 1) {
+      $tr.remove();
+    }
+  });
+
 }
