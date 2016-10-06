@@ -445,17 +445,3 @@ ImproveAssist.prototype = {
     return '< ' + this.name + ' > [' + this.improvableDays.join() + ']';
   }
 };
-
-function banner(bannerText) {
-  var DELIMITER = '-',
-      SPACES = 6;
-      PRE_SPACES = SPACES/2 + 1;
-
-  var bannerLen = bannerText.length,
-      fullLen = SPACES + bannerLen,
-      lineGen = new Array(fullLen),
-      line = lineGen.join(DELIMITER),
-      fixed = new Array(PRE_SPACES).join(' ') + bannerText;
-
-  console.log([line, fixed, line].join('\n'));
-}

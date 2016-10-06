@@ -50,12 +50,15 @@ request({
 
 function cleanInvalidTH($tbody, $) {
 
+  var removedCount = 0;
 
   $tbody.find('tr').each(function() {
     var $tr = $(this);
     if ($tr.find('th').length > 1) {
       $tr.remove();
+      removedCount ++;
     }
   });
 
+  return removedCount;
 }
