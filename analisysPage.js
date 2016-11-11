@@ -2,11 +2,17 @@ var fs = require('fs'),
     cheerio = require('cheerio'),
     $ = null;
 
+var MODELS = require('./model/kaisyu_table'),
+    Category = MODELS.Category,
+    Equip = MODELS.Equip,
+    ImproveTarget = MODELS.ImproveTarget,
+    ImproveDetail = MODELS.ImproveDetail,
+    ResourceCost = MODELS.ResourceCost,
+    ImproveAssist = MODELS.ImproveAssist;
+
 var STATIC = {
   DATA_SOURCE : 'kaisyu-table-fixed.html',
-  TARGET_JSON : 'kaisyu-table-fixed.json',
-  IMPROVABLE : '〇',
-  DISPROVABLE : '×'
+  TARGET_JSON : 'kaisyu-table-fixed.json'
 };
 
 fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {

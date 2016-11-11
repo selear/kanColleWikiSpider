@@ -1,7 +1,7 @@
-function Category(cName) {
+var Category = function(cName) {
   this.cName = cName;
   this.equipArr = [];
-}
+};
 
 Category.prototype = {
   addEquip : function(equip) {
@@ -24,10 +24,10 @@ Category.prototype = {
 // 代表某项装备, 其下具有诸多属性:
 // + String name
 // + ImproveTarget
-function Equip(eName) {
+var Equip = function(eName) {
   this.name = eName;
   this.improveTarget = [];
-}
+};
 
 Equip.prototype = {
   addImproveTarget : function(tar) {
@@ -49,12 +49,12 @@ Equip.prototype = {
 // + ImproveCost improveCost
 // + ResourceCost resourceCost
 // + AssistShip assistShip
-function ImproveTarget() {
+var ImproveTarget = function() {
   this.improveCost = new ImproveCost();
   this.resourceCost = null;
   this.improveAssist = [];
   this.remark = null;
-}
+};
 
 ImproveTarget.prototype = {
   getImproveCost : function() {
@@ -84,9 +84,10 @@ ImproveTarget.prototype = {
 };
 
 // Model - ImproveCost
-function ImproveCost() {
+// 改修消耗
+var ImproveCost = function() {
   this.cost = [];
-}
+};
 
 ImproveCost.prototype = {
   merge : function(detail) {
@@ -100,12 +101,13 @@ ImproveCost.prototype = {
   }
 };
 
-function ImproveDetail(dataArr) {
+// Model - ImproveDetail
+var ImproveDetail = function(dataArr) {
   this.phase = dataArr[0];
   this.develop = dataArr[1];
   this.improve = dataArr[2];
   this.equipCost = dataArr[3];
-}
+};
 
 ImproveDetail.whichPhase = function(phaseStr) {
   switch(phaseStr) {
@@ -147,7 +149,7 @@ ImproveDetail.prototype = {
 };
 
 // Model - ResourceCost
-function ResourceCost(dataArr) {
+var ResourceCost = function(dataArr) {
   this.fuel = dataArr[0];
   this.ammo = dataArr[1];
   this.steel = dataArr[2];
@@ -193,7 +195,7 @@ ResourceCost.prototype = {
       利用Array.prototype.indexOf(val) != -1的方式判断某天是否能够改修
       个人认为使用native code能够提升效率
  */
-function ImproveAssist(assistName, enableDays) {
+var ImproveAssist = function(assistName, enableDays) {
   this.name = assistName;
   this.improvableDays = enableDays;
 }
@@ -209,7 +211,7 @@ ImproveAssist.create = function($tds, idxArr) {
   assist = $tds.eq(idxArr.pop()).text();
 
   idxArr.forEach(function(elem, idx) {
-    if($tds.eq(elem).text() === STATIC.IMPROVABLE)
+    if($tds.eq(elem).text() === this.IMPROVABLE)
       enableDays.push(idx);
   });
 
@@ -217,6 +219,9 @@ ImproveAssist.create = function($tds, idxArr) {
 };
 
 ImproveAssist.prototype = {
+
+  IMPROVABLE : '〇',
+  DISPROVABLE : '×',
   contains : function(weekday) {
     var intVal = parseInt(weekday, 10);
     if(intVal != NaN)
@@ -234,3 +239,10 @@ ImproveAssist.prototype = {
     return '< ' + this.name + ' > [' + this.improvableDays.join() + ']';
   }
 };
+
+exports.Category      = Category;
+exports.Equip         = Equip;
+exports.ImproveTarget = ImproveTarget;
+exports.ImproveDetail = ImproveDetail;
+exports.ResourceCost  = ResourceCost;
+exports.ImproveAssist = ImproveAssist;
