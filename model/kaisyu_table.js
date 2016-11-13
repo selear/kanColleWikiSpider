@@ -44,6 +44,43 @@ Equip.prototype = {
   }
 }
 
+Equip.initResourceCost = function($tds, idxArr) {
+
+  var fuel = $tds.eq(idxArr[0]).text(),
+      ammo = $tds.eq(idxArr[1]).text(),
+      steel = $tds.eq(idxArr[2]).text(),
+      bauxite = $tds.eq(idxArr[3]).text();
+
+  return new ResourceCost([fuel, ammo, steel, bauxite]);
+};
+
+Equip.initImproveDetail = function($tds, idxArr) {
+
+  var phaseStr = $tds.eq(idxArr[0]).text(),
+      phase = ImproveDetail.whichPhase(phaseStr),
+      develop = $tds.eq(idxArr[1]).text(),
+      improve = $tds.eq(idxArr[2]).text(),
+      cost = $tds.eq(idxArr[3]).text();
+
+  return new ImproveDetail([phase, develop, improve, cost]);
+};
+
+Equip.initImproveAssist = function($tds, idxArr) {
+
+  if(idxArr.length != 8)
+    throw new Error();
+
+  var assist = $tds.eq(idxArr.pop()).text(),
+      enableDays = [];
+
+  idxArr.forEach(function(elem, idx) {
+    if($tds.eq(elem).text() === this.IMPROVABLE)
+      enableDays.push(idx);
+  });
+
+  return new ImproveAssist(assist, enableDays);
+}
+
 // Model - ImproveTarget
 // 代表改修装备的方向
 // + ImproveCost improveCost
@@ -126,16 +163,6 @@ ImproveDetail.whichPhase = function(phaseStr) {
   }
 };
 
-ImproveDetail.create = function($tds, idxArr) {
-  var phaseStr = $tds.eq(idxArr[0]).text(),
-      develop = $tds.eq(idxArr[1]).text(),
-      improve = $tds.eq(idxArr[2]).text(),
-      cost = $tds.eq(idxArr[3]).text();
-
-  var phase = ImproveDetail.whichPhase(phaseStr);
-  return new ImproveDetail([phase, develop, improve, cost]);
-};
-
 ImproveDetail.prototype = {
   getPhase : function() {
     return this.phase;
@@ -155,15 +182,6 @@ var ResourceCost = function(dataArr) {
   this.steel = dataArr[2];
   this.bauxite = dataArr[3];
 }
-
-ResourceCost.create = function($tds, idxArr) {
-  var fuel = $tds.eq(idxArr[0]).text(),
-      ammo = $tds.eq(idxArr[1]).text(),
-      steel = $tds.eq(idxArr[2]).text(),
-      bauxite = $tds.eq(idxArr[3]).text();
-
-  return new ResourceCost([fuel, ammo, steel, bauxite]);
-};
 
 ResourceCost.prototype = {
   toArray : function() {
@@ -198,24 +216,6 @@ ResourceCost.prototype = {
 var ImproveAssist = function(assistName, enableDays) {
   this.name = assistName;
   this.improvableDays = enableDays;
-}
-
-ImproveAssist.create = function($tds, idxArr) {
-
-  if(idxArr.length != 8)
-    throw new Error();
-
-  var assist,
-      enableDays = [];
-
-  assist = $tds.eq(idxArr.pop()).text();
-
-  idxArr.forEach(function(elem, idx) {
-    if($tds.eq(elem).text() === this.IMPROVABLE)
-      enableDays.push(idx);
-  });
-
-  return new ImproveAssist(assist, enableDays);
 };
 
 ImproveAssist.prototype = {
@@ -243,6 +243,3 @@ ImproveAssist.prototype = {
 exports.Category      = Category;
 exports.Equip         = Equip;
 exports.ImproveTarget = ImproveTarget;
-exports.ImproveDetail = ImproveDetail;
-exports.ResourceCost  = ResourceCost;
-exports.ImproveAssist = ImproveAssist;

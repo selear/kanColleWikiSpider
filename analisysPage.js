@@ -2,13 +2,10 @@ var fs = require('fs'),
     cheerio = require('cheerio'),
     $ = null;
 
-var MODELS = require('./model/kaisyu_table'),
-    Category = MODELS.Category,
-    Equip = MODELS.Equip,
-    ImproveTarget = MODELS.ImproveTarget,
-    ImproveDetail = MODELS.ImproveDetail,
-    ResourceCost = MODELS.ResourceCost,
-    ImproveAssist = MODELS.ImproveAssist;
+var MODELS        = require('./model/kaisyu_table'),
+    Category      = MODELS.Category,
+    Equip         = MODELS.Equip,
+    ImproveTarget = MODELS.ImproveTarget;
 
 var STATIC = {
   DATA_SOURCE : 'kaisyu-table-fixed.html',
@@ -82,12 +79,13 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
         // 油弹钢铝 - 消耗
         // rCost --> resourceCost
-        var rCost = ResourceCost.create($tds, [2, 3, 4, 5]);
+        var rCost = Equip.initResourceCost($tds, [2, 3, 4, 5]);
 
         // 其他物资 - 消耗
         // iDetal --> improveDetail
-        var iDetail = ImproveDetail.create($tds, [1, 6, 7, 8]);
+        var iDetail = Equip.initImproveDetail($tds, [1, 6, 7, 8]);
 
+        // Equip.
         if(iDetail.getPhase() === 0) {
           currImproveTarget = new ImproveTarget();
         }
@@ -113,7 +111,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
           throw new Error('$tds.eq(9).text().length has some Error, equipName --> ' + eName);
         }
 
-        currImproveTarget.addImproveAssist(ImproveAssist.create($tds, idxArr));
+        currImproveTarget.addImproveAssist(Equip.initImproveAssist($tds, idxArr));
 
         currImproveTarget.setRemark($tds.eq(remarkIdx).text());
 
@@ -121,7 +119,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
       } else if($tds.length === 4) {
 
-        var iDetail = ImproveDetail.create($tds, [0, 1, 2, 3]);
+        var iDetail = Equip.initImproveDetail($tds, [0, 1, 2, 3]);
         currImproveTarget.getImproveCost().merge(iDetail);
 
         // length === 4时, 几乎确定不需要新的ImproveTarget实例, 因此一下代码理应永久不生效
@@ -132,14 +130,14 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
       } else if($tds.length === 8) {
 
-        currImproveTarget.addImproveAssist(ImproveAssist.create($tds, [0, 1, 2, 3, 4, 5, 6, 7]));
+        currImproveTarget.addImproveAssist(Equip.initImproveAssist($tds, [0, 1, 2, 3, 4, 5, 6, 7]));
 
       } else if($tds.length === 12) {
 
-        var iDetail = ImproveDetail.create($tds, [0, 1, 2, 3]);
+        var iDetail = Equip.initImproveDetail($tds, [0, 1, 2, 3]);
         currImproveTarget.getImproveCost().merge(iDetail);
 
-        currImproveTarget.addImproveAssist(ImproveAssist.create($tds, [4, 5, 6, 7, 8, 9, 10, 11]));
+        currImproveTarget.addImproveAssist(Equip.initImproveAssist($tds, [4, 5, 6, 7, 8, 9, 10, 11]));
 
         // length === 12时, 几乎确定不需要新的ImproveTarget实例, 因此一下代码理应永久不生效
         // if(phase === 0) {
@@ -149,7 +147,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
       } else if($tds.length === 17) {
         // 17与18最主要的区别是在.eq(9)的位置是否存在不包含数据td标签
         // 与$tds.length === 19下包含的信息几乎相同, 需要新的ImproveTarget来存放信息
-        var iDetail = ImproveDetail.create($tds, [0, 5, 6, 7]);
+        var iDetail = Equip.initImproveDetail($tds, [0, 5, 6, 7]);
         if(iDetail.getPhase() === 0) {
           currImproveTarget = new ImproveTarget();
 
@@ -159,16 +157,16 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
         currImproveTarget.getImproveCost().merge(iDetail);
 
         // 获取资源消耗并生成新的实例
-        var rCost = ResourceCost.create($tds, [1, 2, 3, 4]);
+        var rCost = Equip.initResourceCost($tds, [1, 2, 3, 4]);
         currImproveTarget.setResourceCost(rCost);
 
-        currImproveTarget.addImproveAssist(ImproveAssist.create($tds, [8, 9, 10, 11, 12, 13, 14, 15]));
+        currImproveTarget.addImproveAssist(Equip.initImproveAssist($tds, [8, 9, 10, 11, 12, 13, 14, 15]));
 
         currImproveTarget.setRemark($tds.eq(16).text());
 
       } else if($tds.length === 18) {
 
-        var iDetail = ImproveDetail.create($tds, [0, 5, 6, 7]);
+        var iDetail = Equip.initImproveDetail($tds, [0, 5, 6, 7]);
         if(iDetail.getPhase() === 0) {
           currImproveTarget = new ImproveTarget();
 
@@ -178,10 +176,10 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
         currImproveTarget.getImproveCost().merge(iDetail);
 
         // 获取资源消耗并生成新的实例
-        var rCost = ResourceCost.create($tds, [1, 2, 3, 4]);
+        var rCost = Equip.initResourceCost($tds, [1, 2, 3, 4]);
         currImproveTarget.setResourceCost(rCost);
 
-        currImproveTarget.addImproveAssist(ImproveAssist.create($tds, [9, 10, 11, 12, 13, 14, 15, 16]));
+        currImproveTarget.addImproveAssist(Equip.initImproveAssist($tds, [9, 10, 11, 12, 13, 14, 15, 16]));
 
         currImproveTarget.setRemark($tds.eq(17).text());
 
