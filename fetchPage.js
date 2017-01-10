@@ -22,22 +22,26 @@ request({
   if (error) {
     console.log(error);
   } else {
+
     var iconv = require('iconv-lite'),
         decoded = iconv.decode(body, 'eucjp'),
-        utf8html = iconv.encode(decoded, 'utf8');
+        utf8html = iconv.encode(decoded, 'utf8'),
+
+        // 根据当前的日期与小时, 生成唯一文件名前缀, 暂时通过该土办法保存以往的改修记录
+        path = './metaData/';
+        todayStr = util.calcTodayStr(), //在node交互界面下, date默认的分割符为'-', 同样的函数生成的分隔符与其他js平台的运行结果可能不同(例如: runtime in chrome devTools下是'/')
+        fileName = 'kaisyu-table-fixed.html',
+        fullPath = path + todayStr + fileName;
 
     var $ = cheerio.load(utf8html);
 
-    //获取改修表格
-    var $kaisyuTable = $('#kaisyu').parent().next().next().find('table'),
-        //获取改修表实体
-        $kaisyuTbody = $kaisyuTable.find('tbody');
+    var $kaisyuTable = $('#kaisyu').parent().next().next().find('table'), //获取改修表格
+        $kaisyuTbody = $kaisyuTable.find('tbody'), //获取改修表实体
+        removedCount = cleanInvalidTH($kaisyuTbody, $),
+        entireTable = '<table><tbody>' + $kaisyuTbody.html() + '</tbody></table>';
 
-    var removedCount = cleanInvalidTH($kaisyuTbody, $);
-
-    var entireTable = '<table><tbody>' + $kaisyuTbody.html() + '</tbody></table>';
-
-    fs.writeFile('kaisyu-table-fixed.html', entireTable, function(err) {
+    // 表格保存到本地
+    fs.writeFile(fullPath, entireTable, function(err) {
 
       if(err) {
 
@@ -54,6 +58,7 @@ request({
         
       }
     });
+
   }
 });
 

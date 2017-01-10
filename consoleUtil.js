@@ -11,6 +11,15 @@ exports.banner = function (text) {
   console.log([line, content, line].join('\n'));
 };
 
+exports.calcTodayStr = function () {
+
+  var currDate = new Date();
+  var dateStr = currDate.toLocaleDateString();
+  var hourStr = currDate.getHours();
+  
+  return '[' + dateStr + 'T' + hourStr + ']';
+};
+
 function generateLine(length, delimiter) {
   var DELIMITER = delimiter || '-';
   var line = new Array(length + 1).join(DELIMITER);

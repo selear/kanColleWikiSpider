@@ -18,7 +18,7 @@ Category.prototype = {
     }
     return result;
   }
-}
+};
 
 // Model - Equip
 // 代表某项装备, 其下具有诸多属性:
@@ -42,7 +42,7 @@ Equip.prototype = {
   toString : function() {
     return this.name + this.improveTarget.toString();
   }
-}
+};
 
 Equip.initResourceCost = function($tds, idxArr) {
 
@@ -79,7 +79,7 @@ Equip.initImproveAssist = function($tds, idxArr) {
   });
 
   return new ImproveAssist(assist, enableDays);
-}
+};
 
 // Model - ImproveTarget
 // 代表改修装备的方向
@@ -158,7 +158,7 @@ ImproveDetail.whichPhase = function(phaseStr) {
       return 2;
       break;
     default:
-      throw new Error(phaseStr);
+      throw new Error('[Error phaseStr]', phaseStr);
       break;
   }
 };
@@ -181,7 +181,7 @@ var ResourceCost = function(dataArr) {
   this.ammo = dataArr[1];
   this.steel = dataArr[2];
   this.bauxite = dataArr[3];
-}
+};
 
 ResourceCost.prototype = {
   toArray : function() {
