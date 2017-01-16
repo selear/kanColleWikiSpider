@@ -1,5 +1,6 @@
 var fs = require('fs'),
     cheerio = require('cheerio'),
+    util = require('./consoleUtil'),
     $ = null;
 
 var MODELS        = require('./model/kaisyu_table'),
@@ -9,6 +10,7 @@ var MODELS        = require('./model/kaisyu_table'),
 
 var STATIC = {
   DATA_SOURCE : 'kaisyu-table-fixed.html',
+  TARGET_PATH : './analisysed/',
   TARGET_JSON : 'kaisyu-table-fixed.json'
 };
 
@@ -202,8 +204,10 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
       jsonContent = jsonContent + JSON.stringify(category, null, '') + '\n';      
     }
 
-    fs.writeFile(STATIC.TARGET_JSON, jsonContent, function(err) {
-      console.log('[已保存] ' + STATIC.TARGET_JSON);
+    var filename = util.calcTodayStr() + STATIC.TARGET_JSON;
+    var fullPath = STATIC.TARGET_PATH + filename;
+    fs.writeFile(fullPath, jsonContent, function(err) {
+      console.log('[已保存] ', filename);
     });
     
     //console.log(countMap);
