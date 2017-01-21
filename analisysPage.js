@@ -9,9 +9,9 @@ var MODELS        = require('./model/kaisyu_table'),
     ImproveTarget = MODELS.ImproveTarget;
 
 var STATIC = {
-  DATA_SOURCE : 'kaisyu-table-fixed.html',
-  TARGET_PATH : './analisysed/',
-  TARGET_JSON : 'kaisyu-table-fixed.json'
+    DATA_SOURCE : 'kaisyu-table-fixed.html',
+    TARGET_PATH : './analisysed/',
+    TARGET_JSON : 'kaisyu-table-fixed.json'
 };
 
 fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
@@ -38,8 +38,8 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
       var $curr = $(this);
 
       // 2016.05.24
-      // 对各个类别来说：
-      // 每个类别均包含category, 当tr中仅包含一个th时, 该th中包含了categoryName
+      // 对各个类别来说, 
+      //   每个类别均包含category, 当tr中仅包含一个th时, 该th中包含了categoryName
       if($curr.find('th').length === 1) {
         var cName = $curr.find('th').text();
 
@@ -98,7 +98,9 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
         currEquip.addImproveTarget(currImproveTarget);
 
         // cheerio读取本地文件时, INDEX is ZERO BASED
-        //MK7 + 六联装鱼雷 + 数种战斗机加入改修后, $tds.eq(9)在表格中, 有的是空节点, 有的不是, 因此通过.text().length来判断后续数据提取
+        // MK7 + 六联装鱼雷 + 数种战斗机加入改修后,
+        //   $tds.eq(9)在表格中, 有的是空节点, 有的不是,
+        //   因此通过.text().length来判断后续数据提取
         var idxArr = [10, 11, 12, 13, 14, 15, 16, 17],
             remarkIdx = 18,
             nodeLength = $tds.eq(9).text().length;
@@ -147,8 +149,8 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
         // }
 
       } else if($tds.length === 17) {
-        // 17与18最主要的区别是在.eq(9)的位置是否存在不包含数据td标签
-        // 与$tds.length === 19下包含的信息几乎相同, 需要新的ImproveTarget来存放信息
+        // 17与18最主要的区别是在.eq(9)的位置是否存在不包含数据td标签,
+        //   与$tds.length === 19下包含的信息几乎相同, 需要新的ImproveTarget来存放信息
         var iDetail = Equip.initImproveDetail($tds, [0, 5, 6, 7]);
         if(iDetail.getPhase() === 0) {
           currImproveTarget = new ImproveTarget();
@@ -158,7 +160,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
         }
         currImproveTarget.getImproveCost().merge(iDetail);
 
-        // 获取资源消耗并生成新的实例
+        // 获取<资源消耗>并生成新的实例
         var rCost = Equip.initResourceCost($tds, [1, 2, 3, 4]);
         currImproveTarget.setResourceCost(rCost);
 
@@ -177,7 +179,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
         }
         currImproveTarget.getImproveCost().merge(iDetail);
 
-        // 获取资源消耗并生成新的实例
+        // 获取<资源消耗>并生成新的实例
         var rCost = Equip.initResourceCost($tds, [1, 2, 3, 4]);
         currImproveTarget.setResourceCost(rCost);
 
@@ -207,7 +209,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
     var filename = util.calcTodayStr() + STATIC.TARGET_JSON;
     var fullPath = STATIC.TARGET_PATH + filename;
     fs.writeFile(fullPath, jsonContent, function(err) {
-      console.log('[已保存] ', filename);
+      console.log('[已保存]', filename);
     });
     
     //console.log(countMap);

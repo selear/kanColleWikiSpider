@@ -45,13 +45,13 @@ request({
 
       if(err) {
 
-        console.log('[ERROR]改修表格保存失败。');
+        console.log('[ERROR]改修表格抓取失败');
 
       } else {
 
         console.log('页面抓取处理完毕。');
         if(removedCount === 0) {
-          console.log('表格未能抓取成功，可能是页面结构改动');
+          console.log('表格未能抓取成功, 可能是页面结构改动');
         } else {
           console.log('移除间隔数 : ' + removedCount);
         }
