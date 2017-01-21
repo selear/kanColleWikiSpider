@@ -98,18 +98,21 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
         curEquip.addImproveTarget(curImproveTar);
 
-        // cheerio读取本地文件时, INDEX is ZERO BASED
-        // MK7 + 六联装鱼雷 + 数种战斗机加入改修后,
-        //   $tds.eq(9)在表格中, 有的是空节点, 有的不是,
-        //   由此通过.text().length判断, 并对提取后续数据
-        var idxArr = [10, 11, 12, 13, 14, 15, 16, 17],
+        /* cheerio读取本地文件时, INDEX is ZERO BASED
+         * MK7 + 六联装鱼雷 + 数种战斗机加入改修后,
+         *   $tds.eq(9)在表格中, 有的是空节点, 有的不是,
+         *   由此通过.text().length判断, 并对提取后续数据
+         */
+            // daysIdx -->     enableDays & assistant,
+            //             能够改修的日期 & 辅助舰娘
+        var daysIdx = [10, 11, 12, 13, 14, 15, 16, 17],
             remarkIdx = 18,
             nodeLength = $tds.eq(9).text().length;
         
         if(nodeLength === 0) {
           // DO NOTHING
         } else if(nodeLength === 1) {
-          idxArr = idxArr.map(function(x) {
+          daysIdx = daysIdx.map(function(x) {
             return x - 1;
           });
           remarkIdx = remarkIdx - 1;
@@ -117,7 +120,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
           throw new Error('$tds.eq(9) length has ERROR, [equipName]' + eName);
         }
 
-        curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, idxArr));
+        curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
 
         curImproveTar.setRemark($tds.eq(remarkIdx).text());
 
@@ -140,8 +143,6 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
       } else if($tds.length === 8) {
 
-            // daysIdx -->     enableDays & assistant,
-            //             能够改修的日期 & 辅助舰娘
         var daysIdx = [0, 1, 2, 3, 4, 5, 6, 7];
 
         curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
