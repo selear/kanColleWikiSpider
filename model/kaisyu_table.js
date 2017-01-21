@@ -195,9 +195,9 @@ ResourceCost.prototype = {
 /*
     类ImproveAssist - 设计思路
     - String name
-    - Array  improvableDays
+    - Array  enableDays
       sample [0, 1, 2, 3, 4, 5, 6], or [2, 3, 6, 0] etc.
-      improvableDays曾考虑使用单独类表示, 数据结构如下:
+      enableDays曾考虑使用单独类表示, 数据结构如下:
         ImprovableWeekdays {
           SUN: false,
           MON: false,
@@ -215,7 +215,7 @@ ResourceCost.prototype = {
  */
 var ImproveAssist = function(assistName, enableDays) {
   this.name = assistName;
-  this.improvableDays = enableDays;
+  this.enableDays = enableDays;
 };
 
 ImproveAssist.prototype = {
@@ -226,17 +226,17 @@ ImproveAssist.prototype = {
     var intVal = parseInt(weekday, 10);
     if(intVal != NaN)
       if(intVal >= 0 && intVal <= 6)
-        return (this.improvableDays.indexOf(intVal) != -1 ? true : false);
+        return (this.enableDays.indexOf(intVal) != -1 ? true : false);
   },
   canImprove : function(weekday) {
     return this.contains(weekday);
   },
   merge : function(weekday) {
     if(!this.contains(weekday))
-      this.improvableDays.push(weekday);
+      this.enableDays.push(weekday);
   },
   toString : function() {
-    return '< ' + this.name + ' > [' + this.improvableDays.join() + ']';
+    return '< ' + this.name + ' > [' + this.enableDays.join() + ']';
   }
 };
 
