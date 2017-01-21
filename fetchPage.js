@@ -27,35 +27,40 @@ request({
         decoded = iconv.decode(body, 'eucjp'),
         utf8html = iconv.encode(decoded, 'utf8'),
 
-        // 根据当前的日期与小时, 生成唯一文件名前缀, 暂时通过该土办法保存以往的改修记录
-        path = './metaData/';
-        todayStr = util.calcTodayStr(), //在node交互界面下, date默认的分割符为'-', 同样的函数生成的分隔符与其他js平台的运行结果可能不同(例如: runtime in chrome devTools下是'/')
+        // 根据当前的日期与小时, 生成唯一文件名前缀,
+        //   暂时通过该土办法保存以往的改修记录
+        path = './metaData/',
+
+        // 在node shell下, new Date().toLocaleDateString()默认的分割符为'-',
+        //   同样的函数生成的分隔符与其他js平台的运行结果可能不同
+        //   sample: code result in [Chrome DevTools] is '/', i.e. "2017/1/21",
+        //   sample: code resule in [node.js]         is '-', i.e. '2017-01-21'
+        todayStr = util.calcTodayStr(),
         fileName = 'kaisyu-table-fixed.html',
         fullPath = path + todayStr + fileName;
 
     var $ = cheerio.load(utf8html);
 
-    var $kaisyuTable = $('#kaisyu').parent().next().next().find('table'), //获取改修表格
-        $kaisyuTbody = $kaisyuTable.find('tbody'), //获取改修表实体
+        // 获取改修表格
+    var $kaisyuTable = $('#kaisyu').parent().next().next().find('table'),
+        // 获取改修表主体内容
+        $kaisyuTbody = $kaisyuTable.find('tbody'),
         removedCount = cleanInvalidTH($kaisyuTbody, $),
-        entireTable = '<table><tbody>' + $kaisyuTbody.html() + '</tbody></table>';
+        entireTable = '<table><tbody>' + $kaisyuTbody.html()
+                      + '</tbody></table>';
 
-    // 表格保存到本地
+    // 保存表格到本地
     fs.writeFile(fullPath, entireTable, function(err) {
 
       if(err) {
-
         console.log('[ERROR]改修表格抓取失败');
-
       } else {
-
         console.log('页面抓取处理完毕。');
         if(removedCount === 0) {
           console.log('表格未能抓取成功, 可能是页面结构改动');
         } else {
           console.log('移除间隔数 : ' + removedCount);
         }
-        
       }
     });
 
