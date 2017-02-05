@@ -33,8 +33,8 @@ request({
 
         // 在node shell下, new Date().toLocaleDateString()默认的分割符为'-',
         //   同样的函数生成的分隔符与其他js平台的运行结果可能不同
-        //   sample: code result in [Chrome DevTools] is '/', i.e. "2017/1/21",
-        //   sample: code resule in [node.js]         is '-', i.e. '2017-01-21'
+        //   sample - through [Chrome DevTools] is '/', i.e. "2017/1/21",
+        //   sample - through [node.js]         is '-', i.e. '2017-01-21'
         todayStr = util.calcTodayStr(),
         fileName = 'kaisyu-table-fixed.html',
         fullPath = path + todayStr + fileName;
@@ -46,6 +46,9 @@ request({
         // 获取改修表主体内容
         $kaisyuTbody = $kaisyuTable.find('tbody'),
         removedCount = cleanInvalidTH($kaisyuTbody, $),
+        // # refactoring #  尝试过使用wrap()的方式添加table, tbody, 结果不理想
+        // # document #     https://github.com/cheeriojs/cheerio#wrap-content-
+        // # risk #         字符串拼接可能会引起性能问题, 2017.02.05并没有看到
         entireTable = '<table><tbody>' + $kaisyuTbody.html()
                       + '</tbody></table>';
 
@@ -55,7 +58,7 @@ request({
       if(err) {
         console.log('[ERROR]改修表格抓取失败');
       } else {
-        console.log('页面抓取处理完毕。');
+        console.log('页面抓取处理完毕。\n[存档路径]', fullPath);
         if(removedCount === 0) {
           console.log('表格未能抓取成功, 可能是页面结构改动');
         } else {

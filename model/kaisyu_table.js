@@ -83,9 +83,6 @@ Equip.initImproveAssist = function($tds, idxArr) {
 
 // Model - ImproveTarget
 // 代表改修装备的方向
-// + ImproveCost improveCost
-// + ResourceCost resourceCost
-// + AssistShip assistShip
 var ImproveTarget = function() {
   this.improveCost = new ImproveCost();
   this.resourceCost = null;
