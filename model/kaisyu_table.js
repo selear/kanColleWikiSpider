@@ -74,7 +74,7 @@ Equip.initImproveAssist = function($tds, idxArr) {
       enableDays = [];
 
   idxArr.forEach(function(elem, idx) {
-    if($tds.eq(elem).text() === this.IMPROVABLE)
+    if($tds.eq(elem).text() === ImproveAssist.ENABLE)
       enableDays.push(idx);
   });
 
@@ -191,10 +191,10 @@ ResourceCost.prototype = {
 
 /*
     类ImproveAssist - 设计思路
-    - String name
-    - Array  enableDays
+    + String name
+    + Array  enableDays
       sample [0, 1, 2, 3, 4, 5, 6], or [2, 3, 6, 0] etc.
-      enableDays曾考虑使用单独类表示, 数据结构如下:
+      enableDays曾考虑使用单独对象表示, 数据结构如下:
         ImprovableWeekdays {
           SUN: false,
           MON: false,
@@ -208,17 +208,18 @@ ResourceCost.prototype = {
         instance.canImprove(weekday)
       但老数据结构仅在更新时相对不方便
       利用Array.prototype.indexOf(val) != -1的方式判断某天是否能够改修
-      个人认为使用native code能够提升效率
  */
-var ImproveAssist = function(assistName, enableDays) {
-  this.name = assistName;
+var ImproveAssist = function(assistShip, enableDays) {
+
+  this.name = assistShip;
   this.enableDays = enableDays;
 };
 
+ImproveAssist.ENABLE = '〇';
+ImproveAssist.DISABLE = '×';
+
 ImproveAssist.prototype = {
 
-  IMPROVABLE : '〇',
-  DISPROVABLE : '×',
   contains : function(weekday) {
     var intVal = parseInt(weekday, 10);
     if(intVal != NaN)
