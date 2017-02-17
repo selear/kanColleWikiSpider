@@ -1,4 +1,4 @@
-exports.banner = function (text) {
+var banner = function (text) {
 
   var SPACES = 8,
       PRE_SPACES = SPACES / 2;
@@ -11,7 +11,7 @@ exports.banner = function (text) {
   console.log([line, content, line].join('\n'));
 };
 
-exports.calcTodayStr = function () {
+var calcTodayStr = function () {
 
   var currDate = new Date();
   var dateStr = currDate.toLocaleDateString();
@@ -46,3 +46,6 @@ function calcRealLen(text) {
   }
   return realLength;
 }
+
+exports.banner = banner;
+exports.calcTodayStr = calcTodayStr;

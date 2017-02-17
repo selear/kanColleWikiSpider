@@ -1,6 +1,6 @@
 var fs = require('fs'),
     cheerio = require('cheerio'),
-    util = require('./consoleUtil'),
+    util = require('./util/consoleUtil'),
     $ = null;
 
 var MODELS        = require('./model/kaisyu_table'),

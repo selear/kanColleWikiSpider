@@ -189,29 +189,7 @@ ResourceCost.prototype = {
   }
 };
 
-var VALIDATE = {};
-VALIDATE.assistShip = function(str, arr) {
-  // 逻辑表达式建议在node命令行下测试或单元测试通过
-  //   runtime不同相同, JS执行结果不一定相同
-  //   sample: nodejs, chrome下的 'typeof []', 'typeof [1, 2, 3]'
-  //           nodejs - 'object', 'object'(nodejs因为发布版本不同, 可能会报错)
-  //           chrome - 'object', 'object'
-  if(typeof str != 'string' || (!arr instanceof Array))
-    return false;
-
-  // 数组的长度肯定大于等于0
-  if(arr.length > 8)
-    return false;
-
-  var outRangeInteger = arr.filter(function(x) {
-    return !Number.isInteger(x) || !( x > -1 && x < 8 )
-  });
-
-  if(outRangeInteger.length > 0)
-    return false;
-
-  return true;
-};
+const validate = require('../util/validateUtil');
 
 /*
     类ImproveAssist - 设计思路
@@ -239,7 +217,7 @@ var ImproveAssist = function(assistShip, enableDays) {
 
   this.name = assistShip;
   this.enableDays = enableDays;
-  var isValid = false || VALIDATE.assistShip(assistShip, enableDays);
+  var isValid = validate.assistShip(assistShip, enableDays);
 };
 
 ImproveAssist.ENABLE = '〇';

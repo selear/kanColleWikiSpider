@@ -2,7 +2,7 @@ var fs = require('fs'),
     request = require('request'),
     cheerio = require('cheerio'),
     HttpProxyAgent = require('http-proxy-agent'),
-    util = require('./consoleUtil');
+    util = require('./util/consoleUtil');
 
 var shadowSocks = 'http://127.0.0.1:1080',
     agent = new HttpProxyAgent(shadowSocks);
