@@ -1,8 +1,9 @@
 // 本文件主要用于运行 环境测试 & 单元测试
-const assert = require('assert');
+const assert   = require('assert');
 const validate = require('../util/validateUtil');
 
-var assistShip = validate.assistShip;
+var assistShip   = validate.assistShip;
+var resourceCost = validate.resourceCost;
 
 
 // runtime基础功能测试
@@ -18,7 +19,7 @@ assert.equal('object', typeof [1, 2, 3, 'strElement']);
 //   理论上, 基础功能测试不再需要
 assert.equal('object', typeof [1, 2, 3, "strElement"]);
 
-console.log('[success]', '基础(语法)');
+console.log('[success]', '基础测试 - 语法');
 
 
 // 函数单元测试
@@ -52,13 +53,13 @@ var invalid = {
 };
 
 // assistShip(str, arr)
-//   两个参数均为有效值
+//   str, arr都为有效值
 assert.equal(assistShip(valid.blankStr,  valid.emptyArr), true);
 assert.equal(assistShip(valid.blankStr,  valid.fullArr), true);
 assert.equal(assistShip(valid.normalStr, valid.emptyArr), true);
 assert.equal(assistShip(valid.normalStr, valid.fullArr), true);
 
-//   参数str不是有效值, 测试项在于str的类型不是String
+//   str为无效值, 测试项在于str的类型不是String
 assert.equal(assistShip(invalid.zero, valid.emptyArr), false);
 assert.equal(assistShip(invalid.zero, valid.fullArr), false);
 assert.equal(assistShip(invalid.negativeInt, valid.emptyArr), false);
@@ -68,17 +69,7 @@ assert.equal(assistShip(invalid.emptyArr, valid.fullArr), false);
 assert.equal(assistShip(invalid.nil, valid.emptyArr), false);
 assert.equal(assistShip(invalid.nil, valid.fullArr), false);
 
-// 参数arr不是有效参数, 测试项在于——
-//   1. 数组元素均为整数, 不包含其他类型的数字, 或数据; 其他数据类型包括:
-//      + float
-//      + string
-//      + array
-//      + null
-//   2. 数组的合法长度为[0, 7], 测试数组长度大于7的情况
-//   3. 数组元素极值范围为[0, 6], 其数值应包含:
-//      + 小于最小值的元素;
-//      + 大于最大值的元素;
-// --4--数组包含重复的合法元素, 从页面抓取的数据一般不会出现该情况
+//   arr为无效值, 具体参见函数说明文档
 assert.equal(assistShip(valid.normalStr, invalid.elemFloat), false);
 assert.equal(assistShip(valid.normalStr, invalid.elemStrInt), false);
 assert.equal(assistShip(valid.normalStr, invalid.elemStr), false);
@@ -90,6 +81,6 @@ assert.equal(assistShip(valid.normalStr, invalid.elemOver), false);
 assert.equal(assistShip(valid.normalStr, invalid.elemLT), false);
 assert.equal(assistShip(valid.normalStr, invalid.elemGT), false);
 
-console.log('[success]', '函数 - assistShip')
+console.log('[success]', '函数测试 - assistShip')
 
 
