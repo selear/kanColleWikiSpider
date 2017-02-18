@@ -172,12 +172,15 @@ ImproveDetail.prototype = {
   }
 };
 
+const validate = require('../util/validateUtil');
+
 // Model - ResourceCost
 var ResourceCost = function(dataArr) {
   this.fuel = dataArr[0];
   this.ammo = dataArr[1];
   this.steel = dataArr[2];
   this.bauxite = dataArr[3];
+  var isValid = validate.resourceCost(dataArr);
 };
 
 ResourceCost.prototype = {
@@ -188,8 +191,6 @@ ResourceCost.prototype = {
     return '[' + this.toArray().join('\/') + ']';
   }
 };
-
-const validate = require('../util/validateUtil');
 
 /*
     类ImproveAssist - 设计思路

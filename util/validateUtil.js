@@ -30,9 +30,28 @@ validate.assistShip = function(str, arr) {
 
   return true;
 };
+
+// 输入参数arr应当满足以下条件:
+// 1. 参数类型应当是一个数组;
+// 2. 参数长度应固定为4;
+// 3. 参数内所有的元素应为正整数, 有效数据范围[0, 2000], 个人最大值不会超过1000
+//    不应有的数据类型包括:
+//    + 任意负数
+//    + 正负浮点数
+//    + 字符串, 数组, FALSY值(主要为null, undefined)
+validate.resourceCost = function(arr) {
+  if(!arr instanceof Array)
+    return false;
+
+  if(arr.length != 4)
+    return false;
+
+  var invalidElementArr = arr.filter(function(x) {
+    //     不是整数 - true      || 数值在[0, 2000]区间外 - true
+    return !Number.isInteger(x) || (x < 0 || x > 2000);
   });
 
-  if(outRangeArr.length > 0)
+  if(invalidElementArr.length > 0)
     return false;
 
   return true;
