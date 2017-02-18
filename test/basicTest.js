@@ -5,6 +5,12 @@ const validate = require('../util/validateUtil');
 var assistShip   = validate.assistShip;
 var resourceCost = validate.resourceCost;
 
+// 将预先设置好的变量放入valid, invalid两个对象中一个最主要的考虑 - 代码可读性
+//   1. 考虑过只使用一个对象存放, 固然可以提高空间利用率, 但代码可读性降低;
+//   2. 分成两个对象, 调用时分别引用, 能快速识别输入参数是[有效参数][无效参数];
+//   3. 执行不同函数单元测试时, 可直接覆盖以下两个对象;
+var valid = null;
+var invalid = null;
 
 // runtime基础功能测试
 assert.notEqual('str', typeof []);
@@ -22,18 +28,15 @@ assert.equal('object', typeof [1, 2, 3, "strElement"]);
 console.log('[success]', '基础测试 - 语法');
 
 
-// 函数单元测试
-//   将预先设置好的变量放入valid, invalid两个对象中一个最主要的考虑 - 代码可读性
-//   1. 考虑过只使用一个对象存放, 固然可以提高空间利用率, 但代码可读性降低;
-//   2. 分成两个对象, 调用时分别引用, 能快速识别输入参数是[有效参数][无效参数];
-var valid = {
+// 函数assistShip(str, arr)单元测试
+valid = {
   'blankStr'   : '',
   'normalStr'  : 'NORMAL_STRING',
   'emptyArr' : [],
   'fullArr'  : [0, 1, 2, 3, 4, 5, 6]
 };
 
-var invalid = {
+invalid = {
   'zero' : 0,
   'negativeInt' : -10,
   'negativeFloat' : -200.5674,
@@ -52,14 +55,13 @@ var invalid = {
   'elemGT'        : [1000, 1, 2, 4, 5, 6]
 };
 
-// assistShip(str, arr)
-//   str, arr都为有效值
+// str, arr都为有效值
 assert.equal(assistShip(valid.blankStr,  valid.emptyArr), true);
 assert.equal(assistShip(valid.blankStr,  valid.fullArr), true);
 assert.equal(assistShip(valid.normalStr, valid.emptyArr), true);
 assert.equal(assistShip(valid.normalStr, valid.fullArr), true);
 
-//   str为无效值, 测试项在于str的类型不是String
+// str为无效值, 测试项在于str的类型不是String
 assert.equal(assistShip(invalid.zero, valid.emptyArr), false);
 assert.equal(assistShip(invalid.zero, valid.fullArr), false);
 assert.equal(assistShip(invalid.negativeInt, valid.emptyArr), false);
@@ -69,7 +71,7 @@ assert.equal(assistShip(invalid.emptyArr, valid.fullArr), false);
 assert.equal(assistShip(invalid.nil, valid.emptyArr), false);
 assert.equal(assistShip(invalid.nil, valid.fullArr), false);
 
-//   arr为无效值, 具体参见函数说明文档
+// arr为无效值, 具体参见函数说明文档
 assert.equal(assistShip(valid.normalStr, invalid.elemFloat), false);
 assert.equal(assistShip(valid.normalStr, invalid.elemStrInt), false);
 assert.equal(assistShip(valid.normalStr, invalid.elemStr), false);
