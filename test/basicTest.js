@@ -27,7 +27,6 @@ assert.equal('object', typeof [1, 2, 3, "strElement"]);
 
 console.log('[success]', '基础测试 - 语法');
 
-
 // 函数assistShip(str, arr)单元测试
 valid = {
   'blankStr'   : '',
@@ -83,6 +82,82 @@ assert.equal(assistShip(valid.normalStr, invalid.elemOver), false);
 assert.equal(assistShip(valid.normalStr, invalid.elemLT), false);
 assert.equal(assistShip(valid.normalStr, invalid.elemGT), false);
 
-console.log('[success]', '函数测试 - assistShip')
+console.log('[success]', '函数测试 - assistShip');
 
+// resourceCost(arr)单元测试, 实际判断条件区间为[0, 2000]
+//   个人认为实际合理范围为[0, 999], 随着数据更新可能扩增
+valid = {
+  'fuel'    : [999, 0, 0, 0],
+  'ammo'    : [0, 999, 0, 0],
+  'steel'   : [0, 0, 999, 0],
+  'bauxite' : [0, 0, 0, 999],
+  'full'    : [999, 999, 999, 999]
+};
 
+invalid = {
+  'negative' : {
+    'fuel'    : [-10, 0, 0, 0],
+    'ammo'    : [0, -100, 0, 0],
+    'steel'   : [0, 0, -1000, 0],
+    'bauxite' : [0, 0, 0, -10000],
+    'full'    : [-10, -100, -1000, -10000]
+  },
+
+  'floatNum' : {
+    'fuel'    : [-1.1, 0, 0, 0],
+    'ammo'    : [0, -10.2, 0, 0],
+    'steel'   : [0, 0, 100.345, 0],
+    'bauxite' : [0, 0, 0, 1000.678],
+    'full'    : [100.345, -10.2, -1.1, 1000.678]
+  },
+
+  'greaterThan' : {
+    'fuel'    : [2001, 0, 0, 0],
+    'ammo'    : [0, 2001, 0, 0],
+    'steel'   : [0, 0, 2001, 0],
+    'bauxite' : [0, 0, 0, 2001],
+    'full'    : [2001, 2001, 2001, 2001]
+  },
+  
+  'nil' : {
+    'fuel'    : [null, 0, 0, 0],
+    'ammo'    : [0, undefined, 0, 0],
+    'steel'   : [0, 0, null, 0],
+    'bauxite' : [0, 0, 0, undefined],
+    'full'    : [undefined, null, undefined, null]
+  }
+};
+
+// arr为有效值
+assert.equal(resourceCost(valid.fuel), true);
+assert.equal(resourceCost(valid.ammo), true);
+assert.equal(resourceCost(valid.steel), true);
+assert.equal(resourceCost(valid.bauxite), true);
+assert.equal(resourceCost(valid.full), true);
+
+// arr为无效值, 具体参见函数说明文档
+assert.equal(resourceCost(invalid.negative.fuel), false);
+assert.equal(resourceCost(invalid.negative.ammo), false);
+assert.equal(resourceCost(invalid.negative.steel), false);
+assert.equal(resourceCost(invalid.negative.bauxite), false);
+assert.equal(resourceCost(invalid.negative.full), false);
+
+assert.equal(resourceCost(invalid.floatNum.fuel), false);
+assert.equal(resourceCost(invalid.floatNum.ammo), false);
+assert.equal(resourceCost(invalid.floatNum.steel), false);
+assert.equal(resourceCost(invalid.floatNum.bauxite), false);
+assert.equal(resourceCost(invalid.floatNum.full), false);
+
+assert.equal(resourceCost(invalid.greaterThan.fuel), false);
+assert.equal(resourceCost(invalid.greaterThan.ammo), false);
+assert.equal(resourceCost(invalid.greaterThan.steel), false);
+assert.equal(resourceCost(invalid.greaterThan.bauxite), false);
+assert.equal(resourceCost(invalid.greaterThan.full), false);
+
+assert.equal(resourceCost(invalid.nil.fuel), false);
+assert.equal(resourceCost(invalid.nil.ammo), false);
+assert.equal(resourceCost(invalid.nil.steel), false);
+assert.equal(resourceCost(invalid.nil.bauxite), false);
+assert.equal(resourceCost(invalid.nil.full), false);
+
+console.log('[success]', '函数测试 - resourceCost');

@@ -38,6 +38,7 @@ validate.assistShip = function(str, arr) {
 //    不应有的数据类型包括:
 //    + 任意负数
 //    + 正负浮点数
+//    + 超出范围的正整数
 //    + 字符串, 数组, FALSY值(主要为null, undefined)
 validate.resourceCost = function(arr) {
   if(!arr instanceof Array)
