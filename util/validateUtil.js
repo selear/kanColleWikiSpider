@@ -58,4 +58,27 @@ validate.resourceCost = function(arr) {
   return true;
 };
 
-module.exports = validate;
+module.exports = validate;// 输入参数arr中的数据分布为[int, string, string, string]应满足以下条件:
+// 1. 输入参数类型应为数组;
+// 2. 输入参数(数组)长度应为固定值 --> 4;
+// 3. 整数范围[0, 2];
+// 4. 字符串字符取值范围为[-/0123456789], 可能出现的情况为:
+//    + 前两个字符串, 可能出现的情况有: Range01/Range02, -/-; 没有混用情况;
+//    + 最后的字符串, 可能出现的情况有: Range01, -, BLANK_STR;
+//    + Range01范围[0, 99], 最大值为推定值
+//    + Range02范围(0, 99], 最大值为推定值
+//    + 详细测试参见regexTest.js
+validate.improveDetail = function(arr) {
+  if(!Array.isArray(arr))
+    return false;
+
+  if(arr.length != 4)
+    return false;
+
+  var intElem = arr.shift();
+  if(!Number.isInteger(intElem) && (intElem < 0 || intElem > 3))
+    return false;
+
+};
+
+module.exports = validate;v

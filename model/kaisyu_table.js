@@ -135,12 +135,15 @@ ImproveCost.prototype = {
   }
 };
 
+const validate = require('../util/validateUtil');
+
 // Model - ImproveDetail
 var ImproveDetail = function(dataArr) {
   this.phase = dataArr[0];
   this.develop = dataArr[1];
   this.improve = dataArr[2];
   this.equipCost = dataArr[3];
+  var isValid = validate.improveDetail(dataArr);
 };
 
 ImproveDetail.whichPhase = function(phaseStr) {
@@ -171,8 +174,6 @@ ImproveDetail.prototype = {
     return '[' + this.toArray().join(', ') + ']';
   }
 };
-
-const validate = require('../util/validateUtil');
 
 // Model - ResourceCost
 var ResourceCost = function(dataArr) {

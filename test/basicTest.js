@@ -82,7 +82,7 @@ assert.equal(assistShip(valid.normalStr, invalid.elemOver), false);
 assert.equal(assistShip(valid.normalStr, invalid.elemLT), false);
 assert.equal(assistShip(valid.normalStr, invalid.elemGT), false);
 
-console.log('[success]', '函数测试 - assistShip');
+console.log('[success]', 'function assistShip(str, arr)');
 
 // resourceCost(arr)单元测试, 实际判断条件区间为[0, 2000]
 //   个人认为实际合理范围为[0, 999], 随着数据更新可能扩增
@@ -160,4 +160,4 @@ assert.equal(resourceCost(invalid.nil.steel), false);
 assert.equal(resourceCost(invalid.nil.bauxite), false);
 assert.equal(resourceCost(invalid.nil.full), false);
 
-console.log('[success]', '函数测试 - resourceCost');
+console.log('[success]', 'function resourceCost(arr)');
