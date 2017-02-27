@@ -13,7 +13,7 @@ var validate = {};
 // --4--数组包含重复的合法元素, 从页面抓取的数据一般不会出现该情况
 validate.assistShip = function(str, arr) {
 
-  if(typeof str != 'string' || (!arr instanceof Array))
+  if(typeof str != 'string' || (!Array.isArray(arr)))
     return false;
 
   // 数组的长度肯定大于等于0
@@ -31,8 +31,8 @@ validate.assistShip = function(str, arr) {
   return true;
 };
 
-// 输入参数arr应当满足以下条件:
-// 1. 参数类型应当是一个数组;
+// 输入参数arr应满足以下条件:
+// 1. 参数类型应为数组;
 // 2. 参数长度应固定为4;
 // 3. 参数内所有的元素应为正整数, 有效数据范围[0, 2000], 个人最大值不会超过1000
 //    不应有的数据类型包括:
@@ -41,7 +41,7 @@ validate.assistShip = function(str, arr) {
 //    + 超出范围的正整数
 //    + 字符串, 数组, FALSY值(主要为null, undefined)
 validate.resourceCost = function(arr) {
-  if(!arr instanceof Array)
+  if(!Array.isArray(arr))
     return false;
 
   if(arr.length != 4)
@@ -58,7 +58,7 @@ validate.resourceCost = function(arr) {
   return true;
 };
 
-module.exports = validate;// 输入参数arr中的数据分布为[int, string, string, string]应满足以下条件:
+// 输入参数arr中的数据分布为[int, string, string, string]应满足以下条件:
 // 1. 输入参数类型应为数组;
 // 2. 输入参数(数组)长度应为固定值 --> 4;
 // 3. 整数范围[0, 2];
@@ -79,6 +79,10 @@ validate.improveDetail = function(arr) {
   if(!Number.isInteger(intElem) && (intElem < 0 || intElem > 3))
     return false;
 
+  var invalidElementArr = arr.filter(function(x) {
+    
+  })
+
 };
 
-module.exports = validate;v
+module.exports = validate;
