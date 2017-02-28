@@ -2,7 +2,8 @@ const assert = require('assert');
 
 // 正则表达式在工具网站下测试通过, 测试数据本注释中也有提及, 匹配模式gm
 //   http://regexr.com/
-//   在网站中, 正则表达式为
+
+//   两组数字测试中, 正则表达式为
 //      /\b([1-9]\d|\d)\/([1-9]\d|[1-9])\b|^-\/-$/gm
 //   在本测试环境中, 每个测试条件都是单行测试, 由此不需要多行匹配模式m, ^, $
 // 变为 /\b([1-9]\d|\d)\/([123456789]\d|[123456789])\b|-\/-/g
@@ -19,8 +20,8 @@ const assert = require('assert');
      0/9b
      0/10c
      0/99d
-     0/100
-     0/999
+     0/100e
+     0/999f
  
      10/0
      10/1   -- T
@@ -63,15 +64,15 @@ const assert = require('assert');
      010/1
      010/10
      010/99
-     000/100
-     000/999
+     010/100
+     010/999
  
      100/0
      100/1
      100/10
      100/99
-     000/100
-     000/999
+     100/100
+     100/999
  
      -/-    -- T
      -/ -
@@ -80,22 +81,28 @@ const assert = require('assert');
      -/--
      --/--
  */
- // 网站中能起作用的正则表达式 - /\b([1-9]\d|\d)\/([1-9]\d|[1-9])\b|^-\/-$/gm
-const regex = /\b([1-9]\d|\d)\/([1-9]\d|[1-9])\b|-\/-/;
+const TWO_NUMS_REG = /\b([1-9]\d|\d)\/([1-9]\d|[1-9])\b|-\/-/;
 
-var result = null;
+const FOR_TEST = {
+  'zeroHead'         : ['0/0', '0/1', '0/9', '0/10', '0/99', '0/100', '0/999'],
+  'zeroHeadAlphabet' : ['0/1a', '0/9b', '0/10c', '0/99d', '0/100e', '0/999f'],
+  'tenHead'          : ['10/0','10/1','10/9','10/10','10/99','10/100','10/999']
+};
 
-const zeroHead = [
-  '0/0',
-  '0/1',
-  '0/9',
-  '0/10',
-  '0/99',
-  '0/100',
-  '0/999'
-];
+const EXPECTED = {
+  'zeroHead'         : ['0/1', '0/9', '0/10', '0/99'],
+  'zeroHeadAlphabet' : [],
+  'tenHead'          : ['99/1','99/9','99/10','99/99']
+};
 
-result = zeroHead.filter(function(elem) {
-  return regex.test(elem);
-});
 
+var validateTwoNums = function(target) {
+
+  var validElemArr = FOR_TEST[target].filter(function(elem) {
+    return TWO_NUMS_REG.test(elem);
+  });
+  assert.deepEqual(validElemArr, EXPECTED[target], 'error in [' + target + ']');
+};
+
+validateTwoNums('zeroHead');
+validateTwoNums('zeroHeadAlphabet');
