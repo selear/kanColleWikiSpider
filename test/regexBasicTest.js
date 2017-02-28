@@ -84,15 +84,27 @@ const assert = require('assert');
 const TWO_NUMS_REG = /\b([1-9]\d|\d)\/([1-9]\d|[1-9])\b|-\/-/;
 
 const FOR_TEST = {
-  'zeroHead'         : ['0/0', '0/1', '0/9', '0/10', '0/99', '0/100', '0/999'],
-  'zeroHeadAlphabet' : ['0/1a', '0/9b', '0/10c', '0/99d', '0/100e', '0/999f'],
-  'tenHead'          : ['10/0','10/1','10/9','10/10','10/99','10/100','10/999']
+  'head_0'           : ['0/0','0/1','0/9','0/10','0/99','0/100','0/999'],
+  'head_0_Alphabet'  : ['0/1a','0/9b','0/10c','0/99d','0/100e','0/999f'],
+  'head_10'          : ['10/0','10/1','10/9','10/10','10/99','10/100','10/999'],
+  'head_10_Alphabet' : ['10/1a','10/9b','10/10c','10/99d','10/100e','10/999f'],
+  'head_99'          : ['99/0','99/1','99/9','99/10','99/99','99/100','99/999'],
+  'head_99_Alphabet' : ['99/1a','99/9b','99/10c','99/99d','99/100e','99/999f'],
+  'head_000'         : ['000/0','000/1','000/10','000/99','000/100','000/999'],
+  'head_010'         : [],
+  'head_999'         : []
 };
 
 const EXPECTED = {
-  'zeroHead'         : ['0/1', '0/9', '0/10', '0/99'],
-  'zeroHeadAlphabet' : [],
-  'tenHead'          : ['99/1','99/9','99/10','99/99']
+  'head_0'           : ['0/1', '0/9', '0/10', '0/99'],
+  'head_0_Alphabet'  : [],
+  'head_10'          : ['10/1','10/9','10/10','10/99'],
+  'head_10_Alphabet' : [],
+  'head_99'          : ['99/1','99/9','99/10','99/99'],
+  'head_99_Alphabet' : [],
+  'head_000'         : [],
+  'head_010'         : [],
+  'head_999'         : []
 };
 
 
@@ -104,5 +116,12 @@ var validateTwoNums = function(target) {
   assert.deepEqual(validElemArr, EXPECTED[target], 'error in [' + target + ']');
 };
 
-validateTwoNums('zeroHead');
-validateTwoNums('zeroHeadAlphabet');
+validateTwoNums('head_0');
+validateTwoNums('head_0_Alphabet');
+validateTwoNums('head_10');
+validateTwoNums('head_10_Alphabet');
+validateTwoNums('head_99');
+validateTwoNums('head_99_Alphabet');
+validateTwoNums('head_000');
+validateTwoNums('head_010');
+validateTwoNums('head_999');
