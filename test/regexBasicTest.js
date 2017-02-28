@@ -81,9 +81,11 @@ const assert = require('assert');
      --/--
  */
  // 网站中能起作用的正则表达式 - /\b([1-9]\d|\d)\/([1-9]\d|[1-9])\b|^-\/-$/gm
-const regex = /\b([1-9]\d|\d)\/([1-9]\d|[1-9])\b|-\/-/g;
+const regex = /\b([1-9]\d|\d)\/([1-9]\d|[1-9])\b|-\/-/;
+
 var result = null;
-var zeroHead = [
+
+const zeroHead = [
   '0/0',
   '0/1',
   '0/9',
@@ -92,7 +94,8 @@ var zeroHead = [
   '0/100',
   '0/999'
 ];
+
 result = zeroHead.filter(function(elem) {
   return regex.test(elem);
 });
-console.log(result.join(', '));
+
