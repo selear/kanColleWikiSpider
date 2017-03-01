@@ -14,7 +14,7 @@ const assert = require('assert');
 // 可能需要添加m
 const TWO_NUMS_REGEXP = /^([1-9]?\d\/[1-9]\d?|-\/-)$/;
 
-const FOR_TEST = {
+var FOR_TEST = {
   'head_0'           : ['0/0','0/1','0/9','0/10','0/99','0/100','0/999'],
   'head_0_Alphabet'  : ['0/1a','0/9b','0/10c','0/99d','0/100e','0/999f'],
   'head_10'          : ['10/0','10/1','10/9','10/10','10/99','10/100','10/999'],
@@ -27,7 +27,7 @@ const FOR_TEST = {
   'special'          : ['-/-','-/ -','- /-','--/-','-/--','--/--']
 };
 
-const EXPECTED = {
+var EXPECTED = {
   'head_0'           : ['0/1', '0/9', '0/10', '0/99'],
   'head_0_Alphabet'  : [],
   'head_10'          : ['10/1','10/9','10/10','10/99'],
@@ -59,3 +59,61 @@ validateTwoNums('head_000');
 validateTwoNums('head_010');
 validateTwoNums('head_999');
 validateTwoNums('special');
+
+// 单元测试#单组梳子#
+//   取值范围为单位正整数, [0, 9]
+//   取值特殊情况, '-', ''
+/*
+    0    --T
+    1    --T
+    2    --T
+    3    --T
+    4    --T
+    5    --T
+    6    --T
+    7    --T
+    8    --T
+    9    --T
+    
+    00
+    01
+    09
+    10
+    99
+    
+    000
+    001
+    009
+    010
+    099
+    100
+    999
+    
+    -    --T
+     - 
+    -- 
+    ---
+     --
+    - -
+    -- 
+ */
+// 最初regexp
+//   /^(\d|-)$/
+const SINGLE_NUM_REGEXP = /^(\d|-)$/;
+
+FOR_TEST = {
+  'singleNum' : ['0','1','2','3','4','5','6','7','8','9']
+};
+
+EXPECTED = {
+  'singleNum' : ['0','1','2','3','4','5','6','7','8','9']
+};
+
+var validateSingleNum = function(target) {
+
+  var validElemArr = FOR_TEST[target].filter(function(elem) {
+    return SINGLE_NUM_REGEXP.test(elem);
+  });
+};
+
+validateSingleNum('singleNum');
