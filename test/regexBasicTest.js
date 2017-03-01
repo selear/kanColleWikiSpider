@@ -75,6 +75,11 @@ validateTwoNums('special');
     8    --T
     9    --T
     
+     0
+    0 
+     9
+    9 
+
     00
     01
     09
@@ -90,8 +95,8 @@ validateTwoNums('special');
     999
     
     -    --T
-     - 
-    -- 
+     -
+    --
     ---
      --
     - -
@@ -102,11 +107,19 @@ validateTwoNums('special');
 const SINGLE_NUM_REGEXP = /^(\d|-)$/;
 
 FOR_TEST = {
-  'singleNum' : ['0','1','2','3','4','5','6','7','8','9']
+  'singleNum'      : ['0','1','2','3','4','5','6','7','8','9'],
+  'singleNumSpace' : [' 0','0 ',' 9','9 '],
+  'twoDigits'      : ['00','01','09','10','99'],
+  'threeDigits'    : ['000','001','009','010','099','100','999'],
+  'special'        : ['-',' -','-- ','---',' --','- -','-- ']
 };
 
 EXPECTED = {
-  'singleNum' : ['0','1','2','3','4','5','6','7','8','9']
+  'singleNum'      : ['0','1','2','3','4','5','6','7','8','9'],
+  'singleNumSpace' : [],
+  'twoDigits'      : [],
+  'threeDigits'    : [],
+  'special'        : ['-']
 };
 
 var validateSingleNum = function(target) {
@@ -114,6 +127,11 @@ var validateSingleNum = function(target) {
   var validElemArr = FOR_TEST[target].filter(function(elem) {
     return SINGLE_NUM_REGEXP.test(elem);
   });
+  assert.deepEqual(validElemArr, EXPECTED[target], 'error in [' + target + ']');
 };
 
 validateSingleNum('singleNum');
+validateSingleNum('singleNumSpace');
+validateSingleNum('twoDigits');
+validateSingleNum('threeDigits');
+validateSingleNum('special');
