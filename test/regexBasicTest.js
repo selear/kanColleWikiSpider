@@ -12,7 +12,7 @@ const assert = require('assert');
 // 优化regexp
 //   /^([1-9]?\d\/[1-9]\d?|-\/-)$/
 // 可能需要添加m
-const TWO_NUMS_REGEXP = /^([1-9]?\d\/[1-9]\d?|-\/-)$/;
+const DUAL_REGEXP = /^([1-9]?\d\/[1-9]\d?|-\/-)$/;
 
 var FOR_TEST = {
   'head_0'           : ['0/0','0/1','0/9','0/10','0/99','0/100','0/999'],
@@ -44,7 +44,7 @@ var EXPECTED = {
 var validateTwoNums = function(target) {
 
   var validElemArr = FOR_TEST[target].filter(function(elem) {
-    return TWO_NUMS_REGEXP.test(elem);
+    return DUAL_REGEXP.test(elem);
   });
   assert.deepEqual(validElemArr, EXPECTED[target], 'error in [' + target + ']');
 };
@@ -67,7 +67,7 @@ validateTwoNums('special');
 //   /^(\d|-)$/
 // 备用regexp
 //   /^[0-9\-]$/
-const SINGLE_NUM_REGEXP = /^[0-9\-]$/;
+const SINGULAR_REGEXP = /^[0-9\-]$/;
 
 FOR_TEST = {
   'singleNum'      : ['0','1','2','3','4','5','6','7','8','9'],
@@ -88,7 +88,7 @@ EXPECTED = {
 var validateSingleNum = function(target) {
 
   var validElemArr = FOR_TEST[target].filter(function(elem) {
-    return SINGLE_NUM_REGEXP.test(elem);
+    return SINGULAR_REGEXP.test(elem);
   });
   assert.deepEqual(validElemArr, EXPECTED[target], 'error in [' + target + ']');
 };
