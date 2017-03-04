@@ -34,7 +34,8 @@ validate.assistShip = function(str, arr) {
 // 输入参数arr应满足以下条件:
 // 1. 参数类型应为数组;
 // 2. 参数长度应固定为4;
-// 3. 参数内所有的元素应为正整数, 有效数据范围[0, 2000], 个人最大值不会超过1000
+// 3. 参数输入时, 均为字符串[str, str, str, str], 且能够转换为正整数
+// 4. 参数内所有的元素应为正整数, 有效数据范围[0, 2000], 个人最大值不会超过1000
 //    不应有的数据类型包括:
 //    + 任意负数
 //    + 正负浮点数
@@ -47,15 +48,24 @@ validate.resourceCost = function(arr) {
   if(arr.length != 4)
     return false;
 
-  var invalidElementArr = arr.filter(function(x) {
+  var invalidElementArr = arr.filter(function(elem) {
+
+    if(isFloat(elem))
+      return true;
+
+    var intVal = Number.parseInt(elem);
     //     不是整数 - true      || 数值在[0, 2000]区间外 - true
-    return !Number.isInteger(x) || (x < 0 || x > 2000);
+    return !Number.isInteger(intVal) || (intVal < 0 || intVal > 2000);
   });
 
   if(invalidElementArr.length > 0)
     return false;
 
   return true;
+
+  function isFloat(x) {
+    return typeof(x, 'Number') && !!(x % 1);
+  }
 };
 
 // 输入参数arr中的数据分布为[int, string, string, string]应满足以下条件:
