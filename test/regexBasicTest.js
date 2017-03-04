@@ -60,6 +60,8 @@ validateTwoNums('head_010');
 validateTwoNums('head_999');
 validateTwoNums('special');
 
+console.log('[subTest]', 'REGEXP - DUAL');
+
 // 单元测试#单组梳子#
 //   取值范围为单位正整数, [0, 9]
 //   取值特殊情况, '-', '', ''的情况可以在抓取数据的时候可以处理掉
@@ -98,3 +100,5 @@ validateSingleNum('singleNumSpace');
 validateSingleNum('twoDigits');
 validateSingleNum('threeDigits');
 validateSingleNum('special');
+
+console.log('[subTest]', 'REGEXP - SINGULAR');

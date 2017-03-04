@@ -1,3 +1,8 @@
+const REGEXP = {
+  'singular' : /^[0-9\-]$/,
+  'dual'     : /^([1-9]?\d\/[1-9]\d?|-\/-)$/
+};
+
 var validate = {};
 
 // 参数arr不是有效参数, 测试项在于——
@@ -77,7 +82,8 @@ validate.resourceCost = function(arr) {
 //    + 最后的字符串, 可能出现的情况有: Range01, -, BLANK_STR;
 //    + Range01范围[0, 99], 最大值为推定值
 //    + Range02范围(0, 99], 最大值为推定值
-//    + 详细测试参见regexTest.js
+//    + 详细单元测试及测试用例参见regexBasicTest.js
+//    + basicTest.js已集成regexBasicTest.js
 validate.improveDetail = function(arr) {
   if(!Array.isArray(arr))
     return false;
@@ -85,14 +91,23 @@ validate.improveDetail = function(arr) {
   if(arr.length != 4)
     return false;
 
+  //执行Array.prototype.shift(), Array.prototype.pop()方法时, 会修改数组本身
   var intElem = arr.shift();
   if(!Number.isInteger(intElem) && (intElem < 0 || intElem > 3))
     return false;
 
-  var invalidElementArr = arr.filter(function(x) {
-    
-  })
+  var lastElem = arr.pop();
+  if(lastElem != '')
+    if(REGEXP.singular.test(lastElem))
+      return false;
 
+  var invalidElementArr = arr.filter(function(elem) {
+    return !REGEXP.dual.test(elem);  
+  });
+  if(invalidElementArr.length > 0)
+    return false;
+
+  return true;
 };
 
 module.exports = validate;
