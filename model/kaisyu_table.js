@@ -143,7 +143,7 @@ var ImproveDetail = function(dataArr) {
   this.develop = dataArr[1];
   this.improve = dataArr[2];
   this.equipCost = dataArr[3];
-  var isValid = validate.improveDetail(dataArr);
+  this.isValid = validate.improveDetail(dataArr);
 };
 
 ImproveDetail.whichPhase = function(phaseStr) {
@@ -181,7 +181,7 @@ var ResourceCost = function(dataArr) {
   this.ammo = dataArr[1];
   this.steel = dataArr[2];
   this.bauxite = dataArr[3];
-  var isValid = validate.resourceCost(dataArr);
+  this.isValid = validate.resourceCost(dataArr);
 };
 
 ResourceCost.prototype = {
@@ -219,7 +219,7 @@ var ImproveAssist = function(assistShip, enableDays) {
 
   this.name = assistShip;
   this.enableDays = enableDays;
-  var isValid = validate.assistShip(assistShip, enableDays);
+  this.isValid = validate.assistShip(assistShip, enableDays);
 };
 
 ImproveAssist.ENABLE = '〇';
