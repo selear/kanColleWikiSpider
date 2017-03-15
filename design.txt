@@ -1,0 +1,25 @@
+Spider
+  +
+  |
+  |
+  +---> [entrance] main.js            main.js
+  |                                      +
+  |                                      |
+  |                                      v
+  +---> [fetch.meta] fetch.js         [fetchPage.meta]
+  |                                      +
+  |                                      |
+  |                                      v
+  +---> [analisys.meta] analisys.js   [analisys.meta]
+  |                                      +
+  |                                      |
+  |                                      v
+  +---> [ouput] output.js             [output.data.by.rules]
+  |
+  |
+  |
+  +---> [file.io] io.file.js
+  |
+  |
+  |
+  +---> [db.io] access.db.js
