@@ -161,6 +161,3 @@ assert.equal(resourceCost(invalid.nil.bauxite), false);
 assert.equal(resourceCost(invalid.nil.full), false);
 
 console.log('[success]', 'function resourceCost(arr)');
-
-//测试validateUtil.improveDetail正则表达式
-require('./regexBasicTest');
