@@ -43,16 +43,6 @@ var ValidateDual = function() {
   };
 };
 
-ValidateDual.prototype.test = function(target) {
-
-  var regexp = this.REGEXP;
-
-  var validElemArr = this.TEST_CASE[target].filter(function(elem) {
-    return regexp.test(elem);
-  });
-  assert.deepEqual(validElemArr, this.EXPECTED[target], 'error in [' + target + ']');
-};
-
 var ValidateSingular = function() {
 
   // 单元测试#单组梳子#
@@ -81,7 +71,7 @@ var ValidateSingular = function() {
   };
 };
 
-ValidateSingular.prototype.test = function(target) {
+var test = function(target) {
 
   var regexp = this.REGEXP;
 
@@ -95,11 +85,11 @@ var testSingular = function() {
 
   var validate = new ValidateSingular();
 
-  validate.test('singleNum');
-  validate.test('singleNumSpace');
-  validate.test('twoDigits');
-  validate.test('threeDigits');
-  validate.test('special');
+  test.call(validate, 'singleNum');
+  test.call(validate, 'singleNumSpace');
+  test.call(validate, 'twoDigits');
+  test.call(validate, 'threeDigits');
+  test.call(validate, 'special');
 
   console.log('[success]', 'Regexp - SINGULAR');
 };
@@ -108,16 +98,16 @@ var testDual = function() {
 
   var validate = new ValidateDual();
 
-  validate.test('head_0');
-  validate.test('head_0_Alphabet');
-  validate.test('head_10');
-  validate.test('head_10_Alphabet');
-  validate.test('head_99');
-  validate.test('head_99_Alphabet');
-  validate.test('head_000');
-  validate.test('head_010');
-  validate.test('head_999');
-  validate.test('special');
+  test.call(validate, 'head_0');
+  test.call(validate, 'head_0_Alphabet');
+  test.call(validate, 'head_10');
+  test.call(validate, 'head_10_Alphabet');
+  test.call(validate, 'head_99');
+  test.call(validate, 'head_99_Alphabet');
+  test.call(validate, 'head_000');
+  test.call(validate, 'head_010');
+  test.call(validate, 'head_999');
+  test.call(validate, 'special');
 
   console.log('[success]', 'Regexp - DUAL');
 };
