@@ -101,7 +101,7 @@ var testSingular = function() {
   validate.test('threeDigits');
   validate.test('special');
 
-  console.log('[subTest]', 'REGEXP - SINGULAR');
+  console.log('[success]', 'Regexp - SINGULAR');
 };
 
 var testDual = function() {
@@ -119,12 +119,11 @@ var testDual = function() {
   validate.test('head_999');
   validate.test('special');
 
-  console.log('[subTest]', 'REGEXP - DUAL');
+  console.log('[success]', 'Regexp - DUAL');
 };
 
 const EXPORTS = {};
-
-EXPORTS.testDual = testDual;
+EXPORTS.testDual     = testDual;
 EXPORTS.testSingular = testSingular;
 
 module.exports = EXPORTS;
