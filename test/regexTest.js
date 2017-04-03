@@ -1,7 +1,5 @@
 const assert = require('assert');
 
-const EXPORTS = {};
-
 var ValidateDual = function() {
 
   // 正则表达式在工具网站下测试通过, 测试数据本注释中也有提及, 匹配模式gm
@@ -123,6 +121,8 @@ var testDual = function() {
 
   console.log('[subTest]', 'REGEXP - DUAL');
 };
+
+const EXPORTS = {};
 
 EXPORTS.testDual = testDual;
 EXPORTS.testSingular = testSingular;
