@@ -28,18 +28,18 @@ var testRuntime = function() {
 var testAssistShip = function() {
 
   var valid = {
-    'blankStr'   : '',
-    'normalStr'  : 'NORMAL_STRING',
+    'blankStr' : '',
+    'normalStr': 'NORMAL_STRING',
     'emptyArr' : [],
     'fullArr'  : [0, 1, 2, 3, 4, 5, 6]
   };
 
   var invalid = {
-    'zero' : 0,
-    'negativeInt' : -10,
+    'zero'          : 0,
+    'negativeInt'   : -10,
     'negativeFloat' : -200.5674,
-    'emptyArr' : [],
-    'nil' : null,
+    'emptyArr'      : [],
+    'nil'           : null,
 
     'elemFloat'     : [5.349, 0, 1, 2, 6],
     'elemStrInt'    : [0, 1, 2, 6, '5'],
@@ -223,7 +223,8 @@ var testImproveDetail = function() {
 
     'notArray' : {
       'nil'     : null,
-      'bool'    : false,
+      'boolT'   : true,
+      'boolF'   : false,
       'numInt'  : -1000,
       'numFloat': 1.2345,
       'string'  : 'String instead of Array.',
@@ -237,17 +238,19 @@ var testImproveDetail = function() {
 
     'firstElem' : {
       'nil'     : [null, '1/1', '2/2', '3/3'],
-      'bool'    : [false, '1/1', '2/2', '3/3'],
+      'boolT'   : [true, '1/1', '2/2', '3/3'],
+      'boolF'   : [false, '1/1', '2/2', '3/3'],
       'numFloat': [1.234567, '1/1', '2/2', '3/3'],
       'string'  : ['String instead of int', '1/1', '2/2', '3/3'],
       'array'   : [[], '1/1', '2/2', '3/3']
     },
 
     'secondElem' : {
-      'nil'     : [0, null, '2/2', '3'],
-      'bool'    : [1, true, '2/2', '3'],
-      'numInt'  : [2, -1,   '2/2', '3'],
-      'numFloat': [0, 5.67, '2/2', '3'],
+      'nil'     : [0, null,  '2/2', '3'],
+      'boolT'   : [1, true,  '2/2', '3'],
+      'boolF'   : [1, false, '2/2', '3'],
+      'numInt'  : [2, -1,    '2/2', '3'],
+      'numFloat': [0, 5.67,  '2/2', '3'],
       'string'  : {
         'alphabet'  : [0, 'ab/cd', '2/2', '3'],
         'LTheadMin' : [1, '-1/1',  '2/2', '3'],
@@ -258,10 +261,11 @@ var testImproveDetail = function() {
     },
 
     'thirdElem' : {
-      'nil'     : [0, '1/1', null, '3'],
-      'bool'    : [1, '1/1', true, '3'],
-      'numInt'  : [2, '1/1', -1,   '3'],
-      'numFloat': [0, '1/1', 5.67, '3'],
+      'nil'     : [0, '1/1', null,  '3'],
+      'boolT'   : [1, '1/1', true,  '3'],
+      'boolF'   : [1, '1/1', false, '3'],
+      'numInt'  : [2, '1/1', -1,    '3'],
+      'numFloat': [0, '1/1', 5.67,  '3'],
       'string'  : {
         'alphabet'  : [1, '1/1', 'ab/cd', '3'],
         'LTheadMin' : [2, '1/1', '-1/1',  '3'],
@@ -273,7 +277,8 @@ var testImproveDetail = function() {
     
     'forthElem' : {
       'nil'     : [0, '1/1', '2/2', null],
-      'bool'    : [0, '1/1', '2/2', false],
+      'boolT'   : [0, '1/1', '2/2', true],
+      'boolF'   : [0, '1/1', '2/2', false],
       'numFloat': [0, '1/1', '2/2', 1.234],
       'string'  : [0, '1/1', '2/2', 'String'],
       'LTmin'   : [0, '1/1', '2/2', '-1'],
@@ -285,20 +290,23 @@ var testImproveDetail = function() {
   assert.equal(improveDetail(invalid.GTlengthLimit), false);
 
   assert.equal(improveDetail(invalid.notArray.nil), false);
-  assert.equal(improveDetail(invalid.notArray.bool), false);
+  assert.equal(improveDetail(invalid.notArray.boolT), false);
+  assert.equal(improveDetail(invalid.notArray.boolF), false);
   assert.equal(improveDetail(invalid.notArray.numInt), false);
   assert.equal(improveDetail(invalid.notArray.numFloat), false);
   assert.equal(improveDetail(invalid.notArray.string), false);
   assert.equal(improveDetail(invalid.notArray.obj), false);
 
   assert.equal(improveDetail(invalid.firstElem.nil), false);
-  assert.equal(improveDetail(invalid.firstElem.bool), false);
+  assert.equal(improveDetail(invalid.firstElem.boolT), false);
+  assert.equal(improveDetail(invalid.firstElem.boolF), false);
   assert.equal(improveDetail(invalid.firstElem.numFloat), false);
   assert.equal(improveDetail(invalid.firstElem.string), false);
   assert.equal(improveDetail(invalid.firstElem.array), false);
 
   assert.equal(improveDetail(invalid.secondElem.nil), false);
-  assert.equal(improveDetail(invalid.secondElem.bool), false);
+  assert.equal(improveDetail(invalid.secondElem.boolT), false);
+  assert.equal(improveDetail(invalid.secondElem.boolF), false);
   assert.equal(improveDetail(invalid.secondElem.numInt), false);
   assert.equal(improveDetail(invalid.secondElem.numFloat), false);
   assert.equal(improveDetail(invalid.secondElem.string.alphabet), false);
@@ -308,7 +316,8 @@ var testImproveDetail = function() {
   assert.equal(improveDetail(invalid.secondElem.string.GTfootMax), false);
 
   assert.equal(improveDetail(invalid.thirdElem.nil), false);
-  assert.equal(improveDetail(invalid.thirdElem.bool), false);
+  assert.equal(improveDetail(invalid.thirdElem.boolT), false);
+  assert.equal(improveDetail(invalid.thirdElem.boolF), false);
   assert.equal(improveDetail(invalid.thirdElem.numInt), false);
   assert.equal(improveDetail(invalid.thirdElem.numFloat), false);
   assert.equal(improveDetail(invalid.thirdElem.string.alphabet), false);
