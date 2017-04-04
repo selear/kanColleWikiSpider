@@ -2,8 +2,9 @@
 const assert   = require('assert');
 const validate = require('../util/validateUtil');
 
-var assistShip   = validate.assistShip;
-var resourceCost = validate.resourceCost;
+var assistShip    = validate.assistShip;
+var resourceCost  = validate.resourceCost;
+var improveDetail = validate.improveDetail;
 
 // **理论上, 本函数测试不再需要**
 var testRuntime = function() {
@@ -164,9 +165,65 @@ var testResourceCost = function() {
   console.log('[success]', 'Function - resourceCost(arr)');  
 };
 
+//正则表达式
+var testImproveDetail = function() {
+
+  var valid = {
+    'firstElem' : {
+      'case1' : [0, '1/1', '2/2', '3'],
+      'case2' : [1, '1/1', '2/2', '3'],
+      'case3' : [2, '1/1', '2/2', '3'],
+    },
+    'secondElem' : {
+      'case1' : [0, '0/50',  '2/2', '3'],
+      'case2' : [0, '99/50', '2/2', '3'],
+      'case3' : [0, '50/1',  '2/2', '3'],
+      'case4' : [0, '50/99', '2/2', '3'],
+      'case5' : [0, '-/-',   '2/2', '3']
+    },
+    'thirdElem' : {
+      'case1' : [0, '1/1', '0/50',  '3'],
+      'case2' : [0, '1/1', '99/50', '3'],
+      'case3' : [0, '1/1', '50/1',  '3'],
+      'case4' : [0, '1/1', '50/99', '3'],
+      'case5' : [0, '1/1', '-/-',   '3']
+    },
+    'fourthElem' : {
+      'case1' : [0, '1/1', '2/2', '0' ],
+      'case2' : [0, '1/1', '2/2', '9'],
+      'case3' : [0, '1/1', '2/2', ''  ],
+      'case4' : [0, '1/1', '2/2', '-' ]
+    }
+  };
+
+  assert.equal(improveDetail(valid.firstElem.case1), true);
+  assert.equal(improveDetail(valid.firstElem.case2), true);
+  assert.equal(improveDetail(valid.firstElem.case3), true);
+
+  assert.equal(improveDetail(valid.secondElem.case1), true);
+  assert.equal(improveDetail(valid.secondElem.case2), true);
+  assert.equal(improveDetail(valid.secondElem.case3), true);
+  assert.equal(improveDetail(valid.secondElem.case4), true);
+  assert.equal(improveDetail(valid.secondElem.case5), true);
+
+  assert.equal(improveDetail(valid.thirdElem.case1), true);
+  assert.equal(improveDetail(valid.thirdElem.case2), true);
+  assert.equal(improveDetail(valid.thirdElem.case3), true);
+  assert.equal(improveDetail(valid.thirdElem.case4), true);
+  assert.equal(improveDetail(valid.thirdElem.case5), true);
+
+  assert.equal(improveDetail(valid.fourthElem.case1), true);
+  assert.equal(improveDetail(valid.fourthElem.case2), true);
+  assert.equal(improveDetail(valid.fourthElem.case3), true);
+  assert.equal(improveDetail(valid.fourthElem.case4), true);
+
+  console.log('[success]', 'Function - improveDetail(arr)');
+};
+
 const EXPORTS = {};
-EXPORTS.testRuntime      = testRuntime;
-EXPORTS.testAssistShip   = testAssistShip;
-EXPORTS.testResourceCost = testResourceCost;
+EXPORTS.testRuntime       = testRuntime;
+EXPORTS.testAssistShip    = testAssistShip;
+EXPORTS.testResourceCost  = testResourceCost;
+EXPORTS.testImproveAssist = testImproveDetail;
 
 module.exports = EXPORTS;

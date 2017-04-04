@@ -77,7 +77,7 @@ var resourceCost = function(arr) {
 // 3. 整数范围[0, 2];
 // 4. 字符串字符取值范围为[-/0123456789], 可能出现的情况为:
 //    + 前两个字符串, 可能出现的情况有: Range01/Range02, -/-; 没有混用情况;
-//    + 最后的字符串, 可能出现的情况有: Range01, -, BLANK_STR;
+//    + 最后的字符串, 可能出现的情况有: [0-9], -, BLANK_STR;
 //    + Range01范围[0, 99], 最大值为推定值
 //    + Range02范围(0, 99], 最大值为推定值
 //    + 详细单元测试及测试用例参见regexBasicTest.js
@@ -96,7 +96,7 @@ var improveDetail = function(arr) {
 
   var lastElem = arr.pop();
   if(lastElem != '')
-    if(REGEXP.singular.test(lastElem))
+    if(!REGEXP.singular.test(lastElem))
       return false;
 
   var invalidElementArr = arr.filter(function(elem) {
