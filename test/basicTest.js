@@ -217,6 +217,106 @@ var testImproveDetail = function() {
   assert.equal(improveDetail(valid.fourthElem.case3), true);
   assert.equal(improveDetail(valid.fourthElem.case4), true);
 
+  var invalid = {
+    'LTlengthLimit' : [0, '1/1', '2/2'],
+    'GTlengthLimit' : [0, '1/1', '2/2', '3', null],
+
+    'notArray' : {
+      'nil'     : null,
+      'bool'    : false,
+      'numInt'  : -1000,
+      'numFloat': 1.2345,
+      'string'  : 'String instead of Array.',
+      'obj'     : {
+        'testA' : 1,
+        'testB' : -1.2,
+        'testC' : [1, 2, 3],
+        'testD' : 'testString'
+      }
+    },
+
+    'firstElem' : {
+      'nil'     : [null, '1/1', '2/2', '3/3'],
+      'bool'    : [false, '1/1', '2/2', '3/3'],
+      'numFloat': [1.234567, '1/1', '2/2', '3/3'],
+      'string'  : ['String instead of int', '1/1', '2/2', '3/3'],
+      'array'   : [[], '1/1', '2/2', '3/3']
+    },
+
+    'secondElem' : {
+      'nil'     : [0, null, '2/2', '3'],
+      'bool'    : [1, true, '2/2', '3'],
+      'numInt'  : [2, -1,   '2/2', '3'],
+      'numFloat': [0, 5.67, '2/2', '3'],
+      'string'  : {
+        'alphabet'  : [0, 'ab/cd', '2/2', '3'],
+        'LTheadMin' : [1, '-1/1',  '2/2', '3'],
+        'GTheadMax' : [2, '100/1', '2/2', '3'],
+        'LTfootMin' : [0, '50/0',  '2/2', '3'],
+        'GTfootMax' : [1, '50/100','2/2', '3']
+      }
+    },
+
+    'thirdElem' : {
+      'nil'     : [0, '1/1', null, '3'],
+      'bool'    : [1, '1/1', true, '3'],
+      'numInt'  : [2, '1/1', -1,   '3'],
+      'numFloat': [0, '1/1', 5.67, '3'],
+      'string'  : {
+        'alphabet'  : [1, '1/1', 'ab/cd', '3'],
+        'LTheadMin' : [2, '1/1', '-1/1',  '3'],
+        'GTheadMax' : [0, '1/1', '100/1', '3'],
+        'LTfootMin' : [1, '1/1', '50/0',  '3'],
+        'GTfootMax' : [2, '1/1', '50/100','3']
+      }
+    },
+    
+    'forthElem' : {
+      'nil'     : [0, '1/1', '2/2', null],
+      'bool'    : [0, '1/1', '2/2', false],
+      'numFloat': [0, '1/1', '2/2', 1.234],
+      'string'  : [0, '1/1', '2/2', 'String'],
+      'LTmin'   : [0, '1/1', '2/2', '-1'],
+      'GTmax'   : [0, '1/1', '2/2', '10'],
+    }
+  };
+
+  assert.equal(improveDetail(invalid.LTlengthLimit), false);
+  assert.equal(improveDetail(invalid.GTlengthLimit), false);
+
+  assert.equal(improveDetail(invalid.notArray.nil), false);
+  assert.equal(improveDetail(invalid.notArray.bool), false);
+  assert.equal(improveDetail(invalid.notArray.numInt), false);
+  assert.equal(improveDetail(invalid.notArray.numFloat), false);
+  assert.equal(improveDetail(invalid.notArray.string), false);
+  assert.equal(improveDetail(invalid.notArray.obj), false);
+
+  assert.equal(improveDetail(invalid.firstElem.nil), false);
+  assert.equal(improveDetail(invalid.firstElem.bool), false);
+  assert.equal(improveDetail(invalid.firstElem.numFloat), false);
+  assert.equal(improveDetail(invalid.firstElem.string), false);
+  assert.equal(improveDetail(invalid.firstElem.array), false);
+
+  assert.equal(improveDetail(invalid.secondElem.nil), false);
+  assert.equal(improveDetail(invalid.secondElem.bool), false);
+  assert.equal(improveDetail(invalid.secondElem.numInt), false);
+  assert.equal(improveDetail(invalid.secondElem.numFloat), false);
+  assert.equal(improveDetail(invalid.secondElem.string.alphabet), false);
+  assert.equal(improveDetail(invalid.secondElem.string.LTheadMin), false);
+  assert.equal(improveDetail(invalid.secondElem.string.GTheadMax), false);
+  assert.equal(improveDetail(invalid.secondElem.string.LTfootMin), false);
+  assert.equal(improveDetail(invalid.secondElem.string.GTfootMax), false);
+
+  assert.equal(improveDetail(invalid.thirdElem.nil), false);
+  assert.equal(improveDetail(invalid.thirdElem.bool), false);
+  assert.equal(improveDetail(invalid.thirdElem.numInt), false);
+  assert.equal(improveDetail(invalid.thirdElem.numFloat), false);
+  assert.equal(improveDetail(invalid.thirdElem.string.alphabet), false);
+  assert.equal(improveDetail(invalid.thirdElem.string.LTheadMin), false);
+  assert.equal(improveDetail(invalid.thirdElem.string.GTheadMax), false);
+  assert.equal(improveDetail(invalid.thirdElem.string.LTfootMin), false);
+  assert.equal(improveDetail(invalid.thirdElem.string.GTfootMax), false);
+
   console.log('[success]', 'Function - improveDetail(arr)');
 };
 
