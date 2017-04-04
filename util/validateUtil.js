@@ -3,8 +3,6 @@ const REGEXP = {
   'dual'     : /^([1-9]?\d\/[1-9]\d?|-\/-)$/
 };
 
-var validate = {};
-
 // 参数arr不是有效参数, 测试项在于——
 //   1. 数组元素均为整数, 不包含其他类型的数字, 或数据; 其他数据类型包括:
 //      + float
@@ -16,7 +14,7 @@ var validate = {};
 //      + 小于最小值的元素;
 //      + 大于最大值的元素;
 // --4--数组包含重复的合法元素, 从页面抓取的数据一般不会出现该情况
-validate.assistShip = function(str, arr) {
+var assistShip = function(str, arr) {
 
   if(typeof str != 'string' || (!Array.isArray(arr)))
     return false;
@@ -46,7 +44,7 @@ validate.assistShip = function(str, arr) {
 //    + 正负浮点数
 //    + 超出范围的正整数
 //    + 字符串, 数组, FALSY值(主要为null, undefined)
-validate.resourceCost = function(arr) {
+var resourceCost = function(arr) {
   if(!Array.isArray(arr))
     return false;
 
@@ -84,7 +82,7 @@ validate.resourceCost = function(arr) {
 //    + Range02范围(0, 99], 最大值为推定值
 //    + 详细单元测试及测试用例参见regexBasicTest.js
 //    + basicTest.js已集成regexBasicTest.js
-validate.improveDetail = function(arr) {
+var improveDetail = function(arr) {
   if(!Array.isArray(arr))
     return false;
 
@@ -110,4 +108,9 @@ validate.improveDetail = function(arr) {
   return true;
 };
 
-module.exports = validate;
+const VALIDATE = {};
+VALIDATE.assistShip = assistShip;
+VALIDATE.resourceCost = resourceCost;
+VALIDATE.improveDetail = improveDetail;
+
+module.exports = VALIDATE;

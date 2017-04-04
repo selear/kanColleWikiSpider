@@ -20,7 +20,7 @@ var testRuntime = function() {
   //   后经过验证, 在cygwin命令行下出现该问题, 可能与nodejs在不同shell下运行有关
   assert.equal('object', typeof [1, 2, 3, "strElement"]);
 
-  console.log('[success]', 'runtime - 语法');
+  console.log('[success]', 'Runtime - 语法');
 };
 
 // 函数assistShip(str, arr)单元测试
@@ -80,7 +80,7 @@ var testAssistShip = function() {
   assert.equal(assistShip(valid.normalStr, invalid.elemLT), false);
   assert.equal(assistShip(valid.normalStr, invalid.elemGT), false);
 
-  console.log('[success]', 'function assistShip(str, arr)');
+  console.log('[success]', 'Function - assistShip(str, arr)');
 };
 
 // resourceCost(arr)单元测试, 实际判断条件区间为[0, 2000]
@@ -161,7 +161,7 @@ var testResourceCost = function() {
   assert.equal(resourceCost(invalid.nil.bauxite), false);
   assert.equal(resourceCost(invalid.nil.full), false);
 
-  console.log('[success]', 'function resourceCost(arr)');  
+  console.log('[success]', 'Function - resourceCost(arr)');  
 };
 
 const EXPORTS = {};
