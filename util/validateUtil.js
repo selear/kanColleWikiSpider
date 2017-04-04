@@ -95,7 +95,7 @@ var improveDetail = function(arr) {
     return false;
 
   var lastElem = arr.pop();
-  if(lastElem != '')
+  if(lastElem !== '')
     if(!REGEXP.singular.test(lastElem))
       return false;
 

@@ -274,7 +274,7 @@ var testImproveDetail = function() {
         'GTfootMax' : [2, '1/1', '50/100','3']
       }
     },
-    
+
     'forthElem' : {
       'nil'     : [0, '1/1', '2/2', null],
       'boolT'   : [0, '1/1', '2/2', true],
@@ -325,6 +325,14 @@ var testImproveDetail = function() {
   assert.equal(improveDetail(invalid.thirdElem.string.GTheadMax), false);
   assert.equal(improveDetail(invalid.thirdElem.string.LTfootMin), false);
   assert.equal(improveDetail(invalid.thirdElem.string.GTfootMax), false);
+
+  assert.equal(improveDetail(invalid.forthElem.nil), false);
+  assert.equal(improveDetail(invalid.forthElem.boolT), false);
+  assert.equal(improveDetail(invalid.forthElem.boolF), false);
+  assert.equal(improveDetail(invalid.forthElem.numFloat), false);
+  assert.equal(improveDetail(invalid.forthElem.string), false);
+  assert.equal(improveDetail(invalid.forthElem.LTmin), false);
+  assert.equal(improveDetail(invalid.forthElem.GTmax), false);
 
   console.log('[success]', 'Function - improveDetail(arr)');
 };
