@@ -143,7 +143,25 @@ ImproveCost.prototype = {
       throw new Error('incorrect type, input instanceof ImproveDetail');
   },
   toString : function() {
+    // return this.cost.join() + (this.isValid() ? '' : '\n********\n[isValid]'
+    //        + this.isValid());
+    // 以上语句可用于console简易调试
     return this.cost.join();
+  },
+  isValid : function() {
+    var costArr = this.cost;
+    if(costArr.length !== 3)
+      return false;
+
+    var valid = true;
+    for(let idx in costArr) {
+      let detail = costArr[idx];
+      if(detail instanceof ImproveDetail)
+        valid = valid && detail.isValid();
+      else
+        throw new Error('instance is NOT ImproveDetail');
+    }
+    return valid;
   }
 };
 

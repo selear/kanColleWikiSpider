@@ -126,20 +126,15 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
         curCategory.addEquip(curEquip);
 
-      } else if($tds.length === 4) {
+        // 2017.04.06, 由元数据[FORMAL][2017-4-3T23]kaisyu-table-fixed.html
+        //   忽略了$tds.length === 5时的情况, 从而导致数据不完整
+        //   test data - sample_pad.html
+      } else if($tds.length === 4 || $tds.length === 5) {
 
         var improveIdx = [0, 1, 2, 3],
             iDetail    = Equip.initImproveDetail($tds, improveIdx);
 
         curImproveTar.getImproveCost().merge(iDetail);
-
-        // length === 4时, 几乎确定不需要创建ImproveTarget实例,
-        //   由此以下代码应永久不生效
-        // if(phase === 0) {
-        //   console.log('new Target @ $tds.length = 4 --> '
-        //               + curEquip.getEquipName());
-        //   curImproveTar = new ImproveTarget();
-        // }
 
       } else if($tds.length === 8) {
 
