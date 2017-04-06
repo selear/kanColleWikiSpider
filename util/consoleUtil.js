@@ -3,7 +3,8 @@ var banner = function (text) {
   var SPACES = 8,
       PRE_SPACES = SPACES / 2;
 
-  //针对变量fullLen，输出中文字符时，一个中文字符占用两个英文字符的位置；因此需要专门的函数计算字符串真实长度
+  // 针对变量fullLen，输出中文字符时，一个中文字符占用两个英文字符的位置；
+  //   因此需要专门的函数计算字符串真实长度
   var fullLen = SPACES + calcRealLen(text),
       line = generateLine(fullLen),
       content = generateLine(PRE_SPACES, ' ') + text;
@@ -47,5 +48,8 @@ function calcRealLen(text) {
   return realLength;
 }
 
-exports.banner = banner;
-exports.calcTodayStr = calcTodayStr;
+const EXPORTS = {};
+EXPORTS.banner = banner;
+EXPORTS.calcTodayStr = calcTodayStr;
+
+module.exports = EXPORTS;
