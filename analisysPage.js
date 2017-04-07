@@ -1,6 +1,6 @@
 var fs = require('fs'),
     cheerio = require('cheerio'),
-    util = require('./consoleUtil'),
+    util = require('./util/consoleUtil'),
     $ = null;
 
 var MODELS        = require('./model/kaisyu_table'),
@@ -27,9 +27,9 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
     // TODO 可以考虑创建一个对象来将这些信息全数包含
     var categories = [],
-        currCategory = null,
-        currEquip = null,
-        currImproveTarget = null,
+        curCategory = null,
+        curEquip = null,
+        curImproveTar = null,
         equipNames = [],
         fenceLength = 0;
 
@@ -37,14 +37,13 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
       var $curr = $(this);
 
-      // 2016.05.24
-      // 对各个类别来说, 
-      //   每个类别均包含category, 当tr中仅包含一个th时, 该th中包含了categoryName
+      // 对各个类别来说, 每个类别均包含category,
+      //   当tr中仅包含一个th时, 该th中包含了categoryName
       if($curr.find('th').length === 1) {
         var cName = $curr.find('th').text();
 
-        currCategory = new Category(cName);
-        categories.push(currCategory);
+        curCategory = new Category(cName);
+        categories.push(curCategory);
       } else if($curr.find('th').length > 1) {
         fenceLength++;
       }
@@ -52,140 +51,165 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
       var sun, mon, tue, wed, thu, fri, sat,
           assist, remark;
 
-      // 2016.05.24
-      // 每个装备的第一个td如果包含a, 则该td中包含了equipName, $tds.length = 19
-      //    如果不包含, 分成多种情况:
-      //    + $tds.length = 4   - [develop, improve, cost]
+      // 每个装备的第一个td如果包含<a>, 则该td包含了equipName, $tds.length = 19
+      //   如果不包含, 分成多种情况:
+      //   + $tds.length = 4   - [develop, improve, cost]
       //
-      //    + $tds.length = 8   - [sun, mon, tue, wed, thu, fri, sat, assist]
+      //   + $tds.length = 8   - [sun, mon, tue, wed, thu, fri, sat, assist]
       //
-      //    + $tds.length = 12  - [develop, improve, cost]
-      //                          [sun, mon, tue, wed, thu, fri, sat, assist]
+      //   + $tds.length = 12  - [develop, improve, cost]
+      //                         [sun, mon, tue, wed, thu, fri, sat, assist]
       //
-      //    + $tds.length = 17  - [fuel, ammo, steel, bauxite]
-      //                          [develop, improve, cost]
-      //                          [sun, mon, tue, wed, thu, fri, sat, assist]
-      //                          [remark]
+      //   + $tds.length = 17  - [fuel, ammo, steel, bauxite]
+      //                         [develop, improve, cost]
+      //                         [sun, mon, tue, wed, thu, fri, sat, assist]
+      //                         [remark]
       //
-      //    + $tds.length = 18  - [fuel, ammo, steel, bauxite]
-      //                          [develop, improve, cost]
-      //                          [sun, mon, tue, wed, thu, fri, sat, assist]
-      //                          [remark]
+      //   + $tds.length = 18  - [fuel, ammo, steel, bauxite]
+      //                         [develop, improve, cost]
+      //                         [sun, mon, tue, wed, thu, fri, sat, assist]
+      //                         [remark]
       // TODO 编写一个数组, 如果出现不同于上述数量的tr, 抛出错误, 并给予提示
       var $tds = $curr.find('td');
       if($tds.first().find('a').length > 0) {
         var eName = $tds.first().text();
         equipNames.push(eName);
 
-        currEquip = new Equip(eName);
+        curEquip = new Equip(eName);
 
-        // 油弹钢铝 - 消耗
-        // rCost --> resourceCost
-        var rCost = Equip.initResourceCost($tds, [2, 3, 4, 5]);
+            // resourceIdx --> fuel & ammo & steel & bauxite
+            //                 燃料 & 弹药 & 钢材  & 铝土
+        var resourceIdx = [2, 3, 4, 5],
+            // rCost --> resourceCost
+            rCost       = Equip.initResourceCost($tds, resourceIdx),
 
-        // 其他物资 - 消耗
-        // iDetal --> improveDetail
-        var iDetail = Equip.initImproveDetail($tds, [1, 6, 7, 8]);
+            // improveIdx -->    phase & develop  & improve  & cost
+            //                改修阶段 & 开发资财 & 改修资财 & 装备消耗
+            improveIdx = [1, 6, 7, 8],
+            // iDetail --> improveDetail
+            iDetail    = Equip.initImproveDetail($tds, improveIdx);
 
-        // Equip.
         if(iDetail.getPhase() === 0) {
-          currImproveTarget = new ImproveTarget();
+          curImproveTar = new ImproveTarget();
         }
-        currImproveTarget.setResourceCost(rCost);
+        curImproveTar.setResourceCost(rCost);
 
-        currImproveTarget.getImproveCost().merge(iDetail);
+        curImproveTar.getImproveCost().merge(iDetail);
 
-        currEquip.addImproveTarget(currImproveTarget);
+        curEquip.addImproveTarget(curImproveTar);
 
-        // cheerio读取本地文件时, INDEX is ZERO BASED
-        // MK7 + 六联装鱼雷 + 数种战斗机加入改修后,
-        //   $tds.eq(9)在表格中, 有的是空节点, 有的不是,
-        //   因此通过.text().length来判断后续数据提取
-        var idxArr = [10, 11, 12, 13, 14, 15, 16, 17],
+        /* cheerio读取本地文件时, INDEX is ZERO BASED
+         * MK7 + 六联装鱼雷 + 数种战斗机加入改修后,
+         *   $tds.eq(9)在表格中, 有的是空节点, 有的不是,
+         *   由此通过.text().length判断, 并对提取后续数据
+         */
+            // daysIdx -->     enableDays & assistant,
+            //             能够改修的日期 & 辅助舰娘
+        var daysIdx = [10, 11, 12, 13, 14, 15, 16, 17],
             remarkIdx = 18,
             nodeLength = $tds.eq(9).text().length;
+        
         if(nodeLength === 0) {
-          //do nothing
+          // DO NOTHING
         } else if(nodeLength === 1) {
-          idxArr = idxArr.map(function(x) {
+          daysIdx = daysIdx.map(function(x) {
             return x - 1;
           });
           remarkIdx = remarkIdx - 1;
         } else {
-          throw new Error('$tds.eq(9).text().length has some Error, equipName --> ' + eName);
+          throw new Error('$tds.eq(9) length has ERROR, [equipName]' + eName);
         }
 
-        currImproveTarget.addImproveAssist(Equip.initImproveAssist($tds, idxArr));
+        curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
 
-        currImproveTarget.setRemark($tds.eq(remarkIdx).text());
+        curImproveTar.setRemark($tds.eq(remarkIdx).text());
 
-        currCategory.addEquip(currEquip);
+        curCategory.addEquip(curEquip);
 
-      } else if($tds.length === 4) {
+        // 2017.04.06, 由元数据[FORMAL][2017-4-3T23]kaisyu-table-fixed.html
+        //   忽略了$tds.length === 5时的情况, 从而导致数据不完整
+        //   test data - sample_pad.html
+      } else if($tds.length === 4 || $tds.length === 5) {
 
-        var iDetail = Equip.initImproveDetail($tds, [0, 1, 2, 3]);
-        currImproveTarget.getImproveCost().merge(iDetail);
+        var improveIdx = [0, 1, 2, 3],
+            iDetail    = Equip.initImproveDetail($tds, improveIdx);
 
-        // length === 4时, 几乎确定不需要新的ImproveTarget实例, 因此一下代码理应永久不生效
-        // if(phase === 0) {
-        //   console.log('new Target @ $tds.length = 4 --> ' + currEquip.getEquipName());
-        //   currImproveTarget = new ImproveTarget();
-        // }
+        curImproveTar.getImproveCost().merge(iDetail);
 
       } else if($tds.length === 8) {
 
-        currImproveTarget.addImproveAssist(Equip.initImproveAssist($tds, [0, 1, 2, 3, 4, 5, 6, 7]));
+        var daysIdx = [0, 1, 2, 3, 4, 5, 6, 7];
+
+        curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
 
       } else if($tds.length === 12) {
 
-        var iDetail = Equip.initImproveDetail($tds, [0, 1, 2, 3]);
-        currImproveTarget.getImproveCost().merge(iDetail);
+        var improveIdx = [0, 1, 2, 3],
+            daysIdx    = [4, 5, 6, 7, 8, 9, 10, 11],
+            iDetail    = Equip.initImproveDetail($tds, improveIdx);
 
-        currImproveTarget.addImproveAssist(Equip.initImproveAssist($tds, [4, 5, 6, 7, 8, 9, 10, 11]));
+        curImproveTar.getImproveCost().merge(iDetail);
 
-        // length === 12时, 几乎确定不需要新的ImproveTarget实例, 因此一下代码理应永久不生效
+        curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
+
+        // length === 12时, 几乎确定不需要创建ImproveTarget实例,
+        //   由此以下代码应永久不生效
         // if(phase === 0) {
-        //   console.log('new Target @ $tds.length = 12 --> ' + currEquip.getEquipName());
+        //   console.log('new Target @ $tds.length = 12 --> '
+        //               + curEquip.getEquipName());
         // }
 
       } else if($tds.length === 17) {
-        // 17与18最主要的区别是在.eq(9)的位置是否存在不包含数据td标签,
-        //   与$tds.length === 19下包含的信息几乎相同, 需要新的ImproveTarget来存放信息
-        var iDetail = Equip.initImproveDetail($tds, [0, 5, 6, 7]);
+        /* 17与18最主要的区别是在.eq(9)的位置是否存在空的td标签,
+         *   以上两者与$tds.length === 19下包含的信息几乎相同,
+         *   需要创建新的ImproveTarget实例存放信息
+         */
+
+        var improveIdx = [0, 5, 6, 7],
+            iDetail    = Equip.initImproveDetail($tds, improveIdx);
+
         if(iDetail.getPhase() === 0) {
-          currImproveTarget = new ImproveTarget();
-
-          currEquip.addImproveTarget(currImproveTarget);
-          console.log('new Target @ $tds.length = 17 --> ' + currEquip.getEquipName());
+          curImproveTar = new ImproveTarget();
+          curEquip.addImproveTarget(curImproveTar);
+          console.log('new Target @ $tds.length = 17 --> '
+                      + curEquip.getEquipName());
         }
-        currImproveTarget.getImproveCost().merge(iDetail);
+        curImproveTar.getImproveCost().merge(iDetail);
 
-        // 获取<资源消耗>并生成新的实例
-        var rCost = Equip.initResourceCost($tds, [1, 2, 3, 4]);
-        currImproveTarget.setResourceCost(rCost);
+        var resourceIdx = [1, 2, 3, 4],
+            daysIdx     = [8, 9, 10, 11, 12, 13, 14, 15],
+            rCost       = Equip.initResourceCost($tds, resourceIdx);
 
-        currImproveTarget.addImproveAssist(Equip.initImproveAssist($tds, [8, 9, 10, 11, 12, 13, 14, 15]));
+        curImproveTar.setResourceCost(rCost);
 
-        currImproveTarget.setRemark($tds.eq(16).text());
+        curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
+
+        curImproveTar.setRemark($tds.eq(16).text());
 
       } else if($tds.length === 18) {
 
-        var iDetail = Equip.initImproveDetail($tds, [0, 5, 6, 7]);
+        var improveIdx = [0, 5, 6, 7],
+            iDetail    = Equip.initImproveDetail($tds, improveIdx);
+
         if(iDetail.getPhase() === 0) {
-          currImproveTarget = new ImproveTarget();
 
-          currEquip.addImproveTarget(currImproveTarget);
-          console.log('new Target @ $tds.length = 18 --> ' + currEquip.getEquipName());
+          curImproveTar = new ImproveTarget();
+          curEquip.addImproveTarget(curImproveTar);
+          console.log('new Target @ $tds.length = 18 --> '
+                      + curEquip.getEquipName());
+
         }
-        currImproveTarget.getImproveCost().merge(iDetail);
+        curImproveTar.getImproveCost().merge(iDetail);
 
-        // 获取<资源消耗>并生成新的实例
-        var rCost = Equip.initResourceCost($tds, [1, 2, 3, 4]);
-        currImproveTarget.setResourceCost(rCost);
+        var resourceIdx = [1, 2, 3, 4],
+            daysIdx     = [9, 10, 11, 12, 13, 14, 15, 16],
+            rCost       = Equip.initResourceCost($tds, resourceIdx);
 
-        currImproveTarget.addImproveAssist(Equip.initImproveAssist($tds, [9, 10, 11, 12, 13, 14, 15, 16]));
+        curImproveTar.setResourceCost(rCost);
 
-        currImproveTarget.setRemark($tds.eq(17).text());
+        curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
+
+        curImproveTar.setRemark($tds.eq(17).text());
 
       }
 
@@ -206,8 +230,9 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
       jsonContent = jsonContent + JSON.stringify(category, null, '') + '\n';      
     }
 
-    var filename = util.calcTodayStr() + STATIC.TARGET_JSON;
-    var fullPath = STATIC.TARGET_PATH + filename;
+    var filename = util.calcTodayStr() + STATIC.TARGET_JSON,
+        fullPath = STATIC.TARGET_PATH + filename;
+
     fs.writeFile(fullPath, jsonContent, function(err) {
       console.log('[已保存]', filename);
     });
@@ -215,7 +240,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
     //console.log(countMap);
     //console.log(categories.join());
     //console.log(JSON.stringify(categories, null, '  '));
-    console.log('可改修total : ' + equipNames.length);
+    console.log('可改修共计 : ', equipNames.length);
     //console.log('间隔栏total : ' + fenceLength);
 
 });

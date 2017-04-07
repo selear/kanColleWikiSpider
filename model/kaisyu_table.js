@@ -1,9 +1,14 @@
 var Category = function(cName) {
-  this.cName = cName;
-  this.equipArr = [];
+  if(this instanceof Category) {
+    this.cName = cName;
+    this.equipArr = [];
+  } else {
+    return new Category(cName);
+  }
 };
 
 Category.prototype = {
+
   addEquip : function(equip) {
     this.equipArr.push(equip);
   },
@@ -25,16 +30,21 @@ Category.prototype = {
 // + String name
 // + ImproveTarget
 var Equip = function(eName) {
-  this.name = eName;
-  this.improveTarget = [];
+  if(this instanceof Equip) {
+    this.name = eName;
+    this.improveTarget = [];
+  } else {
+    return new Equip(eName);
+  }
 };
 
 Equip.prototype = {
+
   addImproveTarget : function(tar) {
     if(tar instanceof ImproveTarget)
       this.improveTarget.push(tar);
     else
-      throw new Error();
+      throw new Error('incorrect type, input instanceof ImproveTarget');
   },
   getEquipName : function() {
     return this.name;
@@ -68,13 +78,13 @@ Equip.initImproveDetail = function($tds, idxArr) {
 Equip.initImproveAssist = function($tds, idxArr) {
 
   if(idxArr.length != 8)
-    throw new Error();
+    throw new Error('indexArray.length NOT equal to 8');
 
   var assist = $tds.eq(idxArr.pop()).text(),
       enableDays = [];
 
   idxArr.forEach(function(elem, idx) {
-    if($tds.eq(elem).text() === this.IMPROVABLE)
+    if($tds.eq(elem).text() === ImproveAssist.ENABLE)
       enableDays.push(idx);
   });
 
@@ -83,9 +93,6 @@ Equip.initImproveAssist = function($tds, idxArr) {
 
 // Model - ImproveTarget
 // 代表改修装备的方向
-// + ImproveCost improveCost
-// + ResourceCost resourceCost
-// + AssistShip assistShip
 var ImproveTarget = function() {
   this.improveCost = new ImproveCost();
   this.resourceCost = null;
@@ -94,6 +101,7 @@ var ImproveTarget = function() {
 };
 
 ImproveTarget.prototype = {
+
   getImproveCost : function() {
     return this.improveCost;
   },
@@ -101,13 +109,13 @@ ImproveTarget.prototype = {
     if(rCost instanceof ResourceCost)
       this.resourceCost = rCost;
     else
-      throw new Error();
+      throw new Error('incorrect type, input instance of ResourceCost');
   },
   addImproveAssist : function(assistShips) {
     if(assistShips instanceof ImproveAssist)
       this.improveAssist.push(assistShips);
     else
-      throw new Error();
+      throw new Error('incorrect type, input instance of ImproveAssist');
   },
   setRemark : function(remark) {
     this.remark = remark || '[ Remark data NOT FOUND here ]';
@@ -127,26 +135,52 @@ var ImproveCost = function() {
 };
 
 ImproveCost.prototype = {
+
   merge : function(detail) {
     if(detail instanceof ImproveDetail)
       this.cost[detail.phase] = detail;
     else
-      throw new Error();
+      throw new Error('incorrect type, input instanceof ImproveDetail');
   },
   toString : function() {
+    // return this.cost.join() + (this.isValid() ? '' : '\n********\n[isValid]'
+    //        + this.isValid());
+    // 以上语句可用于console简易调试
     return this.cost.join();
+  },
+  isValid : function() {
+    var costArr = this.cost;
+    if(costArr.length !== 3)
+      return false;
+
+    var valid = true;
+    for(let idx in costArr) {
+      let detail = costArr[idx];
+      if(detail instanceof ImproveDetail)
+        valid = valid && detail.isValid();
+      else
+        throw new Error('instance is NOT ImproveDetail');
+    }
+    return valid;
   }
 };
 
+const validate = require('../util/validateUtil');
+
 // Model - ImproveDetail
 var ImproveDetail = function(dataArr) {
-  this.phase = dataArr[0];
-  this.develop = dataArr[1];
-  this.improve = dataArr[2];
-  this.equipCost = dataArr[3];
+  if(this instanceof ImproveDetail) {
+    this.phase = dataArr[0];
+    this.develop = dataArr[1];
+    this.improve = dataArr[2];
+    this.equipCost = dataArr[3];  
+  } else {
+    return new ImproveDetail(dataArr);    
+  }
 };
 
 ImproveDetail.whichPhase = function(phaseStr) {
+
   switch(phaseStr) {
     case '初期':
       return 0;
@@ -158,12 +192,13 @@ ImproveDetail.whichPhase = function(phaseStr) {
       return 2;
       break;
     default:
-      throw new Error('[Error phaseStr]', phaseStr);
+      throw new Error('[Error phaseStr]' + phaseStr);
       break;
   }
 };
 
 ImproveDetail.prototype = {
+
   getPhase : function() {
     return this.phase;
   },
@@ -172,32 +207,45 @@ ImproveDetail.prototype = {
   },
   toString : function() {
     return '[' + this.toArray().join(', ') + ']';
+  },
+  isValid : function() {
+    var input = [this.phase, this.develop, this.improve, this.equipCost];
+    return validate.improveDetail(input);
   }
 };
 
 // Model - ResourceCost
 var ResourceCost = function(dataArr) {
-  this.fuel = dataArr[0];
-  this.ammo = dataArr[1];
-  this.steel = dataArr[2];
-  this.bauxite = dataArr[3];
+  if(this instanceof ResourceCost) {
+    this.fuel = dataArr[0];
+    this.ammo = dataArr[1];
+    this.steel = dataArr[2];
+    this.bauxite = dataArr[3];  
+  } else {
+    return new ResourceCost(dataArr);
+  }
 };
 
 ResourceCost.prototype = {
+
   toArray : function() {
     return [this.fuel, this.ammo, this.steel, this.bauxite];
   },
   toString : function() {
     return '[' + this.toArray().join('\/') + ']';
+  },
+  isValid : function() {
+    var input = [this.fuel, this.ammo, this.steel, this.bauxite];
+    return validate.resourceCost(input);
   }
 };
 
 /*
     类ImproveAssist - 设计思路
-    - String name
-    - Array  improvableDays
+    + String name
+    + Array  enableDays
       sample [0, 1, 2, 3, 4, 5, 6], or [2, 3, 6, 0] etc.
-      improvableDays曾考虑使用单独类表示, 数据结构如下:
+      enableDays曾考虑使用单独对象表示, 数据结构如下:
         ImprovableWeekdays {
           SUN: false,
           MON: false,
@@ -211,32 +259,41 @@ ResourceCost.prototype = {
         instance.canImprove(weekday)
       但老数据结构仅在更新时相对不方便
       利用Array.prototype.indexOf(val) != -1的方式判断某天是否能够改修
-      个人认为使用native code能够提升效率
+
+    - Boolean isValid - 默认值false为防御性编程, 可以进一步精简
  */
-var ImproveAssist = function(assistName, enableDays) {
-  this.name = assistName;
-  this.improvableDays = enableDays;
+var ImproveAssist = function(assistShip, enableDays) {
+  if(this instanceof ImproveAssist) {
+    this.name = assistShip;
+    this.enableDays = enableDays;
+  } else {
+    return new ImproveAssist(assistShip, enableDays);
+  }
 };
+
+ImproveAssist.ENABLE = '〇';
+ImproveAssist.DISABLE = '×';
 
 ImproveAssist.prototype = {
 
-  IMPROVABLE : '〇',
-  DISPROVABLE : '×',
   contains : function(weekday) {
     var intVal = parseInt(weekday, 10);
     if(intVal != NaN)
       if(intVal >= 0 && intVal <= 6)
-        return (this.improvableDays.indexOf(intVal) != -1 ? true : false);
+        return (this.enableDays.indexOf(intVal) != -1 ? true : false);
   },
   canImprove : function(weekday) {
     return this.contains(weekday);
   },
   merge : function(weekday) {
     if(!this.contains(weekday))
-      this.improvableDays.push(weekday);
+      this.enableDays.push(weekday);
   },
   toString : function() {
-    return '< ' + this.name + ' > [' + this.improvableDays.join() + ']';
+    return '< ' + this.name + ' > [' + this.enableDays.join() + ']';
+  },
+  isValid : function() {
+    return validate.assistShip(this.name, this.enableDays);
   }
 };
 
