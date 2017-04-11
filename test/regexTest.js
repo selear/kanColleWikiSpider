@@ -147,3 +147,33 @@ EXPORTS.testDual     = testDual;
 EXPORTS.testSingular = testSingular;
 
 module.exports = EXPORTS;
+
+var Debug = function() {
+  if(this instanceof Debug) {
+    this.ARGS_COMMAND_MAP = new Map([['-d', 'selfTest'], ['-debug', 'selfTest']]);
+    this.COMMAND = new Map([['selfTest', function(){ for(let prop in EXPORTS) {
+                                                     EXPORTS[prop]();} }
+    ]]);
+  } else {
+    return new Debug();
+  }
+};
+
+Debug.prototype.execArgs = function() {
+  let validArgs = new Set();
+  let inputArgs = process.argv.slice(2);
+  let argsMap = this.ARGS_COMMAND_MAP;
+
+  inputArgs.filter(function(key) {
+
+    if(argsMap.has(key))
+      validArgs.add(argsMap.get(key));
+  });
+
+  let cmd = this.COMMAND;
+  validArgs.forEach(function(key) {
+    cmd.get(key)();
+  });
+};
+
+Debug().execArgs();
