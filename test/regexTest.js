@@ -96,11 +96,10 @@ var ValidateSingular = function() {
   };
 };
 
-var test = function(target) {
+var caseTest = function(target) {
 
-  var regexp = this.REGEXP;
-
-  var validElemArr = this.TEST_CASE[target].filter(function(elem) {
+  let regexp = this.REGEXP;
+  let validElemArr = this.TEST_CASE[target].filter(function(elem) {
     return regexp.test(elem);
   });
   assert.deepEqual(validElemArr, this.EXPECTED[target], 'error in [' + target + ']');
@@ -108,37 +107,37 @@ var test = function(target) {
 
 var testSingular = function() {
 
-  var validate = new ValidateSingular();
+  let validate = new ValidateSingular();
 
-  test.call(validate, 'singleNum');
-  test.call(validate, 'singleNumSpace');
-  test.call(validate, 'twoDigits');
-  test.call(validate, 'threeDigits');
-  test.call(validate, 'special');
+  caseTest.call(validate, 'singleNum');
+  caseTest.call(validate, 'singleNumSpace');
+  caseTest.call(validate, 'twoDigits');
+  caseTest.call(validate, 'threeDigits');
+  caseTest.call(validate, 'special');
 
   console.log('[success]', '[subTest]Regexp - SINGULAR');
 };
 
 var testDual = function() {
 
-  var validate = new ValidateDual();
+  let validate = new ValidateDual();
 
-  test.call(validate, 'head_0');
-  test.call(validate, 'head_0_Alphabet');
-  test.call(validate, 'head_10');
-  test.call(validate, 'head_10_Alphabet');
-  test.call(validate, 'head_99');
-  test.call(validate, 'head_99_Alphabet');
-  test.call(validate, 'head_000');
-  test.call(validate, 'head_010');
-  test.call(validate, 'head_999');
-  test.call(validate, 'special');
+  caseTest.call(validate, 'head_0');
+  caseTest.call(validate, 'head_0_Alphabet');
+  caseTest.call(validate, 'head_10');
+  caseTest.call(validate, 'head_10_Alphabet');
+  caseTest.call(validate, 'head_99');
+  caseTest.call(validate, 'head_99_Alphabet');
+  caseTest.call(validate, 'head_000');
+  caseTest.call(validate, 'head_010');
+  caseTest.call(validate, 'head_999');
+  caseTest.call(validate, 'special');
 
-  test.call(validate, 'head_QM');
-  test.call(validate, 'head_QM_dual');
-  test.call(validate, 'foot_QM');
-  test.call(validate, 'foot_QM_dual');
-  test.call(validate, 'special_QM');
+  caseTest.call(validate, 'head_QM');
+  caseTest.call(validate, 'head_QM_dual');
+  caseTest.call(validate, 'foot_QM');
+  caseTest.call(validate, 'foot_QM_dual');
+  caseTest.call(validate, 'special_QM');
 
   console.log('[success]', '[subTest]Regexp - DUAL');
 };
