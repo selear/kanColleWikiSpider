@@ -143,24 +143,23 @@ ImproveCost.prototype = {
       throw new Error('incorrect type, input instanceof ImproveDetail');
   },
   toString : function() {
-    // return this.cost.join() + (this.isValid() ? '' : '\n********\n[isValid]'
-    //        + this.isValid());
-    // 以上语句可用于console简易调试
-    return this.cost.join();
+    return this.cost.join()
+           + (this.isValid()? '' : '\n\n    **ImproveCost false**\n\n');
   },
   isValid : function() {
     let costArr = this.cost;
     if(costArr.length !== 3)
       return false;
 
-    var valid = true;
-    for(let idx in costArr) {
-      let detail = costArr[idx];
-      if(detail instanceof ImproveDetail)
-        valid = valid && detail.isValid();
+    let valid = costArr.map(function(elem) {
+      if(elem instanceof ImproveDetail)
+        return elem.isValid;
       else
         throw new Error('instance is NOT ImproveDetail');
-    }
+    }).reduce(function(x, y) {
+      return x && y
+    });
+
     return valid;
   }
 };
@@ -206,7 +205,8 @@ ImproveDetail.prototype = {
     return [this.phase, this.develop, this.improve, this.equipCost];
   },
   toString : function() {
-    return '[' + this.toArray().join(', ') + ']';
+    return '[' + this.toArray().join(', ') + ']'
+           + (this.isValid()? '' : '\n\n    **ImproveDetail false**\n\n');
   },
   isValid : function() {
     let input = [this.phase, this.develop, this.improve, this.equipCost];
@@ -232,7 +232,8 @@ ResourceCost.prototype = {
     return [this.fuel, this.ammo, this.steel, this.bauxite];
   },
   toString : function() {
-    return '[' + this.toArray().join('\/') + ']';
+    return '[' + this.toArray().join('\/') + ']'
+           + (this.isValid()? '' : '\n\n    **ResourceCost false**\n\n');
   },
   isValid : function() {
     let input = [this.fuel, this.ammo, this.steel, this.bauxite];
@@ -290,7 +291,8 @@ ImproveAssist.prototype = {
       this.enableDays.push(weekday);
   },
   toString : function() {
-    return '< ' + this.name + ' > [' + this.enableDays.join() + ']';
+    return '< ' + this.name + ' > [' + this.enableDays.join() + ']'
+           + (this.isValid()? '' : '\n\n    **ImproveAssist false**\n\n');
   },
   isValid : function() {
     return validate.assistShip(this.name, this.enableDays);
