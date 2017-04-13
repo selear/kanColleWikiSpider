@@ -118,7 +118,7 @@ ImproveTarget.prototype = {
       throw new Error('incorrect type, input instance of ImproveAssist');
   },
   setRemark : function(remark) {
-    this.remark = remark || '[ Remark data NOT FOUND here ]';
+    this.remark = remark || '[ Remark NOT FOUND here ]';
   },
   toString : function() {
     return '\n     - ' + this.improveCost.toString()
@@ -149,7 +149,7 @@ ImproveCost.prototype = {
     return this.cost.join();
   },
   isValid : function() {
-    var costArr = this.cost;
+    let costArr = this.cost;
     if(costArr.length !== 3)
       return false;
 
@@ -209,7 +209,7 @@ ImproveDetail.prototype = {
     return '[' + this.toArray().join(', ') + ']';
   },
   isValid : function() {
-    var input = [this.phase, this.develop, this.improve, this.equipCost];
+    let input = [this.phase, this.develop, this.improve, this.equipCost];
     return validate.improveDetail(input);
   }
 };
@@ -235,7 +235,7 @@ ResourceCost.prototype = {
     return '[' + this.toArray().join('\/') + ']';
   },
   isValid : function() {
-    var input = [this.fuel, this.ammo, this.steel, this.bauxite];
+    let input = [this.fuel, this.ammo, this.steel, this.bauxite];
     return validate.resourceCost(input);
   }
 };
