@@ -124,7 +124,20 @@ ImproveTarget.prototype = {
     return '\n     - ' + this.improveCost.toString()
             + '\n     - ' + this.resourceCost.toString()
             + '\n     - ' + this.improveAssist.join('\n     - ')
-            + '\n     > ' + this.remark;
+            + '\n     > ' + this.remark
+            + (this.isValid() ? '' : '\n\n  >> **ImproveTarget false**\n\n');
+  },
+  isValid : function() {
+
+    let icBool = this.improveCost.isValid();
+    let rcBool = this.resourceCost.isValid();
+    let iaBool = this.improveAssist.map(function(assist) {
+      return assist.isValid();
+    }).reduce(function(x, y) {
+      return x && y;
+    });
+
+    return icBool && rcBool && iaBool;
   }
 };
 
