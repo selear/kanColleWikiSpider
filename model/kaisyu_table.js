@@ -118,13 +118,26 @@ ImproveTarget.prototype = {
       throw new Error('incorrect type, input instance of ImproveAssist');
   },
   setRemark : function(remark) {
-    this.remark = remark || '[ Remark data NOT FOUND here ]';
+    this.remark = remark || '[ Remark NOT FOUND here ]';
   },
   toString : function() {
     return '\n     - ' + this.improveCost.toString()
             + '\n     - ' + this.resourceCost.toString()
             + '\n     - ' + this.improveAssist.join('\n     - ')
-            + '\n     > ' + this.remark;
+            + '\n     > ' + this.remark
+            + (this.isValid() ? '' : '\n\n  >> **ImproveTarget false**\n\n');
+  },
+  isValid : function() {
+
+    let icBool = this.improveCost.isValid();
+    let rcBool = this.resourceCost.isValid();
+    let iaBool = this.improveAssist.map(function(assist) {
+      return assist.isValid();
+    }).reduce(function(x, y) {
+      return x && y;
+    });
+
+    return icBool && rcBool && iaBool;
   }
 };
 
@@ -143,24 +156,23 @@ ImproveCost.prototype = {
       throw new Error('incorrect type, input instanceof ImproveDetail');
   },
   toString : function() {
-    // return this.cost.join() + (this.isValid() ? '' : '\n********\n[isValid]'
-    //        + this.isValid());
-    // 以上语句可用于console简易调试
-    return this.cost.join();
+    return this.cost.join()
+           + (this.isValid()? '' : '\n\n    **ImproveCost false**\n\n');
   },
   isValid : function() {
-    var costArr = this.cost;
+    let costArr = this.cost;
     if(costArr.length !== 3)
       return false;
 
-    var valid = true;
-    for(let idx in costArr) {
-      let detail = costArr[idx];
-      if(detail instanceof ImproveDetail)
-        valid = valid && detail.isValid();
+    let valid = costArr.map(function(elem) {
+      if(elem instanceof ImproveDetail)
+        return elem.isValid;
       else
         throw new Error('instance is NOT ImproveDetail');
-    }
+    }).reduce(function(x, y) {
+      return x && y
+    });
+
     return valid;
   }
 };
@@ -206,10 +218,11 @@ ImproveDetail.prototype = {
     return [this.phase, this.develop, this.improve, this.equipCost];
   },
   toString : function() {
-    return '[' + this.toArray().join(', ') + ']';
+    return '[' + this.toArray().join(', ') + ']'
+           + (this.isValid()? '' : '\n\n    **ImproveDetail false**\n\n');
   },
   isValid : function() {
-    var input = [this.phase, this.develop, this.improve, this.equipCost];
+    let input = [this.phase, this.develop, this.improve, this.equipCost];
     return validate.improveDetail(input);
   }
 };
@@ -232,10 +245,11 @@ ResourceCost.prototype = {
     return [this.fuel, this.ammo, this.steel, this.bauxite];
   },
   toString : function() {
-    return '[' + this.toArray().join('\/') + ']';
+    return '[' + this.toArray().join('\/') + ']'
+           + (this.isValid()? '' : '\n\n    **ResourceCost false**\n\n');
   },
   isValid : function() {
-    var input = [this.fuel, this.ammo, this.steel, this.bauxite];
+    let input = [this.fuel, this.ammo, this.steel, this.bauxite];
     return validate.resourceCost(input);
   }
 };
@@ -290,7 +304,8 @@ ImproveAssist.prototype = {
       this.enableDays.push(weekday);
   },
   toString : function() {
-    return '< ' + this.name + ' > [' + this.enableDays.join() + ']';
+    return '< ' + this.name + ' > [' + this.enableDays.join() + ']'
+           + (this.isValid()? '' : '\n\n    **ImproveAssist false**\n\n');
   },
   isValid : function() {
     return validate.assistShip(this.name, this.enableDays);
