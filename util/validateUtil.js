@@ -108,9 +108,9 @@ var improveDetail = function(arr) {
   return true;
 };
 
-const VALIDATE = {};
-VALIDATE.assistShip = assistShip;
-VALIDATE.resourceCost = resourceCost;
-VALIDATE.improveDetail = improveDetail;
+const EXPORTS = {};
+EXPORTS.assistShip = assistShip;
+EXPORTS.resourceCost = resourceCost;
+EXPORTS.improveDetail = improveDetail;
 
-module.exports = VALIDATE;
+module.exports = EXPORTS;
