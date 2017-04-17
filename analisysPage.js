@@ -1,19 +1,19 @@
-var fs = require('fs'),
-    cheerio = require('cheerio'),
-    util = require('./util/consoleUtil'),
-    $ = null;
+const fs = require('fs');
+const cheerio = require('cheerio');
+const util = require('./util/consoleUtil');
 
-var MODELS        = require('./model/kaisyu_table'),
-    Category      = MODELS.Category,
-    Equip         = MODELS.Equip,
-    ImproveTarget = MODELS.ImproveTarget;
+const MODELS      = require('./model/kaisyu_table');
+var Category      = MODELS.Category;
+var Equip         = MODELS.Equip;
+var ImproveTarget = MODELS.ImproveTarget;
 
-var STATIC = {
+const STATIC = {
     DATA_SOURCE : 'kaisyu-table-fixed.html',
     TARGET_PATH : './analisysed/',
     TARGET_JSON : 'kaisyu-table-fixed.json'
 };
 
+var $ = null;
 fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
     if(err) throw err;
