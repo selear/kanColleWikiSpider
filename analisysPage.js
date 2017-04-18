@@ -9,8 +9,9 @@ var ImproveTarget = MODELS.ImproveTarget;
 
 const STATIC = {
     DATA_SOURCE : 'kaisyu-table-fixed.html',
-    TARGET_PATH : './analisysed/',
-    TARGET_JSON : 'kaisyu-table-fixed.json'
+    STORE_PATH  : './analisysed/',
+    WORK_PATH   : './working/',
+    FILENAME    : 'kaisyu-table-fixed.json'
 };
 
 var $ = null;
@@ -229,9 +230,9 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
       var category = categories[i];
       jsonContent = jsonContent + JSON.stringify(category, null, '') + '\n';      
     }
-
-    var filename = util.calcTodayStr() + STATIC.TARGET_JSON,
-        fullPath = STATIC.TARGET_PATH + filename;
+ 
+    let filename = util.calcTodayStr() + STATIC.FILENAME;
+    let fullPath = STATIC.STORE_PATH + filename;
 
     fs.writeFile(fullPath, jsonContent, function(err) {
       console.log('[已保存]', filename);
