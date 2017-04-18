@@ -5,8 +5,9 @@
   "main": "main.js",
   "author": "selear",
   "dependencies": {
-    "request": "latest",
+    "async": "^2.3.0",
     "cheerio": "latest",
-    "mongodb": "2.1.7"
+    "mongodb": "2.1.7",
+    "request": "latest"
   }
 }
