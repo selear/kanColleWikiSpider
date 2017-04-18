@@ -1,5 +1,6 @@
 const fs = require('fs');
 const cheerio = require('cheerio');
+const async = require('async');
 const util = require('./util/consoleUtil');
 
 const MODELS      = require('./model/kaisyu_table');
@@ -230,14 +231,37 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
       var category = categories[i];
       jsonContent = jsonContent + JSON.stringify(category, null, '') + '\n';      
     }
- 
-    let filename = util.calcTodayStr() + STATIC.FILENAME;
-    let fullPath = STATIC.STORE_PATH + filename;
 
-    fs.writeFile(fullPath, jsonContent, function(err) {
-      console.log('[已保存]', filename);
+    async.parallel([
+      function(callback) {
+        let filename = util.calcTodayStr() + STATIC.FILENAME;
+        let fullPath = STATIC.STORE_PATH + filename;
+
+        fs.writeFile(fullPath, jsonContent, function(err) {
+          if(err)
+            callback(err, '[STORE - fail]');
+          else
+            callback(null, '[STORE - success]');
+        });
+      },
+      function(callback) {
+        let filename = STATIC.FILENAME;
+        let fullPath = STATIC.WORK_PATH + filename;
+
+        fs.writeFile(fullPath, jsonContent, function(err) {
+          if(err)
+            callback(err, '[WORK - fail]');
+          else
+            callback(null, '[WORK - success]');
+        });
+      }],
+      function(err, results) {
+        if(err)
+          console.log(err.message, '\n', results);
+        else
+          console.log('[SUCCESS]', results);
     });
-    
+ 
     //console.log(countMap);
     //console.log(categories.join());
     //console.log(JSON.stringify(categories, null, '  '));
