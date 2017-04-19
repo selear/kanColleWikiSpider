@@ -225,10 +225,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
     });
 
-    let jsonContent = '';
-    categories.forEach((c) => {
-      jsonContent = jsonContent + JSON.stringify(c) + '\n';
-    });
+    let content = generateJsonContent(categories);
 
     async.parallel([
       function(callback) {
@@ -267,3 +264,12 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
     //console.log('间隔栏total : ' + fenceLength);
 
 });
+function generateJsonContent(categoryArr) {
+
+  let jsonContent = '';
+  categoryArr.forEach((c) => {
+    jsonContent = jsonContent + JSON.stringify(c) + '\n';
+  });
+
+  return jsonContent;
+}
