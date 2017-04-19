@@ -225,12 +225,10 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
     });
 
-    var i = 0;
-    var jsonContent = '';
-    for(i = 0; i < categories.length; i++) {
-      var category = categories[i];
-      jsonContent = jsonContent + JSON.stringify(category, null, '') + '\n';      
-    }
+    let jsonContent = '';
+    categories.forEach((c) => {
+      jsonContent = jsonContent + JSON.stringify(c) + '\n';
+    });
 
     async.parallel([
       function(callback) {
