@@ -227,43 +227,52 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
     let content = generateJsonContent(categories);
 
-    async.parallel([
-      function(callback) {
-        let filename = util.calcTodayStr() + STATIC.FILENAME;
-        let fullPath = STATIC.STORE_PATH + filename;
+    saveFile(content);
 
-        fs.writeFile(fullPath, jsonContent, function(err) {
-          if(err)
-            callback(err, '[STORE - fail]');
-          else
-            callback(null, '[STORE - success]');
-        });
-      },
-      function(callback) {
-        let filename = STATIC.FILENAME;
-        let fullPath = STATIC.WORK_PATH + filename;
-
-        fs.writeFile(fullPath, jsonContent, function(err) {
-          if(err)
-            callback(err, '[WORK - fail]');
-          else
-            callback(null, '[WORK - success]');
-        });
-      }],
-      function(err, results) {
-        if(err)
-          console.log(err.message, '\n', results);
-        else
-          console.log('[SUCCESS]', results);
-    });
- 
     //console.log(countMap);
     //console.log(categories.join());
     //console.log(JSON.stringify(categories, null, '  '));
     console.log('可改修共计 : ', equipNames.length);
     //console.log('间隔栏total : ' + fenceLength);
-
 });
+
+// 向working, analisysed目录写入文件, 不需要采用series或waterfall的方式
+function saveFile(content) {
+
+  async.parallel({
+    toStore : function(callback) {
+        let filename = util.calcTodayStr() + STATIC.FILENAME;
+        let fullPath = STATIC.STORE_PATH + filename;
+
+        fs.writeFile(fullPath, content, function(err) {
+          if(err)
+            callback(err, '[STORE - fail]');
+          else
+            callback(null, '[success]');
+        });
+      },
+    toWork : function(callback) {
+        let filename = STATIC.FILENAME;
+        let fullPath = STATIC.WORK_PATH + filename;
+
+        fs.writeFile(fullPath, content, function(err) {
+          if(err)
+            callback(err, '[WORK - fail]');
+          else
+            callback(null, '[success]');
+        });
+      }
+    },
+    function(err, results) {
+      if(err)
+        console.log(err.message, '\n', results);
+      else
+        console.log('[SUCCESS]', results);
+    }
+  );
+
+}
+
 function generateJsonContent(categoryArr) {
 
   let jsonContent = '';
