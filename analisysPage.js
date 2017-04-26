@@ -275,10 +275,10 @@ function saveFile(content) {
 
 function generateJsonContent(categoryArr) {
 
-  let jsonContent = '';
+  let jsonContent = '{"categories":[';
   categoryArr.forEach((c) => {
-    jsonContent = jsonContent + JSON.stringify(c) + '\n';
+    jsonContent = jsonContent.concat(JSON.stringify(c), ',');
   });
 
-  return jsonContent;
+  return jsonContent.slice(0, -1).concat(']}');
 }
