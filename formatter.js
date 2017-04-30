@@ -4,7 +4,7 @@ const async = require('async');
 async.waterfall([
     openFile,
     parseToJson,
-    classifyEquip
+    formatJson2Map
   ],
   function(err, result) {
     if(err)
@@ -29,6 +29,8 @@ function openFile(callback) {
   });
 }
 
+// 将文件内容转化为JSON
+// 如果转化到JSON的过程中出错, 则报错
 function parseToJson(fileContent, callback) {
 
   try {
@@ -39,33 +41,45 @@ function parseToJson(fileContent, callback) {
   }
 }
 
-function classifyEquip(json, callback) {
+// 将包含类型数据的信息进行格式化
+function formatJson2Map(json, callback) {
 
-  if(!json.categories) {
+  let metaJson = json.categories;
+  if(!metaJson) {
 
-    callback(new Error('fileContent has NO "categories", or WRONG data.'));
+    callback(new Error('fileContent has NO "categories", or has WRONG DATA FORMAT.'));
   } else {
 
-    let categoryMeta = objectify(json.categories);
-    let classfiedMap = classifyCategory(categoryMeta);
-
-    callback(null, classfiedMap);
+    let formattedMetaMap = format2Map(metaJson);
+    callback(null, formattedMetaMap);
   }
 
   // 将数组变为对象
-  function objectify(categoryArr) {
+  function format2Map(categoryArr) {
 
-    let categoryMeta = {};
-    categoryArr.forEach(function(category) {
-      categoryMeta[category.cName] = category.equipArr;
+    let formattedMap = new Map();
+    categoryArr.forEach((category) => {
+      formattedMap.set(category.cName, category.equipArr);
     });
 
-    return categoryMeta;
+    return formattedMap;
   }
+}
+
+function regroup(metaCategoryMap, callback) {
 
   // 组合不同的分类装备到"组合"中
   function classifyCategory(categoryMeta) {
 
+    /*
+        小口径主砲, 中口径主砲, 大口径主砲,
+        副砲,       魚雷,       艦上戦闘機,
+        艦上爆撃機, 艦上偵察機, 水上偵察機,
+        水上戦闘機, 電探,       ソナ｜,
+        爆雷,       対艦強化弾, 対空機銃,
+        高射装置,   上陸用舟艇, 探照灯,
+        バルジ,     機関部強化, 潜水艦装備
+     */
     let classifyMap = new Map([
       ['小口径主炮/鱼雷', ['小口径主砲', '魚雷']],
       ['中口径主炮/副炮', ['中口径主砲', '副砲']],
@@ -94,6 +108,6 @@ function classifyEquip(json, callback) {
   }
 }
 
-function doExport(json, callback) {
-  //输出数据
+function doExport(regroupedMap, callback) {
+
 }
