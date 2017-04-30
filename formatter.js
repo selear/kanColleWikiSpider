@@ -2,11 +2,11 @@ const fs = require('fs');
 const async = require('async');
 
 async.waterfall([
-    openFile,
-    parseToJson,
-    formatJson2Map
-    //regroup
-    //extract
+    readFile,
+    parseContentToJson,
+    convertJsonToMap
+    //regroupCategory
+    //preExport
     //doExport
   ],
   function(err, result) {
@@ -17,13 +17,10 @@ async.waterfall([
 });
 
 const EXPORTS = {};
-EXPORTS.openFile    = openFile;
-EXPORTS.parseToJson = parseToJson;
-EXPORTS.doExport    = doExport;
 
 module.exports = EXPORTS;
 
-function openFile(callback) {
+function readFile(callback) {
   fs.readFile('./working/kaisyu-table-fixed.json', (err, data) => {
     if(err)
       callback(new Error(err));
@@ -34,7 +31,7 @@ function openFile(callback) {
 
 // 将文件内容转化为JSON
 // 如果转化到JSON的过程中出错, 则报错
-function parseToJson(fileContent, callback) {
+function parseContentToJson(fileContent, callback) {
 
   try {
     let contentInJson = JSON.parse(fileContent);
@@ -45,7 +42,7 @@ function parseToJson(fileContent, callback) {
 }
 
 // 将包含类型数据的信息进行格式化
-function formatJson2Map(json, callback) {
+function convertJsonToMap(json, callback) {
 
   let metaJson = json.categories;
   if(!metaJson) {
@@ -53,23 +50,23 @@ function formatJson2Map(json, callback) {
     callback(new Error('fileContent has NO "categories", or has WRONG DATA FORMAT.'));
   } else {
 
-    let formattedMetaMap = format2Map(metaJson);
-    callback(null, formattedMetaMap);
+    let metaCategoryMap = convertToMap(metaJson);
+    callback(null, metaCategoryMap);
   }
 
   // 将数组变为对象
-  function format2Map(categoryArr) {
+  function convertToMap(categoryArr) {
 
-    let formattedMap = new Map();
+    let metaMap = new Map();
     categoryArr.forEach((category) => {
-      formattedMap.set(category.cName, category.equipArr);
+      metaMap.set(category.cName, category.equipArr);
     });
 
-    return formattedMap;
+    return metaMap;
   }
 }
 
-function regroup(metaCategoryMap, callback) {
+function regroupCategory(categoryMap, callback) {
 
   // 组合不同的分类装备到"组合"中
   function classifyCategory(categoryMeta) {
@@ -111,7 +108,7 @@ function regroup(metaCategoryMap, callback) {
   }
 }
 
-function extract(regroupedMap, callback) {
+function preExport(regroupedMap, callback) {
 
 }
 
