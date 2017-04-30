@@ -5,6 +5,9 @@ async.waterfall([
     openFile,
     parseToJson,
     formatJson2Map
+    //regroup
+    //extract
+    //doExport
   ],
   function(err, result) {
     if(err)
@@ -108,6 +111,10 @@ function regroup(metaCategoryMap, callback) {
   }
 }
 
-function doExport(regroupedMap, callback) {
+function extract(regroupedMap, callback) {
+
+}
+
+function doExport(reduced, callback) {
 
 }
