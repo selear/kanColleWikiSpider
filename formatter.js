@@ -103,9 +103,9 @@ function regroupCategory(categoryMap, callback) {
   }
 
   // 组合不同的分类装备到"组合"中
-  function classifyCategory(categoryMeta) {
+  function regroup(categoryMap) {
 
-    let classifyMap = new Map([
+    let regroupRule = new Map([
       ['小口径主炮/鱼雷', ['小口径主砲', '魚雷']],
       ['中口径主炮/副炮', ['中口径主砲', '副砲']],
       ['大口径主炮/强化弹', ['大口径主砲', '対艦強化弾']],
@@ -118,18 +118,18 @@ function regroupCategory(categoryMap, callback) {
       ['登陆艇/探照灯/装甲带/动力', ['上陸用舟艇', '探照灯', 'バルジ', '機関部強化']]
     ]);
 
-    let classfied = new Map();
-    classifyMap.forEach((value, key) => {
+    let regrouped = new Map();
+    regroupRule.forEach((groupArr, regroupName) => {
       let arr = [];
-      value.forEach((name) => {
-        categoryMeta[name].forEach((equip) => {
+      groupArr.forEach((name) => {
+        categoryMap.get(name).forEach((equip) => {
           arr.push(equip);
         });
       });
-      classfied.set(key, arr);
+      regrouped.set(regroupName, arr);
     });
 
-    return classfied;
+    return regrouped;
   }
 }
 
