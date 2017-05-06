@@ -44,13 +44,14 @@ function parseContentToJson(fileContent, callback) {
 // 将包含类型数据的信息进行格式化
 function convertJsonToMap(json, callback) {
 
-  let metaJson = json.categories;
-  if(!metaJson) {
+  let categoryJson = json.categories;
+  let categoryDataNotExist = categoryJson ? false : true;
+  if(categoryDataNotExist) {
 
     callback(new Error('fileContent has NO "categories", or has WRONG DATA FORMAT.'));
   } else {
 
-    let metaCategoryMap = convertToMap(metaJson);
+    let metaCategoryMap = convertToMap(categoryJson);
     callback(null, metaCategoryMap);
   }
 
