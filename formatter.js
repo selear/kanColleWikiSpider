@@ -4,8 +4,8 @@ const async = require('async');
 async.waterfall([
     readFile,
     parseContentToJson,
-    convertJsonToMap
-    //regroupCategory
+    convertJsonToMap,
+    regroupCategory
     //preExport
     //doExport
   ],
@@ -70,6 +70,14 @@ function convertJsonToMap(json, callback) {
 function regroupCategory(categoryMap, callback) {
 
   let compareResult = compareWithLocal(categoryMap.keys());
+
+  if(compareResult.isEqual) {
+    let regrouped = regroup(categoryMap);
+    callback(null, regrouped);
+  } else {
+    callback(new Error(compareResult.message));
+  }
+
   function compareWithLocal(inputMapKeys) {
 
     //数组排序混乱时, 就无法进行正确的数组比对
