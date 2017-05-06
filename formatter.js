@@ -69,18 +69,42 @@ function convertJsonToMap(json, callback) {
 
 function regroupCategory(categoryMap, callback) {
 
+  let compareResult = compareWithLocal(categoryMap.keys());
+  function compareWithLocal(inputMapKeys) {
+
+    //数组排序混乱时, 就无法进行正确的数组比对
+    let localCategoryArr = [
+      '小口径主砲', '中口径主砲', '大口径主砲',
+      '副砲',       '魚雷',       '艦上戦闘機',
+      '艦上爆撃機', '艦上偵察機', '水上偵察機',
+      '水上戦闘機', '電探',       'ソナ｜',
+      '爆雷',       '対艦強化弾', '対空機銃',
+      '高射装置',   '上陸用舟艇', '探照灯',
+      'バルジ',     '機関部強化', '潜水艦装備'
+    ].sort();
+    let inputCategoryArr = Array.from(inputMapKeys).sort();
+
+    if(localCategoryArr.length !== inputCategoryArr.length) {
+      return {
+        isEqual : false,
+        message : 'length between arrays is NOT equal.'
+      };
+    }
+
+    let compareResult = { isEqual : true };
+    for(let idx = 0; idx < localCategoryArr.length; idx++) {
+      if(localCategoryArr[idx] != inputCategoryArr[idx]) {
+        compareResult.isEqual = false;
+        compareResult.message = `new Category data detected - [${localCategoryArr[idx]}] with [${inputCategoryArr[idx]}].`
+      }
+    }
+
+    return compareResult;
+  }
+
   // 组合不同的分类装备到"组合"中
   function classifyCategory(categoryMeta) {
 
-    /*
-        小口径主砲, 中口径主砲, 大口径主砲,
-        副砲,       魚雷,       艦上戦闘機,
-        艦上爆撃機, 艦上偵察機, 水上偵察機,
-        水上戦闘機, 電探,       ソナ｜,
-        爆雷,       対艦強化弾, 対空機銃,
-        高射装置,   上陸用舟艇, 探照灯,
-        バルジ,     機関部強化, 潜水艦装備
-     */
     let classifyMap = new Map([
       ['小口径主炮/鱼雷', ['小口径主砲', '魚雷']],
       ['中口径主炮/副炮', ['中口径主砲', '副砲']],
