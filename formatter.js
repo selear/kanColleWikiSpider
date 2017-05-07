@@ -5,8 +5,8 @@ async.waterfall([
     readFile,
     parseContentToJson,
     convertJsonToMap,
-    regroupCategory
-    //preExport
+    regroupCategory,
+    preExport
     //doExport
   ],
   function(err, result) {
@@ -124,7 +124,7 @@ function regroupCategory(categoryMap, callback) {
       ['电探', ['電探']],
       ['机枪/高射装置', ['対空機銃', '高射装置']],
       ['声纳/爆雷/潜水艇装备', ['ソナ｜', '爆雷', '潜水艦装備']],
-      ['登陆艇/探照灯/装甲带/动力', ['上陸用舟艇', '探照灯', 'バルジ', '機関部強化']]
+      ['登陆艇/探照灯/装甲带/轮机', ['上陸用舟艇', '探照灯', 'バルジ', '機関部強化']]
     ]);
 
     let regrouped = new Map();
@@ -145,6 +145,45 @@ function regroupCategory(categoryMap, callback) {
 
 function preExport(regroupedMap, callback) {
 
+  let reduced = extract();
+  callback(null, reduced);
+
+  function extract() {
+
+    let extracted = {};
+    regroupedMap.forEach((detailMap, groupName) => {
+
+      detailMap.forEach((equipDetailArr, equipName) => {
+        let equip = {};
+        equip['name'] = equipName;
+        equip['icon'] = equipDetailArr.pop().category;
+        equip['category'] = groupName; // 这里的category实际上表示的是groupName
+        equip['detail'] = extractDetail(equipDetailArr);
+        equip['remark'] = extractRemark(equipDetailArr);
+
+        extracted[equipName] = equip;
+      });
+    });
+
+    return extracted;
+
+    // 九三式水中聴音機, 大発動艇, 存在方向不同的改修, 需要特别注意
+    function extractDetail(detailInArr) {
+
+      let detail = [];
+      // TODO 后续确认输出格式后, 进行迭代, 而非指定
+      detailInArr[0].improveAssist.forEach((assist) => {
+        detail.push({ 'assistant' : assist.name, 'enableDays' : assist.enableDays })
+      });
+      return detail;
+    }
+
+    // 九三式水中聴音機, 大発動艇, 存在方向不同的改修, 需要特别注意
+    function extractRemark(detailInArr) {
+      // TODO 后续确认输出格式后, 进行迭代, 而非指定
+      return detailInArr[0].remark;
+    }
+  }
 }
 
 function doExport(reduced, callback) {
