@@ -69,16 +69,16 @@ function convertJsonToMap(json, callback) {
 
 function regroupCategory(categoryMap, callback) {
 
-  let compareResult = compareWithLocal(categoryMap.keys());
+  let compareResult = compareWithLocalCategory(categoryMap.keys());
 
   if(compareResult.isEqual) {
-    let regrouped = regroup(categoryMap);
-    callback(null, regrouped);
+    let regroupedMap = regroup(categoryMap);
+    callback(null, regroupedMap);
   } else {
     callback(new Error(compareResult.message));
   }
 
-  function compareWithLocal(inputMapKeys) {
+  function compareWithLocalCategory(inputMapKeys) {
 
     //数组排序混乱时, 就无法进行正确的数组比对
     let localCategoryArr = [
@@ -111,6 +111,7 @@ function regroupCategory(categoryMap, callback) {
   }
 
   // 组合不同的分类装备到"组合"中
+  // 额外在每个装备系列的数组中添加对象 { 'category' : `${categoryName}` }
   function regroup(categoryMap) {
 
     let regroupRule = new Map([
@@ -128,13 +129,14 @@ function regroupCategory(categoryMap, callback) {
 
     let regrouped = new Map();
     regroupRule.forEach((groupArr, regroupName) => {
-      let arr = [];
-      groupArr.forEach((name) => {
-        categoryMap.get(name).forEach((equip) => {
-          arr.push(equip);
+      let detailMap = new Map();
+      groupArr.forEach((categoryName) => {
+        categoryMap.get(categoryName).forEach((equip) => {
+          equip.improveTarget.push({ 'category' : categoryName });
+          detailMap.set(equip.name, equip.improveTarget);
         });
       });
-      regrouped.set(regroupName, arr);
+      regrouped.set(regroupName, detailMap);
     });
 
     return regrouped;
