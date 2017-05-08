@@ -12,11 +12,10 @@ const STATIC = {
   DATA_SOURCE : 'kaisyu-table-fixed.html'
 };
 
-var $ = null;
 fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
     if(err) throw err;
-    $ = cheerio.load(utf8html);
+    let $ = cheerio.load(utf8html);
 
     var $tbody = $('tbody');
 
@@ -121,7 +120,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
         curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
 
-        curImproveTar.setRemark($tds.eq(remarkIdx).text());
+        curImproveTar.setRemark(formatRemark($tds.eq(remarkIdx), $));
 
         curCategory.addEquip(curEquip);
 
@@ -183,7 +182,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
         curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
 
-        curImproveTar.setRemark($tds.eq(16).text());
+        curImproveTar.setRemark(formatRemark($tds.eq(16), $));
 
       } else if($tds.length === 18) {
 
@@ -208,7 +207,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
         curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
 
-        curImproveTar.setRemark($tds.eq(17).text());
+        curImproveTar.setRemark(formatRemark($tds.eq(17), $));
 
       }
 
@@ -283,4 +282,17 @@ function generateJsonContent(categoryArr) {
   });
 
   return jsonContent.slice(0, -1).concat(']}');
+}
+
+function formatRemark($remarkNode, $) {
+  let countSpacer = $remarkNode.find($('br.spacer')).length;
+  $remarkNode.find($('br.spacer')).replaceWith('\n');
+
+  let remarkStr = $remarkNode.text();
+
+  if(remarkStr.endsWith('\n')) {
+    remarkStr = remarkStr.substr(0, remarkStr.length - 1);
+  }
+
+  return remarkStr;
 }
