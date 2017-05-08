@@ -90,10 +90,9 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
         if(iDetail.getPhase() === 0) {
           curImproveTar = new ImproveTarget();
         }
+
         curImproveTar.setResourceCost(rCost);
-
         curImproveTar.getImproveCost().merge(iDetail);
-
         curEquip.addImproveTarget(curImproveTar);
 
         /* cheerio读取本地文件时, INDEX is ZERO BASED
@@ -119,9 +118,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
         }
 
         curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
-
         curImproveTar.setRemark(formatRemark($tds.eq(remarkIdx), $));
-
         curCategory.addEquip(curEquip);
 
         // 2017.04.06, 由元数据[FORMAL][2017-4-3T23]kaisyu-table-fixed.html
@@ -147,7 +144,6 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
             iDetail    = Equip.initImproveDetail($tds, improveIdx);
 
         curImproveTar.getImproveCost().merge(iDetail);
-
         curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
 
         // length === 12时, 几乎确定不需要创建ImproveTarget实例,
@@ -179,9 +175,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
             rCost       = Equip.initResourceCost($tds, resourceIdx);
 
         curImproveTar.setResourceCost(rCost);
-
         curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
-
         curImproveTar.setRemark(formatRemark($tds.eq(16), $));
 
       } else if($tds.length === 18) {
@@ -204,9 +198,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
             rCost       = Equip.initResourceCost($tds, resourceIdx);
 
         curImproveTar.setResourceCost(rCost);
-
         curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
-
         curImproveTar.setRemark(formatRemark($tds.eq(17), $));
 
       }
