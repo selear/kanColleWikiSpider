@@ -9,10 +9,7 @@ var Equip         = MODELS.Equip;
 var ImproveTarget = MODELS.ImproveTarget;
 
 const STATIC = {
-    DATA_SOURCE : 'kaisyu-table-fixed.html',
-    STORE_PATH  : './analisysed/',
-    WORK_PATH   : './working/',
-    FILENAME    : 'kaisyu-table-fixed.json'
+  DATA_SOURCE : 'kaisyu-table-fixed.html'
 };
 
 var $ = null;
@@ -239,10 +236,16 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 // 向working, analisysed目录写入文件, 不需要采用series或waterfall的方式
 function saveFile(content) {
 
+  const path = {
+    toStore    : './analisysed/',
+    toWork     : './working/',
+    savingName : 'kaisyu-table-fixed.json'
+  };
+
   async.parallel({
-    toStore : function(callback) {
-        let filename = util.calcTodayStr() + STATIC.FILENAME;
-        let fullPath = STATIC.STORE_PATH + filename;
+      toStore : function(callback) {
+        let filename = util.calcTodayStr() + path.savingName;
+        let fullPath = path.toStore + filename;
 
         fs.writeFile(fullPath, content, function(err) {
           if(err)
@@ -251,9 +254,9 @@ function saveFile(content) {
             callback(null, '[success]');
         });
       },
-    toWork : function(callback) {
-        let filename = STATIC.FILENAME;
-        let fullPath = STATIC.WORK_PATH + filename;
+      toWork : function(callback) {
+        let filename = path.savingName;
+        let fullPath = path.toWork + filename;
 
         fs.writeFile(fullPath, content, function(err) {
           if(err)
@@ -270,7 +273,6 @@ function saveFile(content) {
         console.log('[SUCCESS]', results);
     }
   );
-
 }
 
 function generateJsonContent(categoryArr) {
