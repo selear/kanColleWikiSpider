@@ -3,7 +3,8 @@ const async = require('async');
 
 const STATIC = {
   EQUIP_DATA_FILE : './working/kaisyu-table-fixed.json',
-  EXPORT_TEMPLATE : './working/preEquipData.js'
+  EXPORT_TEMPLATE : './working/preEquipData.js',
+  EXPORT_FILENAME : './working/equipData.js'
 };
 
 async.waterfall([
@@ -12,8 +13,8 @@ async.waterfall([
     convertJsonToMap,
     regroupCategory,
     generateEquipContent,
-    generateExportContent
-    //doExport
+    generateExportContent,
+    doExport
   ],
   function(err, result) {
     if(err)
@@ -211,4 +212,10 @@ function generateExportContent(equipContent, callback) {
 
 function doExport(fileContent, callback) {
 
+  fs.writeFile(STATIC.EXPORT_FILENAME, fileContent, 'utf8', (err) => {
+    if(err)
+      callback(new Error(`Encounter errors while exporting\n${err}`));
+    else
+      callback(null, `[EXPORT ${STATIC.EXPORT_FILENAME} success]`);
+  });
 }
