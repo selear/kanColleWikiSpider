@@ -1,8 +1,13 @@
 const fs = require('fs');
 const async = require('async');
 
+const STATIC = {
+  EQUIP_DATA_FILE : './working/kaisyu-table-fixed.json',
+  EXPORT_TEMPLATE : './working/preEquipData.js'
+};
+
 async.waterfall([
-    readFile,
+    readEquipFile,
     parseContentToJson,
     convertJsonToMap,
     regroupCategory,
@@ -21,8 +26,8 @@ const EXPORTS = {};
 
 module.exports = EXPORTS;
 
-function readFile(callback) {
-  fs.readFile('./working/kaisyu-table-fixed.json', (err, data) => {
+function readEquipFile(callback) {
+  fs.readFile(STATIC.EQUIP_DATA_FILE, (err, data) => {
     if(err)
       callback(new Error(err));
     else
@@ -32,10 +37,10 @@ function readFile(callback) {
 
 // 将文件内容转化为JSON
 // 如果转化到JSON的过程中出错, 则报错
-function parseContentToJson(fileContent, callback) {
+function parseContentToJson(equipFileContent, callback) {
 
   try {
-    let contentInJson = JSON.parse(fileContent);
+    let contentInJson = JSON.parse(equipFileContent);
     callback(null, contentInJson);
   } catch(e) {
     callback(new Error('ERROR by processing JSON.parse()'));
@@ -194,7 +199,7 @@ function generateEquipContent(regroupedMap, callback) {
 
 function generateExportContent(equipContent, callback) {
 
-  fs.readFile('./working/preEquipData.js', { encoding : 'utf8' }, (err, targetFileContent) => {
+  fs.readFile(STATIC.EXPORT_TEMPLATE, { encoding : 'utf8' }, (err, targetFileContent) => {
     if(err) {
       callback(new Error(`opening <preEquipData> encounter Errors\n${err}`));
     } else {
