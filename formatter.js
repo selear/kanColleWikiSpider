@@ -6,7 +6,7 @@ async.waterfall([
     parseContentToJson,
     convertJsonToMap,
     regroupCategory,
-    preExport
+    generateEquipContent
     //doExport
   ],
   function(err, result) {
@@ -143,10 +143,15 @@ function regroupCategory(categoryMap, callback) {
   }
 }
 
-function preExport(regroupedMap, callback) {
+function generateEquipContent(regroupedMap, callback) {
 
-  let reduced = extract();
-  callback(null, reduced);
+  if(!regroupedMap instanceof Map)
+    callback(new Error('Input data invalid, wrong data type'));
+  /* 不对regroupedMap.size进行判断, 目前认为没必要进行判断 */
+
+  let equipDataContent = 'equips = ' + JSON.stringify(extract(), null, '  ');
+
+  callback(null, equipDataContent);
 
   function extract() {
 
