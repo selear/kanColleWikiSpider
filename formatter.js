@@ -191,6 +191,6 @@ function generateEquipContent(regroupedMap, callback) {
   }
 }
 
-function doExport(reduced, callback) {
+function doExport(fileContent, callback) {
 
 }
