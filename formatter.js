@@ -6,7 +6,8 @@ async.waterfall([
     parseContentToJson,
     convertJsonToMap,
     regroupCategory,
-    generateEquipContent
+    generateEquipContent,
+    generateExportContent
     //doExport
   ],
   function(err, result) {
@@ -189,6 +190,18 @@ function generateEquipContent(regroupedMap, callback) {
       return detailInArr[0].remark;
     }
   }
+}
+
+function generateExportContent(equipContent, callback) {
+
+  fs.readFile('./working/preEquipData.js', { encoding : 'utf8' }, (err, targetFileContent) => {
+    if(err) {
+      callback(new Error(`opening <preEquipData> encounter Errors\n${err}`));
+    } else {
+      let fileContent = targetFileContent + equipContent;
+      callback(null, fileContent);
+    }
+  });
 }
 
 function doExport(fileContent, callback) {
