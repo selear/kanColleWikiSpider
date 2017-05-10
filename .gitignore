@@ -1,7 +1,9 @@
+# Ignore everything
 kaisyu-table-fixed.html
 diff_backup/*
 metaData/*
 analisysed/*
 working/*
 
+# Ignore Except these files
 !working/preEquipData.js
