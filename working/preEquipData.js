@@ -1,7 +1,5 @@
 var kanColle = {
   remodel: {
-    categoryNameList: ['小口径主砲/副砲', '中口径主砲', '大口径主砲', '魚雷', '反潛裝備', '特種裝備', '電探', '艦載機'],
-    defaultSelected: ['20.3cm(2号)連装砲', '20.3cm(3号)連装砲', '41cm連装砲', '46cm三連装砲', '61cm五連装(酸素)魚雷', '九一式徹甲弾'],
 
     /*
      *  访问路径: kanColle.remodel.extractEquip(equipName)
@@ -140,7 +138,5 @@ var kanColle = {
   }
 };
 
-kanColle.remodel.equips = {};
-
-var equips = kanColle.remodel.equips;
-
+kanColle.remodel.categoryNameList = ['小口径主炮/鱼雷', '中口径主砲', '大口径主砲', '魚雷', '反潛裝備', '特種裝備', '電探', '艦載機'];
+kanColle.remodel.defaultSelected = ['20.3cm(2号)連装砲', '20.3cm(3号)連装砲', '41cm連装砲', '46cm三連装砲', '61cm五連装(酸素)魚雷', '九一式徹甲弾'];

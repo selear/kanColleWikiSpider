@@ -153,7 +153,7 @@ function regroupCategory(categoryMap, callback) {
 function generateEquipContent(regroupedMap, callback) {
 
   if(regroupedMap instanceof Map) {
-    let equipDataContent = 'equips = ' + JSON.stringify(extract(), null, '  ');
+    let equipDataContent = 'kanColle.remodel.equips = ' + JSON.stringify(extract(), null, '  ') + ';';
     callback(null, equipDataContent);  
   } else {
     callback(new Error('INVALID input data, wrong dataType'));
