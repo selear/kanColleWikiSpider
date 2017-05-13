@@ -1,23 +1,21 @@
-var fs = require('fs'),
-    cheerio = require('cheerio'),
-    util = require('./util/consoleUtil'),
-    $ = null;
+const fs = require('fs');
+const cheerio = require('cheerio');
+const async = require('async');
+const util = require('./util/consoleUtil');
 
-var MODELS        = require('./model/kaisyu_table'),
-    Category      = MODELS.Category,
-    Equip         = MODELS.Equip,
-    ImproveTarget = MODELS.ImproveTarget;
+const MODELS      = require('./model/kaisyu_table');
+var Category      = MODELS.Category;
+var Equip         = MODELS.Equip;
+var ImproveTarget = MODELS.ImproveTarget;
 
-var STATIC = {
-    DATA_SOURCE : 'kaisyu-table-fixed.html',
-    TARGET_PATH : './analisysed/',
-    TARGET_JSON : 'kaisyu-table-fixed.json'
+const STATIC = {
+  DATA_SOURCE : 'kaisyu-table-fixed.html'
 };
 
 fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
     if(err) throw err;
-    $ = cheerio.load(utf8html);
+    let $ = cheerio.load(utf8html);
 
     var $tbody = $('tbody');
 
@@ -92,10 +90,9 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
         if(iDetail.getPhase() === 0) {
           curImproveTar = new ImproveTarget();
         }
+
         curImproveTar.setResourceCost(rCost);
-
         curImproveTar.getImproveCost().merge(iDetail);
-
         curEquip.addImproveTarget(curImproveTar);
 
         /* cheerio读取本地文件时, INDEX is ZERO BASED
@@ -121,9 +118,7 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
         }
 
         curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
-
-        curImproveTar.setRemark($tds.eq(remarkIdx).text());
-
+        curImproveTar.setRemark(formatRemark($tds.eq(remarkIdx), $));
         curCategory.addEquip(curEquip);
 
         // 2017.04.06, 由元数据[FORMAL][2017-4-3T23]kaisyu-table-fixed.html
@@ -149,7 +144,6 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
             iDetail    = Equip.initImproveDetail($tds, improveIdx);
 
         curImproveTar.getImproveCost().merge(iDetail);
-
         curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
 
         // length === 12时, 几乎确定不需要创建ImproveTarget实例,
@@ -181,10 +175,8 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
             rCost       = Equip.initResourceCost($tds, resourceIdx);
 
         curImproveTar.setResourceCost(rCost);
-
         curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
-
-        curImproveTar.setRemark($tds.eq(16).text());
+        curImproveTar.setRemark(formatRemark($tds.eq(16), $));
 
       } else if($tds.length === 18) {
 
@@ -206,10 +198,8 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
             rCost       = Equip.initResourceCost($tds, resourceIdx);
 
         curImproveTar.setResourceCost(rCost);
-
         curImproveTar.addImproveAssist(Equip.initImproveAssist($tds, daysIdx));
-
-        curImproveTar.setRemark($tds.eq(17).text());
+        curImproveTar.setRemark(formatRemark($tds.eq(17), $));
 
       }
 
@@ -223,24 +213,78 @@ fs.readFile(STATIC.DATA_SOURCE, { encoding: 'utf8' }, function(err, utf8html) {
 
     });
 
-    var i = 0;
-    var jsonContent = '';
-    for(i = 0; i < categories.length; i++) {
-      var category = categories[i];
-      jsonContent = jsonContent + JSON.stringify(category, null, '') + '\n';      
-    }
+    let content = generateJsonContent(categories);
 
-    var filename = util.calcTodayStr() + STATIC.TARGET_JSON,
-        fullPath = STATIC.TARGET_PATH + filename;
+    saveFile(content);
 
-    fs.writeFile(fullPath, jsonContent, function(err) {
-      console.log('[已保存]', filename);
-    });
-    
     //console.log(countMap);
     //console.log(categories.join());
     //console.log(JSON.stringify(categories, null, '  '));
     console.log('可改修共计 : ', equipNames.length);
     //console.log('间隔栏total : ' + fenceLength);
-
 });
+
+// 向working, analisysed目录写入文件, 不需要采用series或waterfall的方式
+function saveFile(content) {
+
+  const path = {
+    toStore    : './analisysed/',
+    toWork     : './working/',
+    savingName : 'kaisyu-table-fixed.json'
+  };
+
+  async.parallel({
+      toStore : function(callback) {
+        let filename = util.calcTodayStr() + path.savingName;
+        let fullPath = path.toStore + filename;
+
+        fs.writeFile(fullPath, content, function(err) {
+          if(err)
+            callback(err, '[STORE - fail]');
+          else
+            callback(null, '[success]');
+        });
+      },
+      toWork : function(callback) {
+        let filename = path.savingName;
+        let fullPath = path.toWork + filename;
+
+        fs.writeFile(fullPath, content, function(err) {
+          if(err)
+            callback(err, '[WORK - fail]');
+          else
+            callback(null, '[success]');
+        });
+      }
+    },
+    function(err, results) {
+      if(err)
+        console.log(err.message, '\n', results);
+      else
+        console.log('[SUCCESS]', results);
+    }
+  );
+}
+
+function generateJsonContent(categoryArr) {
+
+  let jsonContent = '{"categories":[';
+  categoryArr.forEach((c) => {
+    jsonContent = jsonContent.concat(JSON.stringify(c), ',');
+  });
+
+  return jsonContent.slice(0, -1).concat(']}');
+}
+
+function formatRemark($remarkNode, $) {
+  let countSpacer = $remarkNode.find($('br.spacer')).length;
+  $remarkNode.find($('br.spacer')).replaceWith('\n');
+
+  let remarkStr = $remarkNode.text();
+
+  if(remarkStr.endsWith('\n')) {
+    remarkStr = remarkStr.substr(0, remarkStr.length - 1);
+  }
+
+  return remarkStr;
+}
