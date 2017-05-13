@@ -168,7 +168,7 @@ function generateEquipContent(regroupedMap, callback) {
       detailMap.forEach((equipDetailArr, equipName) => {
         let equip = {};
         equip['name'] = equipName;
-        equip['icon'] = equipDetailArr.pop().category;
+        equip['icon'] = calcIcon(equipName, equipDetailArr.pop().category);
         equip['category'] = groupName; // 这里的category实际上表示的是groupName
         equip['detail'] = extractDetail(equipDetailArr);
         equip['remark'] = extractRemark(equipDetailArr);
@@ -178,6 +178,21 @@ function generateEquipContent(regroupedMap, callback) {
     });
 
     return extracted;
+
+    function calcIcon(equipName, category) {
+
+      let specialIconMap = new Map([
+         ['10cm高角砲＋高射装置', '高角砲'], ['90mm単装高角砲', '高角砲'],
+             ['12.7cm連装高角砲', '高角砲'], ['8cm高角砲', '高角砲'],
+        ['8cm高角砲改＋増設機銃', '高角砲'], ['特二式内火艇', '特二式内火艇']
+      ]);
+
+      if(specialIconMap.has(equipName)) {
+        return specialIconMap.get(equipName);
+      } else {
+        return category || 'default';
+      }
+    }
 
     // 九三式水中聴音機, 大発動艇, 存在方向不同的改修, 需要特别注意
     function extractDetail(detailInArr) {

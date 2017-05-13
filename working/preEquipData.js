@@ -131,6 +131,7 @@ var kanColle = {
           JetPowerededBomber2 - 噴式戦闘爆撃機(橘花, 喷式景云图标不一样)
           Submarine Radar - 潜水艇装备, Submarine Radar & Waterproof Telescope, Submarine Radar & Passive Radiolocator 
         */
+        'default': 'default',
         '小口径主砲': 'main-cannon-light',
         '中口径主砲': 'main-cannon-medium',
         '大口径主砲': 'main-cannon-heavy',
@@ -153,6 +154,7 @@ var kanColle = {
         'バルジ': 'anti-torpedo-bulge',
         '機関部強化': 'engine-improvement',
         '潜水艦装備': 'submarine-radar',
+        '特二式内火艇': 'amphibious-landing-craft',
 
         // groupName
         '小口径主炮/鱼雷'           : 'main-cannon-light',
