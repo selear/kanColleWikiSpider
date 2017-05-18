@@ -3,16 +3,19 @@
   "version": "1.0",
   "author": "selear <selear@gmail.com> (https://github.com/selear)",
   "description": "extract data from kanColle Wiki, data source is in HTML",
-  "keywords": ["node.js", "javascript"],
+  "keywords": [
+    "node.js",
+    "javascript"
+  ],
   "repository": {
-      "type": "git",
-      "url": "https://github.com/selear/kanColleWikiSpider"
-    },
+    "type": "git",
+    "url": "https://github.com/selear/kanColleWikiSpider"
+  },
   "homepage": "https://github.com/selear/kanColleWikiSpider",
   "bugs": {
-      "url": "https://github.com/selear/kanColleWikiSpider/issues",
-      "email": "selear@gmail.com"
-    },
+    "url": "https://github.com/selear/kanColleWikiSpider/issues",
+    "email": "selear@gmail.com"
+  },
   "license": "GPL-1.0",
   "main": "main.js",
   "dependencies": {
@@ -22,5 +25,8 @@
   },
   "scripts": {
     "test": ""
+  },
+  "devDependencies": {
+    "mocha": "^3.4.1"
   }
 }
