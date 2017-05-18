@@ -1,13 +1,26 @@
 {
-  "name": "kanColle wiki spider",
-  "version": "0.0.1",
-  "description": "data scrape from kanColle wiki",
+  "name": "kanColleWikiSpider",
+  "version": "1.0",
+  "author": "selear <selear@gmail.com> (https://github.com/selear)",
+  "description": "extract data from kanColle Wiki, data source is in HTML",
+  "keywords": ["node.js", "javascript"],
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/selear/kanColleWikiSpider"
+    },
+  "homepage": "https://github.com/selear/kanColleWikiSpider",
+  "bugs": {
+      "url": "https://github.com/selear/kanColleWikiSpider/issues",
+      "email": "selear@gmail.com"
+    },
+  "license": "GPL-1.0",
   "main": "main.js",
-  "author": "selear",
   "dependencies": {
     "async": "^2.3.0",
     "cheerio": "latest",
-    "mongodb": "2.1.7",
     "request": "latest"
+  },
+  "scripts": {
+    "test": ""
   }
 }
