@@ -1,6 +1,6 @@
 {
   "name": "kanColleWikiSpider",
-  "version": "1.0",
+  "version": "1.0.1",
   "author": "selear <selear@gmail.com> (https://github.com/selear)",
   "description": "extract data from kanColle Wiki, data source is in HTML",
   "keywords": [
@@ -24,7 +24,7 @@
     "request": "latest"
   },
   "scripts": {
-    "test": ""
+    "test": "mocha"
   },
   "devDependencies": {
     "mocha": "^3.4.1"
