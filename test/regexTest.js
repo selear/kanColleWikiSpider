@@ -1,7 +1,6 @@
-const assert = require('assert');
+const should = require('should');
 
-var ValidateDual = function() {
-
+describe('REGEXP - DUAL', function() {
   // 正则表达式在工具网站下测试通过, 测试数据本注释中也有提及, 匹配模式gm
   //   http://regexr.com/
 
@@ -13,10 +12,10 @@ var ValidateDual = function() {
   //   /^(([1-9]?\d|\?)\/([1-9]\d?|\?)|-\/-)$/gm
   // node.js    - regexp
   //   /^(([1-9]?\d|\?)\/([1-9]\d?|\?)|-\/-)$/
-  this.REGEXP = /^(([1-9]?\d|\?)\/([1-9]\d?|\?)|-\/-)$/;
+  let regexp = /^(([1-9]?\d|\?)\/([1-9]\d?|\?)|-\/-)$/;
 
   //QM is short for 'question mark', etc. '?'
-  this.TEST_CASE = {
+  let testCase = {
     'head_0'           : ['0/0','0/1','0/9','0/10','0/99','0/100','0/999'],
     'head_0_Alphabet'  : ['0/1a','0/9b','0/10c','0/99d','0/100e','0/999f'],
     'head_10'          : ['10/0','10/1','10/9','10/10','10/99','10/100','10/999'],
@@ -48,7 +47,7 @@ var ValidateDual = function() {
                           '??/ ?','? /??','?/ ??','??/??','?? /??','??/ ??']
   };
 
-  this.EXPECTED = {
+  let expected = {
     'head_0'           : ['0/1', '0/9', '0/10', '0/99'],
     'head_0_Alphabet'  : [],
     'head_10'          : ['10/1','10/9','10/10','10/99'],
@@ -66,10 +65,37 @@ var ValidateDual = function() {
     'foot_QM_dual'     : [],
     'special_QM'       : ['?/?']
   };
-};
 
-var ValidateSingular = function() {
+  let test = function(prop) {
+    testCase.should.have.property(prop);
+    expected.should.have.property(prop);
+    let matchedArr = testCase[prop].filter(function(elem) {
+      return regexp.test(elem);
+    });
+    matchedArr.should.eql(expected[prop]);
+  };
 
+  it('should all pass', function() {
+    test('head_0');
+    test('head_0_Alphabet');
+    test('head_10');
+    test('head_10_Alphabet');
+    test('head_99');
+    test('head_99_Alphabet');
+    test('head_000');
+    test('head_010');
+    test('head_999');
+    test('special');
+
+    test('head_QM');
+    test('head_QM_dual');
+    test('foot_QM');
+    test('foot_QM_dual');
+    test('special_QM');
+  });
+});
+
+describe('REGEXP - SINGULAR', function() {
   // 单元测试#单组梳子#
   //   取值范围为单位正整数, [0, 9]
   //   取值特殊情况, '-', '', ''的情况可以在抓取数据的时候可以处理掉
@@ -77,9 +103,9 @@ var ValidateSingular = function() {
   //   /^(\d|-)$/
   // 备用regexp
   //   /^[0-9\-]$/
-  this.REGEXP = /^[0-9\-]$/;
+  let regexp = /^[0-9\-]$/;
 
-  this.TEST_CASE = {
+  let testCase = {
     'singleNum'      : ['0','1','2','3','4','5','6','7','8','9'],
     'singleNumSpace' : [' 0','0 ',' 9','9 '],
     'twoDigits'      : ['00','01','09','10','99'],
@@ -87,93 +113,28 @@ var ValidateSingular = function() {
     'special'        : ['-',' -','-- ','---',' --','- -','-- ']
   };
 
-  this.EXPECTED = {
+  let expected = {
     'singleNum'      : ['0','1','2','3','4','5','6','7','8','9'],
     'singleNumSpace' : [],
     'twoDigits'      : [],
     'threeDigits'    : [],
     'special'        : ['-']
   };
-};
 
-var caseTest = function(target) {
+  let test = function(prop) {
+    testCase.should.have.property(prop);
+    expected.should.have.property(prop);
+    let matchedArr = testCase[prop].filter(function(elem) {
+      return regexp.test(elem);
+    });
+    matchedArr.should.eql(expected[prop]);
+  };
 
-  let regexp = this.REGEXP;
-  let validElemArr = this.TEST_CASE[target].filter(function(elem) {
-    return regexp.test(elem);
-  });
-  assert.deepEqual(validElemArr, this.EXPECTED[target], 'error in [' + target + ']');
-};
-
-var testSingular = function() {
-
-  let validate = new ValidateSingular();
-
-  caseTest.call(validate, 'singleNum');
-  caseTest.call(validate, 'singleNumSpace');
-  caseTest.call(validate, 'twoDigits');
-  caseTest.call(validate, 'threeDigits');
-  caseTest.call(validate, 'special');
-
-  console.log('[success]', '[subTest]Regexp - SINGULAR');
-};
-
-var testDual = function() {
-
-  let validate = new ValidateDual();
-
-  caseTest.call(validate, 'head_0');
-  caseTest.call(validate, 'head_0_Alphabet');
-  caseTest.call(validate, 'head_10');
-  caseTest.call(validate, 'head_10_Alphabet');
-  caseTest.call(validate, 'head_99');
-  caseTest.call(validate, 'head_99_Alphabet');
-  caseTest.call(validate, 'head_000');
-  caseTest.call(validate, 'head_010');
-  caseTest.call(validate, 'head_999');
-  caseTest.call(validate, 'special');
-
-  caseTest.call(validate, 'head_QM');
-  caseTest.call(validate, 'head_QM_dual');
-  caseTest.call(validate, 'foot_QM');
-  caseTest.call(validate, 'foot_QM_dual');
-  caseTest.call(validate, 'special_QM');
-
-  console.log('[success]', '[subTest]Regexp - DUAL');
-};
-
-const EXPORTS = {};
-EXPORTS.testDual     = testDual;
-EXPORTS.testSingular = testSingular;
-
-module.exports = EXPORTS;
-
-var Debug = function() {
-  if(this instanceof Debug) {
-    this.ARGS_COMMAND_MAP = new Map([['-d', 'selfTest'], ['-debug', 'selfTest']]);
-    this.COMMAND = new Map([['selfTest', function(){ for(let prop in EXPORTS) {
-                                                     EXPORTS[prop]();} }
-    ]]);
-  } else {
-    return new Debug();
-  }
-};
-
-Debug.prototype.execArgs = function() {
-  let validArgs = new Set();
-  let inputArgs = process.argv.slice(2);
-  let argsMap = this.ARGS_COMMAND_MAP;
-
-  inputArgs.filter(function(key) {
-
-    if(argsMap.has(key))
-      validArgs.add(argsMap.get(key));
-  });
-
-  let cmd = this.COMMAND;
-  validArgs.forEach(function(key) {
-    cmd.get(key)();
-  });
-};
-
-Debug().execArgs();
+  it('should all pass', function() {
+    test('singleNum');
+    test('singleNumSpace');
+    test('twoDigits');
+    test('threeDigits');
+    test('special');
+  })
+});
