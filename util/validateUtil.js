@@ -16,20 +16,23 @@ const REGEXP = {
 // --4--数组包含重复的合法元素, 从页面抓取的数据一般不会出现该情况
 var assistShip = function(str, arr) {
 
-  if(typeof str != 'string' || (!Array.isArray(arr)))
+  if(typeof str != 'string' || (!Array.isArray(arr))) {
     return false;
+  }
 
   // 数组的长度肯定大于等于0
-  if(arr.length > 8)
+  if(arr.length > 8) {
     return false;
+  }
 
   var invalidElementArr = arr.filter(function(x) {
-    //     不是整数 - true      || 数值在[0, 6]区间外 - true
+    //          不是整数 - true || 数值在[0, 6]区间外 - true
     return !Number.isInteger(x) || ( x < 0 || x > 6 );
   });
 
-  if(invalidElementArr.length > 0)
+  if(invalidElementArr.length > 0) {
     return false;
+  }
 
   return true;
 };
@@ -45,24 +48,28 @@ var assistShip = function(str, arr) {
 //    + 超出范围的正整数
 //    + 字符串, 数组, FALSY值(主要为null, undefined)
 var resourceCost = function(arr) {
-  if(!Array.isArray(arr))
+  if(!Array.isArray(arr)) {
     return false;
+  }
 
-  if(arr.length != 4)
+  if(arr.length != 4) {
     return false;
+  }
 
   var invalidElementArr = arr.filter(function(elem) {
 
-    if(isFloat(elem))
+    if(isFloat(elem)) {
       return true;
+    }
 
     var intVal = Number.parseInt(elem);
     //     不是整数 - true      || 数值在[0, 2000]区间外 - true
     return !Number.isInteger(intVal) || (intVal < 0 || intVal > 2000);
   });
 
-  if(invalidElementArr.length > 0)
+  if(invalidElementArr.length > 0) {
     return false;
+  }
 
   return true;
 
