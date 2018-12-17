@@ -20,8 +20,10 @@
   "main": "main.js",
   "dependencies": {
     "async": "^2.3.0",
-    "cheerio": "latest",
-    "request": "latest"
+    "cheerio": "^0.22.0",
+    "request": "^2.81.0",
+    "https-proxy-agent" : "^1.0.0",
+    "iconv-lite" : "^0.4.15"
   },
   "scripts": {
     "test": "mocha"

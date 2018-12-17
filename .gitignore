@@ -1,9 +1,18 @@
 # Ignore everything
-kaisyu-table-fixed.html
+.idea/*
+
+analisysed/*
 diff_backup/*
 metaData/*
-analisysed/*
+model/*
+util/
 working/*
+test/testData/*
+test/basicTest.js
+test/regexTest.js
 
-# Ignore Except these files
-!working/preEquipData.js
+kaisyu-table-fixed.html
+analisysPage.js
+fetchPage.js
+formatter.js
+main.js
