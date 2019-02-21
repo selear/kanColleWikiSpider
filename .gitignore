@@ -1,18 +1,23 @@
 # Ignore everything
 .idea/*
 
-analisysed/*
-diff_backup/*
-metaData/*
-model/*
+analisysed/
+diff_backup/
+metaData/
+model/
 util/
-working/*
-test/testData/*
+working/
+test/testData/
 test/basicTest.js
 test/regexTest.js
 
 kaisyu-table-fixed.html
+output.html
 analisysPage.js
 fetchPage.js
 formatter.js
 main.js
+
+# README暂时不进行跟踪
+README
+dist/
