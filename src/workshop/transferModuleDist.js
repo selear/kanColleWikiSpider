@@ -1,25 +1,16 @@
 let cheerio = null;
 
-let html = `<ul id="fruits">
-    <li class="apple">Apple</li>
-    <li class="orange">Orange</li>
-    <li class="pear">Pear</li>
-  </ul></div>`;
-
-function setCheerio(cheerioMod) {
-  cheerio = cheerioMod;
+function setEnvironment(module) {
+  cheerio = module;
 }
 
-function display() {
-
-  // console.log(`type cheerio - ${cheerio}`);
-
+function display(html) {
   let $ = cheerio.load(html);
-  console.log(`dist $('li').length - ${$('li').length}`);
-  console.log(`dist $('.cherry').length - ${$('.cherry').length}`)
+  console.log(`dist $('li.apple').length - ${$('li.apple').length}`);
+  console.log(`dist $('.plum').length - ${$('.plum').length}`);
 }
 
-export{
-  setCheerio as set,
+export {
+  setEnvironment as set,
   display as display
 };
