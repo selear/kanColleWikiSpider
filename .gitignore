@@ -4,20 +4,24 @@
 analisysed/
 diff_backup/
 metaData/
+working/
 model/
 util/
-working/
+dist/
 test/testData/
 test/basicTest.js
 test/regexTest.js
 
-kaisyu-table-fixed.html
-output.html
-analisysPage.js
-fetchPage.js
-formatter.js
-main.js
+/kaisyu-table-fixed.html
+/promiseTest.html
+/output.html
+/gitCommitMsg.txt
+/package-lock.json
+/analisysPage.js
+/cheerioTest.js
+/formatter.js
+/fetchPage.js
+/main.js
 
 # README暂时不进行跟踪
 README
-dist/
