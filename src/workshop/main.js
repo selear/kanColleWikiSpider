@@ -9,5 +9,5 @@
 const src = require('./transferModuleSrc');
 const dist = require('./transferModuleDist');
 
-dist.set(src.$);
+dist.set(src.cheerio);
 dist.display();
