@@ -16,6 +16,7 @@ test/regexTest.js
 /promiseTest.html
 /output.html
 /gitCommitMsg.txt
+/gitTagMsg.txt
 /package-lock.json
 /analisysPage.js
 /cheerioTest.js
