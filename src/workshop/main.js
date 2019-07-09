@@ -1,8 +1,15 @@
-// const toJson = require('./convert2Json');
-//
-// console.log(toJson);
-// console.log(toJson.sample, toJson.example);
+const cheerio = require('cheerio');
+const src = require('./transferModuleSrc');
+const dist = require('./transferModuleDist');
 
-const fetcher = require('./fetchPage');
+const html = `<ul id="fruits">
+    <li class="apple">Apple</li>
+    <li class="orange">Orange</li>
+    <li class="pear">Pear</li>
+  </ul>`
 
-const htmlTbl = fetcher.minmizeAfterFetch();
+src.set(cheerio);
+src.display(html);
+
+dist.set(cheerio);
+dist.display(html);
