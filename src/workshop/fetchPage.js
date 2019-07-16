@@ -13,22 +13,18 @@ let options = {
 };
 
 function fetchExport() {
-  req_promise(options)
-    .then(($) => {
-      storeFile('promiseTest.html', cleanTbody($).html());
-    })
-    .catch((err) => {
-      console.log(`Error occurs - ${err}`);
-    });
+  return req_promise(options);
 }
 
 
 function storeFile(filename, content) {
+
+  checkFilename(filename);
   fs.writeFile(__dirname + backToProjectRootPath + filename, content, (err) => {
     if (err) {
-      throw err;
+      throw new Error(`Saving ${filename} occurs ERROR`);
     }
-    console.log(`The file >>> ${filename} <<< has been saved.`);
+    console.log(`File >>> ${filename} <<< has been saved.`);
   });
 }
 
@@ -48,8 +44,21 @@ function cleanTbody($) {
   return $tbody;
 }
 
+function checkFilename(fileName) {
+
+  const STRING_TYPE = '[object String]';
+  if(toString.call(fileName) != STRING_TYPE) {
+    throw new Error('Invalid filename param');
+  }
+  if(fileName.length > 256) {
+    throw new Error(`Invalid filename length - ${fileName.length}`);
+  }
+}
+
 export {
-  fetchExport as minmizeAfterFetch
+  fetchExport as fetch,
+  cleanTbody as minmize,
+  storeFile as save
 };
 
 

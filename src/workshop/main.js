@@ -1,8 +1,16 @@
-// const toJson = require('./convert2Json');
-//
-// console.log(toJson);
-// console.log(toJson.sample, toJson.example);
-
 const fetcher = require('./fetchPage');
 
-const htmlTbl = fetcher.minmizeAfterFetch();
+let fetchPagePromise = fetcher.fetch();
+
+fetchPagePromise
+  .then(($) => {
+    let $minmized = fetcher.minmize($);
+    // TODO for debugging, could delete in release
+    console.log($minmized.html().length / 1024);
+
+    // store file, optional
+    fetcher.save('promiseTest.html', $minmized.html());
+  });
+
+  // typeof('test') --> string
+  // toString.call('test') / toString.call(new String) --> [object String]
