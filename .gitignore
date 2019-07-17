@@ -1,16 +1,16 @@
 # Ignore everything
 .idea/*
 
-analisysed/
-diff_backup/
-metaData/
-working/
-model/
-util/
-dist/
-test/testData/
-test/basicTest.js
-test/regexTest.js
+/analisysed/
+/diff_backup/
+/metaData/
+/working/
+/model/
+/util/
+/dist/
+/test/testData/
+/test/basicTest.js
+/test/regexTest.js
 
 /kaisyu-table-fixed.html
 /promiseTest.html
