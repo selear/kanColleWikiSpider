@@ -1,8 +1,2 @@
-let sample = 'sample';
-let example = 'example';
+const model = require('../model/kaisyuTable');
 
-console.log(sample, example);
-
-export {
-  sample, example
-};
