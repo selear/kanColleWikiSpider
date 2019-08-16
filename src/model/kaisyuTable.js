@@ -1,19 +1,25 @@
-// CategoryList
-// Category
-// Equip
+//CategoryList
+//Category
+//Equip
 
 const TYPE = {
-  STRING: '[object String]',
-  ARRAY: '[object Array]',
+  STRING: (() => {
+    return toString.call({});
+  })(),
+  ARRAY: (() => {
+    return toString.call([]);
+  })(),
   whichItIs: function (param) {
     return toString.call(param);
   }
 };
 
+//name      - equipName
+//assists   - class Assist
 class Equip {
 
-  #meta;
   #name;
+  #assists = [];
 
   constructor(name) {
     this.#name = name;
@@ -22,49 +28,64 @@ class Equip {
   get name() {
     return this.#name;
   }
+
+  set name(str) {
+    this.#name = str;
+  }
+
 }
 
-class EnhanceCost {
+//stage   - 0/1/2
+//supply  - array.length = 4
+//develop - array.length = 2
+//enhance - array.length = 2
+//equip   - string
+class EnhanceDetail {
 
-  #stage;       // 0, 1, 2
-  #supplyMeta;  // should be Array, length = 4
-  #developMeta; // should be Array, length = 2
-  #enhanceMeta; // should be Array, length = 2
-  #equipMeta;   // should be String
+  #stage;
+  #supply;
+  #develop;
+  #enhance;
+  #equip;
 
-  set supply(arr) {
-    this.#supplyMeta = processSupplyRaw(arr);
+  set supplyCost(arr) {
+    this.#supply = processSupplyRaw(arr);
   }
 
-  set develop(strOrArr) {
-    this.#developMeta = processDevelopEnhanceRaw(strOrArr);
+  set developCost(strOrArr) {
+    this.#develop = processDevelopEnhanceRaw(strOrArr);
   }
 
-  set enhance(strOrArr) {
-    this.#enhanceMeta = processDevelopEnhanceRaw(strOrArr);
+  set enhanceCost(strOrArr) {
+    this.#enhance = processDevelopEnhanceRaw(strOrArr);
   }
 
   set equipAmount(str) {
-    this.#equipMeta = processEquipAmountRaw(str);
+    this.#equip = processEquipAmountRaw(str);
   }
 
-  get supply() {
-    return this.#supplyMeta;
+  get supplyCost() {
+    return this.#supply;
   }
 
-  get develop() {
-    return this.#developMeta;
+  get developCost() {
+    return this.#develop;
   }
 
-  get enhance() {
-    return this.#enhanceMeta;
+  get enhanceCost() {
+    return this.#enhance;
   }
 
   get equipAmount() {
-    return this.#equipMeta;
+    return this.#equip;
   }
 }
 
+/*
+  INPUT   :  array/anything
+  OUTPUT  :  array/undefined
+  INVALID :  LOG information
+ */
 function processSupplyRaw(beArray) {
 
   const SUPPLY_TYPE_COUNT = 4;
@@ -83,6 +104,11 @@ function processSupplyRaw(beArray) {
   return beArray;
 }
 
+/*
+  INPUT   :  array/string/anything
+  OUTPUT  :  array/undefined
+  INVALID :  LOG information
+ */
 //在调用该函数之前, 就应该保证参数beStringOrArray是一个合规参数;
 //如果是字符串, 应当属于'-/-', '12/34'的形式, 不能有更多的数据.
 //如果是数组, 则数组长度应当为2. etc
@@ -113,13 +139,17 @@ function processDevelopEnhanceRaw(beStringOrArray) {
   return returnVal;
 }
 
+/*
+  INPUT   :  string/anything
+  OUTPUT  :  string/undefined
+  INVALID :  LOG information
+ */
 function processEquipAmountRaw(beString) {
 
   const VALID_LENGTH = 1;
-  let type = TYPE.whichItIs(beString);
 
   let returnVal;
-  if (type !== TYPE.STRING) {
+  if (TYPE.whichItIs(beString) !== TYPE.STRING) {
     //TODO log error: invalid param type, %{ showing %type here }
     returnVal = undefined;
   }
@@ -133,4 +163,4 @@ function processEquipAmountRaw(beString) {
   return returnVal;
 }
 
-module.exports = {  };
+module.exports = { Equip, EnhanceDetail };
