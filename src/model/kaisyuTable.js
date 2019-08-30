@@ -25,14 +25,30 @@ class Equip {
     this.#name = name;
   }
 
+  //gettter
   get name() {
     return this.#name;
   }
 
+  get assists() {
+    return this.#assists;
+  }
+
+  //setter
   set name(str) {
     this.#name = str;
   }
 
+  addAssist(assist) {
+
+    const VALID_ARRAY_LENGTH = 2;
+    //TODO Push assist into assists if it's valid; total length of assists should be 2
+    if (assist.length && assist.length < VALID_ARRAY_LENGTH) {
+      this.#assists.push(assist);
+    } else {
+      //TODO log error:
+    }
+  }
 }
 
 //stage   - 0/1/2
@@ -40,13 +56,18 @@ class Equip {
 //develop - array.length = 2
 //enhance - array.length = 2
 //equip   - string
-class EnhanceDetail {
+class EnhanceCost {
 
   #stage;
   #supply;
   #develop;
   #enhance;
   #equip;
+
+  //setter
+  set stage(stage) {
+    this.#stage = stage;
+  }
 
   set supplyCost(arr) {
     this.#supply = processSupplyRaw(arr);
@@ -64,6 +85,7 @@ class EnhanceDetail {
     this.#equip = processEquipAmountRaw(str);
   }
 
+  //getter
   get supplyCost() {
     return this.#supply;
   }
@@ -163,4 +185,4 @@ function processEquipAmountRaw(beString) {
   return returnVal;
 }
 
-module.exports = { Equip, EnhanceDetail };
+module.exports = { Equip };
