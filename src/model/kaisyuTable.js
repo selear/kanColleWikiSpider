@@ -14,6 +14,24 @@ const TYPE = {
   }
 };
 
+class Category {
+  #name;
+  #equips = [];
+
+  constructor(cName) {
+    this.#name = cName;
+  }
+
+  //getter
+  get name() {
+    return this.#name;
+  }
+
+  addEquip(equip) {
+    this.#equips.push(equip);
+  }
+}
+
 //name      - equipName
 //assists   - class Assist
 class Equip {
@@ -48,6 +66,85 @@ class Equip {
     } else {
       //TODO log error:
     }
+  }
+}
+
+//names       - class AssistShip
+//upgradeTo   - null/equipName
+//remark      - remark
+//enhanceCost - class EnhanceCost
+class Assist {
+
+  #names = [];
+  #upgradeTo;
+  #remark;
+  #enhanceCost;
+
+  //setter
+  set names(nameArray) {
+    this.#names = nameArray;
+  }
+
+  set upgradeTo(toNext) {
+    this.#upgradeTo = toNext;
+  }
+
+  set remark(remark) {
+    this.#remark = remark;
+  }
+
+  set enhanceCost(enhanceCostInstance) {
+    this.#enhanceCost = enhanceCostInstance;
+  }
+
+  //getter
+  get names() {
+    return this.#names;
+  }
+
+  get upgradeTo() {
+    return this.#upgradeTo;
+  }
+
+  get remark() {
+    return this.#remark;
+  }
+
+  get enhanceCost() {
+    return this.#enhanceCost;
+  }
+}
+
+class AssistShip {
+
+  #name;
+  #canUpgrade = undefined;
+  #accessDay;
+
+  //setter
+  set name(shipName) {
+    this.#name = shipName;
+  }
+
+  set canUpgrade(flag) {
+    this.#canUpgrade = flag;
+  }
+
+  set accessDay(dayArray) {
+    this.#accessDay = dayArray;
+  }
+
+  //getter
+  get name() {
+    return this.#name;
+  }
+
+  get canUpgrade() {
+    return this.#canUpgrade;
+  }
+
+  get accessDay() {
+    return this.#accessDay;
   }
 }
 
