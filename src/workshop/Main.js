@@ -5,9 +5,11 @@ let fetchPagePromise = fetcher.fetch();
 
 fetchPagePromise
   .then(($) => {
+
     // TODO for debugging, could delete in release
     console.log(`Full page size: ${$.html().length / 1024}KB.`);
     return $;
+
   })
   .then(($) => {
 
@@ -17,14 +19,15 @@ fetchPagePromise
 
     // store file, optional
     fetcher.save('promiseTest.html', $minmized.html());
+    return $minmized;
 
   })
-  .then(() => {
+  .then((kaisyuPage) => {
 
     let instance = new extractor.DataAnalyst();
     instance.instanceFunc('Foo');
     extractor.DataAnalyst.staticFunc('bar');
-    extractor.DataAnalyst.thisIsTest();
+    extractor.DataAnalyst.collect(kaisyuPage);
 
   });
 
