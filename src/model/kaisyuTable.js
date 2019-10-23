@@ -2,6 +2,8 @@
 //Category
 //Equip
 
+let shortId = require('shortid');
+
 const TYPE = {
   STRING: (() => {
     return toString.call({});
@@ -14,21 +16,35 @@ const TYPE = {
   }
 };
 
+const CATEGORY = new Map();
+const EQUIP = new Map();
+
 class Category {
+  
+  #sid;
   #name;
-  #equips = [];
+  #equipIds = [];
 
   constructor(cName) {
+    this.#sid = shortId.generate();
     this.#name = cName;
   }
 
   //getter
+  get id() {
+    return this.#sid;
+  }
+
   get name() {
     return this.#name;
   }
 
   addEquip(equip) {
-    this.#equips.push(equip);
+    this.#equipIds.push(equip.id);
+  }
+
+  addEquipId(equipId) {
+    this.#equipIds.push(equipId);
   }
 }
 
@@ -36,14 +52,20 @@ class Category {
 //assists   - class Assist
 class Equip {
 
+  #sid;
   #name;
   #assists = [];
 
   constructor(name) {
+    this.#sid = shortId.generate();
     this.#name = name;
   }
 
   //gettter
+  get id() {
+    return this.#sid;
+  }
+
   get name() {
     return this.#name;
   }
@@ -282,4 +304,7 @@ function processEquipAmountRaw(beString) {
   return returnVal;
 }
 
-module.exports = { Equip };
+module.exports = {
+  'Category' : Category,
+  'Equip' : Equip
+};
