@@ -6,30 +6,23 @@ let fetchPagePromise = fetcher.fetch();
 fetchPagePromise
   .then(($) => {
 
-    // TODO for debugging, could delete in release
     console.log(`Full page size: ${$.html().length / 1024}KB.`);
-    return $;
-
-  })
-  .then(($) => {
-
-    let $minmized = fetcher.minmize($);
+    let $minmize = fetcher.minmize($);
     // TODO for debugging, could delete in release
-    console.log(`Minmized page size: ${$minmized.html().length / 1024}KB.`);
+    // console.log(`Minmized page size: ${$minmize.html().length / 1024}KB.`);
 
-    // store file, optional
-    fetcher.save('promiseTest.html', $minmized.html());
-    return $minmized;
+    // save file, optional
+    fetcher.save('promiseTest.html', $minmize.html());
+
+    let instance = new extractor.DataAnalyst();
+
+    instance.extract($minmize);
 
   })
   .then((kaisyuPage) => {
 
-    let instance = new extractor.DataAnalyst();
-    instance.instanceFunc('Foo');
-    extractor.DataAnalyst.staticFunc('bar');
-    extractor.DataAnalyst.collect(kaisyuPage);
+    // instance.instanceFunc('Foo');
+    // extractor.DataAnalyst.staticFunc('bar');
+    // extractor.DataAnalyst.collect(kaisyuPage);
 
   });
-
-  // typeof('test') --> string
-  // toString.call('test') / toString.call(new String) --> [object String]

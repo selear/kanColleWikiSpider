@@ -2,7 +2,8 @@ import fs from "fs";
 import req_promise from "request-promise";
 import cheerio from "cheerio";
 
-const backToProjectRootPath = '/../../';
+const BACK_TO_PROJECT_ROOT = '/../../';
+const MAX_FILENAME_LENGTH = 256;
 
 let options = {
   uri: 'http://localhost:32520/kaisyu',
@@ -12,15 +13,15 @@ let options = {
   }
 };
 
-function fetchExport() {
+function fetch() {
   return req_promise(options);
 }
 
 
-function storeFile(filename, content) {
+function save(filename, content) {
 
   checkFilename(filename);
-  fs.writeFile(__dirname + backToProjectRootPath + filename, content, (err) => {
+  fs.writeFile(__dirname + BACK_TO_PROJECT_ROOT + filename, content, (err) => {
     if (err) {
       throw new Error(`Saving ${filename} occurs ERROR`);
     }
@@ -28,20 +29,33 @@ function storeFile(filename, content) {
   });
 }
 
-function cleanTbody($) {
+function minmize($) {
+
+  let table = $('#kaisyu').parent().next().next().find('table').parent();
+  table.find('thead').remove().end().find('tfoot').remove();
 
   let removedLineCount = 0;
-  let $tbody = $('#kaisyu').parent().next().next().find('table tbody');
+  let categoryCount = 0;
+  table.find('tr').each(function () {
 
-  $tbody.find('tr').each(function () {
-    let $currLine = $(this);
-    if ($currLine.find('th').length > 1) {
-      $currLine.remove();
+    let th = $(this).find('th');
+    let thLength = th.length;
+    // $(this).find('th').length === 1时 就是categoryName
+    if (thLength > 1) {
+      $(this).remove();
       removedLineCount++;
+    } else if (thLength === 1) {
+      if (th.text().length === 0) {
+        th.remove();
+        return;
+      }
+      console.log(`  ${ categoryCount++ }\t${$(this).find('th').text().length} - ${ $(this).find('th').text() }`);
     }
   });
   console.log(`removedLineCount - ${removedLineCount}`);
-  return $tbody;
+  // DONE for debug
+  // console.log(`<tr> - length ${table.find('tbody>tr>th').length}`);
+  return table;
 }
 
 function checkFilename(fileName) {
@@ -50,15 +64,15 @@ function checkFilename(fileName) {
   if(toString.call(fileName) != STRING_TYPE) {
     throw new Error('Invalid filename param');
   }
-  if(fileName.length > 256) {
+  if(fileName.length > MAX_FILENAME_LENGTH) {
     throw new Error(`Invalid filename length - ${fileName.length}`);
   }
 }
 
-export {
-  fetchExport as fetch,
-  cleanTbody as minmize,
-  storeFile as save
+module.exports = {
+  'fetch': fetch,
+  'minmize': minmize,
+  'save': save
 };
 
 

@@ -15,6 +15,13 @@ class Extractor {
   instanceFunc(appendStr) {
     console.log(chalk.cyanBright(Decorator.banner(`this is instance method, ${appendStr}`)));
   }
+
+  extract(kaisyu) {
+    console.log(chalk.yellowBright(Decorator.banner(`Content length - ${kaisyu.html().length / 1024}KB`)));
+
+    // for debug - show category numbers
+    console.log(`th.length - ${kaisyu.find('table tr>th').length}`);
+  }
 }
 
 class Decorator {

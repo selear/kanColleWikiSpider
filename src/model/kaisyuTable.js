@@ -305,6 +305,8 @@ function processEquipAmountRaw(beString) {
 }
 
 module.exports = {
-  'Category' : Category,
-  'Equip' : Equip
+  'Category': Category,
+  'Equip': Equip,
+  'categoryMap': CATEGORY,
+  'equipMap': EQUIP
 };
