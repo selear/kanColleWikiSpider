@@ -46,6 +46,13 @@ class Category {
   addEquipId(equipId) {
     this.#equipIds.push(equipId);
   }
+
+  // 根据名字创建实例，并将实例写入到CategoryMap中；其他模块调用时，无需额外再写入Map一次
+  static append(cName) {
+    let c = new Category(cName);
+    CATEGORY.set(c.id, c);
+    return c;
+  }
 }
 
 //name      - equipName
@@ -80,7 +87,6 @@ class Equip {
   }
 
   addAssist(assist) {
-
     const VALID_ARRAY_LENGTH = 2;
     //TODO Push assist into assists if it's valid; total length of assists should be 2
     if (assist.length && assist.length < VALID_ARRAY_LENGTH) {
@@ -88,6 +94,13 @@ class Equip {
     } else {
       //TODO log error:
     }
+  }
+
+  // 根据名字创建实例，并将实例写入到CategoryMap中；其他模块调用时，无需额外再写入Map一次
+  static append(eName) {
+    let e = new Equip(eName);
+    EQUIP.set(e.id, e);
+    return e;
   }
 }
 
@@ -307,6 +320,6 @@ function processEquipAmountRaw(beString) {
 module.exports = {
   'Category': Category,
   'Equip': Equip,
-  'categoryMap': CATEGORY,
-  'equipMap': EQUIP
+  'CATEGORY_MAP': CATEGORY,
+  'EQUIP_MAP': EQUIP
 };

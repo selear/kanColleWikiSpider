@@ -16,7 +16,7 @@ fetchPagePromise
 
     let instance = new extractor.DataAnalyst();
 
-    instance.extract($minmize);
+    instance.extract($minmize, $);
 
   })
   .then((kaisyuPage) => {

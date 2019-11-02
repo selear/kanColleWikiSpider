@@ -34,8 +34,7 @@ function minmize($) {
   let table = $('#kaisyu').parent().next().next().find('table').parent();
   table.find('thead').remove().end().find('tfoot').remove();
 
-  let removedLineCount = 0;
-  let categoryCount = 0;
+  let invalidRemovedCount = 0;
   table.find('tr').each(function () {
 
     let th = $(this).find('th');
@@ -43,16 +42,12 @@ function minmize($) {
     // $(this).find('th').length === 1时 就是categoryName
     if (thLength > 1) {
       $(this).remove();
-      removedLineCount++;
-    } else if (thLength === 1) {
-      if (th.text().length === 0) {
+      invalidRemovedCount++;
+    } else if (thLength === 1 && th.text().length === 0) {
         th.remove();
-        return;
-      }
-      console.log(`  ${ categoryCount++ }\t${$(this).find('th').text().length} - ${ $(this).find('th').text() }`);
     }
   });
-  console.log(`removedLineCount - ${removedLineCount}`);
+  console.log(`invalid removed count - ${invalidRemovedCount}`);
   // DONE for debug
   // console.log(`<tr> - length ${table.find('tbody>tr>th').length}`);
   return table;
