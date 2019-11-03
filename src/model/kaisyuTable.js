@@ -34,7 +34,6 @@ class Category {
   get id() {
     return this.#sid;
   }
-
   get name() {
     return this.#name;
   }
@@ -42,7 +41,6 @@ class Category {
   addEquip(equip) {
     this.#equipIds.push(equip.id);
   }
-
   addEquipId(equipId) {
     this.#equipIds.push(equipId);
   }
@@ -72,11 +70,9 @@ class Equip {
   get id() {
     return this.#sid;
   }
-
   get name() {
     return this.#name;
   }
-
   get assists() {
     return this.#assists;
   }
@@ -119,15 +115,12 @@ class Assist {
   set names(nameArray) {
     this.#names = nameArray;
   }
-
   set upgradeTo(toNext) {
     this.#upgradeTo = toNext;
   }
-
   set remark(remark) {
     this.#remark = remark;
   }
-
   set enhanceCost(enhanceCostInstance) {
     this.#enhanceCost = enhanceCostInstance;
   }
@@ -136,15 +129,12 @@ class Assist {
   get names() {
     return this.#names;
   }
-
   get upgradeTo() {
     return this.#upgradeTo;
   }
-
   get remark() {
     return this.#remark;
   }
-
   get enhanceCost() {
     return this.#enhanceCost;
   }
@@ -160,11 +150,9 @@ class AssistShip {
   set name(shipName) {
     this.#name = shipName;
   }
-
   set canUpgrade(flag) {
     this.#canUpgrade = flag;
   }
-
   set accessDay(dayArray) {
     this.#accessDay = dayArray;
   }
@@ -173,11 +161,9 @@ class AssistShip {
   get name() {
     return this.#name;
   }
-
   get canUpgrade() {
     return this.#canUpgrade;
   }
-
   get accessDay() {
     return this.#accessDay;
   }
@@ -200,19 +186,15 @@ class EnhanceCost {
   set stage(stage) {
     this.#stage = stage;
   }
-
   set supplyCost(arr) {
     this.#supply = processSupplyRaw(arr);
   }
-
   set developCost(strOrArr) {
     this.#develop = processDevelopEnhanceRaw(strOrArr);
   }
-
   set enhanceCost(strOrArr) {
     this.#enhance = processDevelopEnhanceRaw(strOrArr);
   }
-
   set equipAmount(str) {
     this.#equip = processEquipAmountRaw(str);
   }
@@ -221,15 +203,12 @@ class EnhanceCost {
   get supplyCost() {
     return this.#supply;
   }
-
   get developCost() {
     return this.#develop;
   }
-
   get enhanceCost() {
     return this.#enhance;
   }
-
   get equipAmount() {
     return this.#equip;
   }
