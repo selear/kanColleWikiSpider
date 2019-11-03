@@ -48,7 +48,7 @@ function minmize($) {
     }
   });
   console.log(`invalid removed count - ${invalidRemovedCount}`);
-  // DONE for debug
+  // DEBUG
   // console.log(`<tr> - length ${table.find('tbody>tr>th').length}`);
   return table;
 }
@@ -56,6 +56,7 @@ function minmize($) {
 function checkFilename(fileName) {
 
   const STRING_TYPE = '[object String]';
+  // fixme
   if(toString.call(fileName) != STRING_TYPE) {
     throw new Error('Invalid filename param');
   }

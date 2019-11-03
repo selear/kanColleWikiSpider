@@ -19,6 +19,7 @@ fetchPagePromise
     instance.extract($minmize, $);
 
   })
+  // fixme
   .then((kaisyuPage) => {
 
     // instance.instanceFunc('Foo');

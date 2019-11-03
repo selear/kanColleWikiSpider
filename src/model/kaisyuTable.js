@@ -60,6 +60,7 @@ class Equip {
   #sid;
   #name;
   #assists = [];
+  #supply;
 
   constructor(name) {
     this.#sid = shortId.generate();
@@ -76,10 +77,16 @@ class Equip {
   get assists() {
     return this.#assists;
   }
+  get supplyCost() {
+    return this.#supply;
+  }
 
   //setter
   set name(str) {
     this.#name = str;
+  }
+  set supplyCost(arr) {
+    this.#supply = processSupplyRaw(arr);
   }
 
   addAssist(assist) {
@@ -111,20 +118,6 @@ class Assist {
   #remark;
   #enhanceCost;
 
-  //setter
-  set names(nameArray) {
-    this.#names = nameArray;
-  }
-  set upgradeTo(toNext) {
-    this.#upgradeTo = toNext;
-  }
-  set remark(remark) {
-    this.#remark = remark;
-  }
-  set enhanceCost(enhanceCostInstance) {
-    this.#enhanceCost = enhanceCostInstance;
-  }
-
   //getter
   get names() {
     return this.#names;
@@ -138,6 +131,20 @@ class Assist {
   get enhanceCost() {
     return this.#enhanceCost;
   }
+
+  //setter
+  set names(nameArray) {
+    this.#names = nameArray;
+  }
+  set upgradeTo(toNext) {
+    this.#upgradeTo = toNext;
+  }
+  set remark(remark) {
+    this.#remark = remark;
+  }
+  set enhanceCost(enhanceCostInstance) {
+    this.#enhanceCost = enhanceCostInstance;
+  }
 }
 
 class AssistShip {
@@ -145,17 +152,6 @@ class AssistShip {
   #name;
   #canUpgrade = undefined;
   #accessDay;
-
-  //setter
-  set name(shipName) {
-    this.#name = shipName;
-  }
-  set canUpgrade(flag) {
-    this.#canUpgrade = flag;
-  }
-  set accessDay(dayArray) {
-    this.#accessDay = dayArray;
-  }
 
   //getter
   get name() {
@@ -167,6 +163,17 @@ class AssistShip {
   get accessDay() {
     return this.#accessDay;
   }
+
+  //setter
+  set name(shipName) {
+    this.#name = shipName;
+  }
+  set canUpgrade(flag) {
+    this.#canUpgrade = flag;
+  }
+  set accessDay(dayArray) {
+    this.#accessDay = dayArray;
+  }
 }
 
 //stage   - 0/1/2
@@ -177,17 +184,34 @@ class AssistShip {
 class EnhanceCost {
 
   #stage;
-  #supply;
   #develop;
   #enhance;
   #equip;
 
+  //getter
+  get developCost() {
+    return this.#develop;
+  }
+  get enhanceCost() {
+    return this.#enhance;
+  }
+  get equipAmount() {
+    return this.#equip;
+  }
+  get cost() {
+    let develop = fixCostVal(this.#develop, 0);
+    let enhance = fixCostVal(this.#enhance, 0);
+    return [this.#stage, develop, enhance, this.#equip];
+  }
+  get promiseCost() {
+    let develop = fixCostVal(this.#develop, 1);
+    let enhance = fixCostVal(this.#enhance, 1);
+    return [this.#stage, develop, enhance, this.#equip];
+  }
+
   //setter
   set stage(stage) {
     this.#stage = stage;
-  }
-  set supplyCost(arr) {
-    this.#supply = processSupplyRaw(arr);
   }
   set developCost(strOrArr) {
     this.#develop = processDevelopEnhanceRaw(strOrArr);
@@ -197,20 +221,6 @@ class EnhanceCost {
   }
   set equipAmount(str) {
     this.#equip = processEquipAmountRaw(str);
-  }
-
-  //getter
-  get supplyCost() {
-    return this.#supply;
-  }
-  get developCost() {
-    return this.#develop;
-  }
-  get enhanceCost() {
-    return this.#enhance;
-  }
-  get equipAmount() {
-    return this.#equip;
   }
 }
 
@@ -223,9 +233,12 @@ function processSupplyRaw(beArray) {
 
   const SUPPLY_TYPE_COUNT = 4;
 
-  // 比较起toString.call(beArray) !== '[object Array]'
-  // 我认为instanceof的方法更加有利, 因为字符串判断更加耗费性能
-  if (!(beArray instanceof Array)) {
+  // 一共有三种方法用于判断:
+  // 1. toString.call(beArray) !== '[object Array]'
+  // 2. instanceof Array
+  // 3. Array.isArray
+  // 我认为instanceof的方法更加有利, 因为字符串判断更加耗费性能, 先采用isArray方法
+  if (!(Array.isArray(beArray))) {
     //TODO log error: Type check failed, type should be Array, current type is %param.
     return undefined;
   }
@@ -241,21 +254,22 @@ function processSupplyRaw(beArray) {
   INPUT   :  array/string/anything
   OUTPUT  :  array/undefined
   INVALID :  LOG information
+
+  在调用该函数之前, 就应该保证参数beStringOrArray是一个合规参数;
+  如果是字符串, 应当属于'-/-', '12/34'的形式, 不能有更多的数据.
+  如果是数组, 则数组长度应当为2. etc
+
+  判定条件较为复杂且内容较多, 使用switch语句并不合适.
  */
-//在调用该函数之前, 就应该保证参数beStringOrArray是一个合规参数;
-//如果是字符串, 应当属于'-/-', '12/34'的形式, 不能有更多的数据.
-//如果是数组, 则数组长度应当为2. etc
-//
-//判定条件较为复杂且内容较多, 使用switch语句并不合适.
 function processDevelopEnhanceRaw(beStringOrArray) {
 
   const VALID_LENGTH = 2;
-  let type = TYPE.whichItIs(beStringOrArray);
+  let paramType = TYPE.whichItIs(beStringOrArray);
 
-  let returnVal = undefined;
-  if (type === TYPE.STRING && beStringOrArray.indexOf('/') !== -1) {
+  let returnArray = undefined;
+  if (paramType === TYPE.STRING && beStringOrArray.indexOf('/') !== -1) {
     if (beStringOrArray.split('/').length === VALID_LENGTH) {
-      returnVal = beStringOrArray.split('/');
+      returnArray = beStringOrArray.split('/');
     } else {
       //TODO log error: invalid array length, %{ showing invalid param here }.
     }
@@ -263,13 +277,13 @@ function processDevelopEnhanceRaw(beStringOrArray) {
     //TODO log error: invalid param content, %{ showing invalid param here }.
   }
   // noinspection JSObjectNullOrUndefined
-  if (type === TYPE.ARRAY && returnVal.length === VALID_LENGTH) {
-    returnVal = beStringOrArray;
+  if (paramType === TYPE.ARRAY && returnArray.length === VALID_LENGTH) {
+    returnArray = beStringOrArray;
   } else {
     //TODO log error: invalid array length, %{ showing invalid param here }.
   }
 
-  return returnVal;
+  return returnArray;
 }
 
 /*
@@ -281,19 +295,22 @@ function processEquipAmountRaw(beString) {
 
   const VALID_LENGTH = 1;
 
-  let returnVal;
+  let returnVal = undefined;
   if (TYPE.whichItIs(beString) !== TYPE.STRING) {
     //TODO log error: invalid param type, %{ showing %type here }
-    returnVal = undefined;
   }
   if (beString.length === VALID_LENGTH) {
     returnVal = beString;
   } else {
     //TODO log error: Invalid param length, %{ showing param here }.
-    returnVal = undefined;
   }
 
   return returnVal;
+}
+
+function fixCostVal(beArr, dataIdx) {
+  return Array.isArray(beArr)
+  && (Number.isInteger(beArr[dataIdx]) || beArr[dataIdx] === '-') ? beArr[dataIdx] : -1 ;
 }
 
 module.exports = {

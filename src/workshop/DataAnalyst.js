@@ -24,26 +24,33 @@ class Extractor {
   extract(kaisyu, $) {
     console.log(chalk.yellowBright(Decorator.banner(`Content length - ${kaisyu.html().length / 1024}KB`)));
 
-    // TODO delete this if release
-    // for debug - show category numbers
+    // DEBUG delete this if release, show category numbers
     // console.log(`th.length - ${kaisyu.find('table tr>th').length}`);
 
-    // extract category data into CATEGORY_MAP
-    kaisyu.find('table tr>th').each(function(idx) {
-      console.log(`    ${ idx }\t${ $(this).text() }`);
+    // Extract category data; the instance will set into map automatically by using Category.append(cName)
+    kaisyu.find('table tr>th').each(function() {
+      // console.log(`    ${ idx }\t${ $(this).text() }`);
       Category.append($(this).text());
     });
-    // TODO delete this if release
-    console.log(`category.size - ${CATEGORY_MAP.size}`);
+    // DEBUG delete this if release
+    console.log(`category.size\t- ${CATEGORY_MAP.size}`);
 
+    // Extract category data; the instance will set into map automatically by using Equip.append(eName)
+    let idx = 0;
+    let e = undefined;
     kaisyu.find('table tr').each(function() {
       let $tdSet = $(this).find('td');
       if($tdSet.first().find('a').length > 0) {
         let eName = $tdSet.first().text();
-        Equip.append(eName);
+        // console.log(`   ${ idx++ }\t${ eName }`);
+        e = Equip.append(eName);
+        console.log(`${idx++} - ${$tdSet.length}`);
+
+
       }
     });
-    console.log(`equip.size - ${EQUIP_MAP.size}`);
+    // DEBUG delete this if release;
+    console.log(`equip.size\t- ${EQUIP_MAP.size}`);
   }
 }
 
