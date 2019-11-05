@@ -24,32 +24,33 @@ class Extractor {
   extract(kaisyu, $) {
     console.log(chalk.yellowBright(Decorator.banner(`Content length - ${kaisyu.html().length / 1024}KB`)));
 
-    // DEBUG delete this if release, show category numbers
-    // console.log(`th.length - ${kaisyu.find('table tr>th').length}`);
-
-    // Extract category data; the instance will set into map automatically by using Category.append(cName)
-    kaisyu.find('table tr>th').each(function() {
-      // console.log(`    ${ idx }\t${ $(this).text() }`);
-      Category.append($(this).text());
-    });
-    // DEBUG delete this if release
-    console.log(`category.size\t- ${CATEGORY_MAP.size}`);
-
-    // Extract category data; the instance will set into map automatically by using Equip.append(eName)
+    // Extract data; the instance will set into map automatically by using Category.register(cName) / Equip.register(eName)
     let idx = 0;
+    let c = undefined;
     let e = undefined;
     kaisyu.find('table tr').each(function() {
+
+      if($(this).find('th').length === 1) {
+        c = Category.register($(this).text());
+      }
+
       let $tdSet = $(this).find('td');
       if($tdSet.first().find('a').length > 0) {
         let eName = $tdSet.first().text();
         // console.log(`   ${ idx++ }\t${ eName }`);
-        e = Equip.append(eName);
-        console.log(`${idx++} - ${$tdSet.length}`);
-
-
+        e = Equip.register(eName);
+        e.initSupply($tdSet, true);
+        c.addEquip(e);
+      } else if ($tdSet.length === 17) {
+        e.initSupply($tdSet);
+      } else if ($tdSet.length === 18) {
+        e.initSupply($tdSet);
       }
+      console.log(`${idx++} - ${$tdSet.length} - ${e.name}`);
+      console.log('  ' + chalk.yellowBright(e.supply));
     });
     // DEBUG delete this if release;
+    console.log(`category.size\t- ${CATEGORY_MAP.size}`);
     console.log(`equip.size\t- ${EQUIP_MAP.size}`);
   }
 }

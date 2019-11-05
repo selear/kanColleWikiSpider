@@ -15,6 +15,10 @@ const TYPE = {
     return toString.call(param);
   }
 };
+const EQUIP_SUPPLY_INDEX_PRESET = {
+  'head' : [2, 3, 4, 5],
+  'other': [1, 2, 3, 4]
+};
 
 const CATEGORY = new Map();
 const EQUIP = new Map();
@@ -41,26 +45,22 @@ class Category {
   addEquip(equip) {
     this.#equipIds.push(equip.id);
   }
-  addEquipId(equipId) {
-    this.#equipIds.push(equipId);
-  }
 
   // 根据名字创建实例，并将实例写入到CategoryMap中；其他模块调用时，无需额外再写入Map一次
-  static append(cName) {
+  static register(cName) {
     let c = new Category(cName);
     CATEGORY.set(c.id, c);
     return c;
   }
 }
 
-//name      - equipName
-//assists   - class Assist
+//name    - equipName
+//enhance - [ <Enhance> ]
 class Equip {
 
   #sid;
   #name;
-  #assists = [];
-  #supply;
+  #enhance = [];
 
   constructor(name) {
     this.#sid = shortId.generate();
@@ -74,53 +74,64 @@ class Equip {
   get name() {
     return this.#name;
   }
-  get assists() {
-    return this.#assists;
-  }
-  get supplyCost() {
-    return this.#supply;
+  get enhance() {
+    return this.#enhance;
   }
 
   //setter
   set name(str) {
     this.#name = str;
   }
-  set supplyCost(arr) {
-    this.#supply = processSupplyRaw(arr);
-  }
 
-  addAssist(assist) {
+  addEnhance(enhance) {
     const VALID_ARRAY_LENGTH = 2;
-    //TODO Push assist into assists if it's valid; total length of assists should be 2
-    if (assist.length && assist.length < VALID_ARRAY_LENGTH) {
-      this.#assists.push(assist);
+    //TODO Push enhance into enhance if it's valid; total length of enhance should be 2
+    if (this.#enhance && this.#enhance.length < VALID_ARRAY_LENGTH) {
+      this.#enhance.push(enhance);
     } else {
       //TODO log error:
     }
   }
+  initSupply($tdSet, isHead) {
+    let enh = new Enhance();
+    enh.initSupply($tdSet, isHead);
+    this.#enhance.push(enh);
+  }
 
   // 根据名字创建实例，并将实例写入到CategoryMap中；其他模块调用时，无需额外再写入Map一次
-  static append(eName) {
+  static register(eName) {
     let e = new Equip(eName);
     EQUIP.set(e.id, e);
     return e;
   }
+
+  get supply() {
+    let retVal = [];
+    if (this.#enhance.length === 1) {
+      retVal.push(this.enhance[0].supplyCost);
+    } else if (this.#enhance.length === 2) {
+      retVal.push(this.enhance[0].supplyCost, this.enhance[1].supplyCost);
+    }
+    return retVal;
+  }
 }
 
-//names       - class AssistShip
+//assistShips - [ <AssistShip> ]
 //upgradeTo   - null/equipName
 //remark      - remark
-//enhanceCost - class EnhanceCost
-class Assist {
+//enhanceCost - [ <EnhanceCost> ]
+//develop     - array.length = 2
+class Enhance {
 
-  #names = [];
+  #assistShips;
   #upgradeTo;
   #remark;
   #enhanceCost;
+  #supply;
 
   //getter
-  get names() {
-    return this.#names;
+  get assistShips() {
+    return this.#assistShips;
   }
   get upgradeTo() {
     return this.#upgradeTo;
@@ -131,10 +142,13 @@ class Assist {
   get enhanceCost() {
     return this.#enhanceCost;
   }
+  get supplyCost() {
+    return this.#supply;
+  }
 
   //setter
-  set names(nameArray) {
-    this.#names = nameArray;
+  set assistShips(nameArray) {
+    this.#assistShips = nameArray;
   }
   set upgradeTo(toNext) {
     this.#upgradeTo = toNext;
@@ -142,8 +156,23 @@ class Assist {
   set remark(remark) {
     this.#remark = remark;
   }
-  set enhanceCost(enhanceCostInstance) {
-    this.#enhanceCost = enhanceCostInstance;
+  set enhanceCost(enhanceCost) {
+    this.#enhanceCost = enhanceCost;
+  }
+  // fixme 该方法可能用不到, 需要决定去留
+  // set supplyCost(arr) {
+  //   this.#supply = processSupplyRaw(arr);
+  // }
+
+  // isHead true时, 取EQUIP_SUPPLY_INDEX_PRESET.head
+  //       false时, 取.EQUIP_SUPPLY_INDEX_PRESET.other
+  initSupply($tdSet, isHead) {
+    let idx = EQUIP_SUPPLY_INDEX_PRESET.head;
+    if(!isHead) {
+      idx = EQUIP_SUPPLY_INDEX_PRESET.other;
+    }
+    this.#supply = processSupplyRaw([$tdSet.eq(idx[0]).text(),
+      $tdSet.eq(idx[1]).text(), $tdSet.eq(idx[2]).text(), $tdSet.eq(idx[3]).text()]);
   }
 }
 
@@ -177,7 +206,6 @@ class AssistShip {
 }
 
 //stage   - 0/1/2
-//supply  - array.length = 4
 //develop - array.length = 2
 //enhance - array.length = 2
 //equip   - string
