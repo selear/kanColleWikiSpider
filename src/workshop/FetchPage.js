@@ -37,6 +37,7 @@ function minmize($) {
   let invalidRemovedCount = 0;
   table.find('tr').each(function () {
 
+    // 移除表头
     let th = $(this).find('th');
     let thLength = th.length;
     // $(this).find('th').length === 1时 就是categoryName

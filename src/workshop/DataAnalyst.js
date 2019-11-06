@@ -42,33 +42,49 @@ class Extractor {
         e = Equip.register(eName);
         c.addEquip(e);
         e.initSupply($tdSet, true);
-        // fixme idx = [1, 6, 7, 8]
+        // done idx = [1, 6, 7, 8]
         e.addEnhanceCost($tdSet, Equip.NEW_EQUIP);
+        // fixme idx = [10, 11, 12, 13, 14, 15, 16, 17]
+        //            \[9, 10, 11, 12, 13, 14, 15, 16]
+        e.addAccessDay($tdSet, true);
+        console.log(`${idx++}\t- ${chalk.redBright($tdSet.length)}\t- ${e.name}\n\t${chalk.greenBright('|->')} ${chalk.yellow(e.assistStatus())}`);
+
       } else if ($tdSet.length === 4 || $tdSet.length === 5) {
 
-        // fixme idx = [0, 1, 2, 3]
+        // done idx = [0, 1, 2, 3]
         e.addEnhanceCost($tdSet, Equip.OTHER);
       } else if ($tdSet.length === 8) {
 
+        // fixme idx = [0, 1, 2, 3, 4, 5, 6, 7]
+        e.addAccessDay($tdSet);
+        console.log(`\t${chalk.greenBright('|->')} ${chalk.yellow(e.assistStatus())}`);
       } else if ($tdSet.length === 12) {
 
-        // fixme idx = [0, 1, 2, 3]
+        // done idx = [0, 1, 2, 3]
         e.addEnhanceCost($tdSet, Equip.OTHER);
+        // fixme idx = [4, 5, 6, 7, 8, 9, 10, 11]
+        e.addAccessDay($tdSet);
+        console.log(`\t${chalk.greenBright('|->')} ${chalk.yellow(e.assistStatus())}`);
       } else if ($tdSet.length === 17) {
 
         e.initSupply($tdSet);
-        // fixme idx = [0, 5, 6, 7]
+        // done idx = [0, 5, 6, 7]
         e.addEnhanceCost($tdSet, Equip.NEW_UPGRADE);
+        // fixme idx = [8, 9, 10, 11, 12, 13, 14, 15]
+        e.addAccessDay($tdSet, true);
+        console.log(`\t${chalk.greenBright('|->')} ${chalk.yellow(e.assistStatus())}`);
       } else if ($tdSet.length === 18) {
 
         e.initSupply($tdSet);
-        // fixme idx = [0, 5, 6, 7]
+        // done idx = [0, 5, 6, 7]
         e.addEnhanceCost($tdSet, Equip.NEW_UPGRADE);
+        // fixme idx = [9, 10, 11, 12, 13, 14, 15, 16]
+        e.addAccessDay($tdSet, true);
+        console.log(`\t${chalk.greenBright('|->')} ${chalk.yellow(e.assistStatus())}`);
       }
-      console.log(`${idx++} - ${$tdSet.length} - ${e.name}`);
       // console.log('  ' + chalk.yellowBright(e.supply));
-      // Equip.enhance.enhanceCost.stage没有getter, 需要在内部进行测试
-      console.log('    ' + chalk.yellowBright(e.enhance.length));
+      /*Equip.enhance.enhanceCost.stage没有getter, 需要在内部进行测试
+      console.log('    ' + chalk.yellowBright(e.enhance.length));*/
     });
     // DEBUG delete this if release;
     console.log(`category.size\t- ${CATEGORY_MAP.size}`);
