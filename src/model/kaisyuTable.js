@@ -15,10 +15,22 @@ const TYPE = {
     return toString.call(param);
   }
 };
+
+const NEW_EQUIP = 'newEquip';
+const NEW_UPGRADE = 'newUpgrade';
+const OTHER = 'other';
+
 const EQUIP_SUPPLY_INDEX_PRESET = {
-  'head' : [2, 3, 4, 5],
-  'other': [1, 2, 3, 4]
+  'newEquip' : [2, 3, 4, 5],
+  'other'    : [1, 2, 3, 4]
 };
+const EQUIP_ENHANCE_COST_INDEX_PRESET = {
+  'newEquip'    : [1, 6, 7, 8],
+  'newUpgrade'  : [0, 5, 6, 7],
+  'other'       : [0, 1, 2, 3]
+};
+
+const ENHANCE_COST_PHASE_PRESET = ['初期', '★6', '★max'];
 
 const CATEGORY = new Map();
 const EQUIP = new Map();
@@ -27,11 +39,12 @@ class Category {
   
   #sid;
   #name;
-  #equipIds = [];
+  #equipIds;
 
   constructor(cName) {
     this.#sid = shortId.generate();
     this.#name = cName;
+    this.#equipIds = [];
   }
 
   //getter
@@ -60,11 +73,15 @@ class Equip {
 
   #sid;
   #name;
-  #enhance = [];
+  #enhance;
+
+  // 指向当前enhance
+  #currEnhance;
 
   constructor(name) {
     this.#sid = shortId.generate();
     this.#name = name;
+    this.#enhance = [];
   }
 
   //gettter
@@ -92,10 +109,14 @@ class Equip {
       //TODO log error:
     }
   }
-  initSupply($tdSet, isHead) {
+  initSupply(cheerioObj, isNewEquip) {
     let enh = new Enhance();
-    enh.initSupply($tdSet, isHead);
+    enh.initSupply(cheerioObj, isNewEquip);
     this.#enhance.push(enh);
+    this.#currEnhance = enh;
+  }
+  addEnhanceCost(cheerioObj, idxType) {
+    this.#currEnhance.addEnhanceCost(cheerioObj, idxType);
   }
 
   // 根据名字创建实例，并将实例写入到CategoryMap中；其他模块调用时，无需额外再写入Map一次
@@ -103,6 +124,18 @@ class Equip {
     let e = new Equip(eName);
     EQUIP.set(e.id, e);
     return e;
+  }
+
+  // outsiders will think they are CONSTANTS of a class;
+  // of course, these CAN NOT be changed.
+  static get NEW_EQUIP() {
+    return NEW_EQUIP;
+  }
+  static get NEW_UPGRADE() {
+    return NEW_UPGRADE;
+  }
+  static get OTHER() {
+    return OTHER;
   }
 
   get supply() {
@@ -164,15 +197,23 @@ class Enhance {
   //   this.#supply = processSupplyRaw(arr);
   // }
 
-  // isHead true时, 取EQUIP_SUPPLY_INDEX_PRESET.head
-  //       false时, 取.EQUIP_SUPPLY_INDEX_PRESET.other
-  initSupply($tdSet, isHead) {
-    let idx = EQUIP_SUPPLY_INDEX_PRESET.head;
-    if(!isHead) {
+  // isNewEquip true时, 取EQUIP_SUPPLY_INDEX_PRESET.newEquip
+  //           false时, 取EQUIP_SUPPLY_INDEX_PRESET.other
+  initSupply(cheerioObj, isNewEquip) {
+    let idx = EQUIP_SUPPLY_INDEX_PRESET.newEquip;
+    if(!isNewEquip) {
       idx = EQUIP_SUPPLY_INDEX_PRESET.other;
     }
-    this.#supply = processSupplyRaw([$tdSet.eq(idx[0]).text(),
-      $tdSet.eq(idx[1]).text(), $tdSet.eq(idx[2]).text(), $tdSet.eq(idx[3]).text()]);
+    this.#supply = processSupplyRaw([cheerioObj.eq(idx[0]).text(),
+      cheerioObj.eq(idx[1]).text(), cheerioObj.eq(idx[2]).text(), cheerioObj.eq(idx[3]).text()]);
+  }
+  addEnhanceCost(cheerioObj, idxType) {
+    let idx = EQUIP_ENHANCE_COST_INDEX_PRESET[idxType];
+    let ec = new EnhanceCost();
+    ec.stage = EnhanceCost.findPhase(cheerioObj.eq(idx[0]).text().trim());
+    ec.developCost = cheerioObj.eq(idx[1]).text();
+    ec.enhanceCost = cheerioObj.eq(idx[2]).text();
+    ec.equipAmount = cheerioObj.eq(idx[3]).text();
   }
 }
 
@@ -217,6 +258,9 @@ class EnhanceCost {
   #equip;
 
   //getter
+  get stage() {
+    return this.#stage;
+  }
   get developCost() {
     return this.#develop;
   }
@@ -249,6 +293,15 @@ class EnhanceCost {
   }
   set equipAmount(str) {
     this.#equip = processEquipAmountRaw(str);
+  }
+
+  static findPhase(strToTransfer) {
+    // fixme
+    if (ENHANCE_COST_PHASE_PRESET.indexOf(strToTransfer) === -1) {
+      // TODO console.err()
+      console.error('ERROR DATA FOUND!!!!!!!!!');
+    }
+    return ENHANCE_COST_PHASE_PRESET.indexOf(strToTransfer);
   }
 }
 

@@ -36,18 +36,39 @@ class Extractor {
 
       let $tdSet = $(this).find('td');
       if($tdSet.first().find('a').length > 0) {
+
         let eName = $tdSet.first().text();
         // console.log(`   ${ idx++ }\t${ eName }`);
         e = Equip.register(eName);
-        e.initSupply($tdSet, true);
         c.addEquip(e);
+        e.initSupply($tdSet, true);
+        // fixme idx = [1, 6, 7, 8]
+        e.addEnhanceCost($tdSet, Equip.NEW_EQUIP);
+      } else if ($tdSet.length === 4 || $tdSet.length === 5) {
+
+        // fixme idx = [0, 1, 2, 3]
+        e.addEnhanceCost($tdSet, Equip.OTHER);
+      } else if ($tdSet.length === 8) {
+
+      } else if ($tdSet.length === 12) {
+
+        // fixme idx = [0, 1, 2, 3]
+        e.addEnhanceCost($tdSet, Equip.OTHER);
       } else if ($tdSet.length === 17) {
+
         e.initSupply($tdSet);
+        // fixme idx = [0, 5, 6, 7]
+        e.addEnhanceCost($tdSet, Equip.NEW_UPGRADE);
       } else if ($tdSet.length === 18) {
+
         e.initSupply($tdSet);
+        // fixme idx = [0, 5, 6, 7]
+        e.addEnhanceCost($tdSet, Equip.NEW_UPGRADE);
       }
       console.log(`${idx++} - ${$tdSet.length} - ${e.name}`);
-      console.log('  ' + chalk.yellowBright(e.supply));
+      // console.log('  ' + chalk.yellowBright(e.supply));
+      // Equip.enhance.enhanceCost.stage没有getter, 需要在内部进行测试
+      console.log('    ' + chalk.yellowBright(e.enhance.length));
     });
     // DEBUG delete this if release;
     console.log(`category.size\t- ${CATEGORY_MAP.size}`);
