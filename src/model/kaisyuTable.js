@@ -6,7 +6,7 @@ let shortId = require('shortid');
 
 const TYPE = {
   STRING: (() => {
-    return toString.call({});
+    return toString.call("");
   })(),
   ARRAY: (() => {
     return toString.call([]);
@@ -422,9 +422,9 @@ function processDevelopEnhanceRaw(beStringOrArray) {
   } else {
     //TODO log error: invalid param content, %{ showing invalid param here }.
   }
-  // noinspection JSObjectNullOrUndefined
-  if (paramType === TYPE.ARRAY && returnArray.length === VALID_LENGTH) {
-    returnArray = beStringOrArray;
+  // no inspection JSObject, Null, Undefined
+  if (paramType === TYPE.ARRAY && beStringOrArray.length === VALID_LENGTH) {
+    return beStringOrArray;
   } else {
     //TODO log error: invalid array length, %{ showing invalid param here }.
   }
@@ -455,8 +455,13 @@ function processEquipAmountRaw(beString) {
 }
 
 function fixCostVal(beArr, dataIdx) {
-  return Array.isArray(beArr)
-  && (Number.isInteger(beArr[dataIdx]) || beArr[dataIdx] === '-') ? beArr[dataIdx] : -1 ;
+
+  if(Array.isArray(beArr)) {
+    return beArr[dataIdx];
+  } else {
+    console.log('beArr is not array');
+    return -1;
+  }
 }
 
 module.exports = {
