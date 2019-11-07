@@ -99,21 +99,28 @@ class Equip {
   get enhance() {
     return this.#enhance;
   }
-  get supply() {
-    let retVal = [];
-    if (this.#enhance.length === 1) {
-      retVal.push([this.enhance[0].supplyCost]);
-    } else if (this.#enhance.length === 2) {
-      retVal.push([this.enhance[0].supplyCost, this.enhance[1].supplyCost]);
-    }
-    return retVal;
-  }
 
-  // TODO
-  assistStatus() {
+  // fixme 需要确认是否出现在API中
+  debugSupply() {
     let arr = [];
     for(let e of this.#enhance) {
-      arr.push(e.assistStatus());
+      arr.push(e.supplyCost);
+    }
+    return arr;
+  }
+  // fixme 需要确认是否出现在API中
+  debugEnhanceCost() {
+    let arr = [];
+    for(let e of this.#enhance) {
+      arr.push(e.enhanceCost);
+    }
+    return arr;
+  }
+  // fixme 需要确认是否出现在API中
+  debugAssist() {
+    let arr = [];
+    for(let e of this.#enhance) {
+      arr.push(e.debugAssist());
     }
     return arr;
   }
@@ -123,6 +130,7 @@ class Equip {
     this.#name = str;
   }
 
+  //fixme 用于debug, 需要确认是否出现在API中
   addEnhance(enhance) {
     const VALID_ARRAY_LENGTH = 2;
     //TODO Push enhance into enhance if it's valid; total length of enhance should be 2
@@ -142,7 +150,7 @@ class Equip {
     this.#currEnhance.addEnhanceCost(cheerioObj, idxType);
   }
   addAccessDay(cheerioObj, isNewAssist) {
-    this.#currEnhance.addAccessDay(cheerioObj, isNewAssist);
+    this.#currEnhance.addAssist(cheerioObj, isNewAssist);
   }
 
   // outsiders will think they are CONSTANTS of a class;
@@ -203,8 +211,8 @@ class Enhance {
     return this.#supply;
   }
 
-  // TODO
-  assistStatus() {
+  // fixme 尚不确定是否需要存在于API
+  debugAssist() {
     let arr = [];
     for(let a of this.#assistShips) {
       arr.push([a.canUpgrade, a.name, a.accessDay]);
@@ -243,12 +251,13 @@ class Enhance {
   addEnhanceCost(cheerioObj, idxType) {
     let idx = EQUIP_ENHANCE_COST_INDEX_PRESET[idxType];
     let ec = new EnhanceCost();
+    this.#enhanceCost.push(ec);
     ec.stage = EnhanceCost.findPhase(cheerioObj.eq(idx[0]).text().trim());
     ec.developCost = cheerioObj.eq(idx[1]).text();
     ec.enhanceCost = cheerioObj.eq(idx[2]).text();
     ec.equipAmount = cheerioObj.eq(idx[3]).text();
   }
-  addAccessDay(cheerioObj, isNewAssist) {
+  addAssist(cheerioObj, isNewAssist) {
 
     let adBeginIdx;
     let adEndIndex;
@@ -263,12 +272,13 @@ class Enhance {
       adBeginIdx = cheerioObj.length - 8;
       adEndIndex = cheerioObj.length - 1;
     }
-    assist.name = cheerioObj.eq(adEndIndex).text().trim();
     for(let i = adBeginIdx, day = 0; i < adEndIndex; i++, day++) {
       if (AssistShip.canAccess(cheerioObj.eq(i).text().trim())) {
         ad.push(day);
       }
     }
+    // init assist
+    assist.name = cheerioObj.eq(adEndIndex).text().trim();
     assist.canUpgrade = this.#currAssistUpgrade;
     assist.accessDay = ad;
     this.#assistShips.push(assist);
@@ -304,10 +314,10 @@ class AssistShip {
   }
 
   static canAccess(dayStr) {
-    return (dayStr === CAN ? true : false);
+    return (dayStr === CAN);
   }
   static canUpgrade(remarkStr) {
-    return (remarkStr.indexOf(UPGRADE_SIGN) === NOT_FOUND ? false : true);
+    return (remarkStr.indexOf(UPGRADE_SIGN) !== NOT_FOUND);
   }
 }
 
@@ -335,12 +345,14 @@ class EnhanceCost {
   get equipAmount() {
     return this.#equip;
   }
-  get cost() {
+  // fixme 尚不确定是否需要存在于API
+  debugCost() {
     let develop = fixCostVal(this.#develop, 0);
     let enhance = fixCostVal(this.#enhance, 0);
     return [this.#stage, develop, enhance, this.#equip];
   }
-  get promiseCost() {
+  // fixme 尚不确定是否需要存在于API
+  debugPromiseCost() {
     let develop = fixCostVal(this.#develop, 1);
     let enhance = fixCostVal(this.#enhance, 1);
     return [this.#stage, develop, enhance, this.#equip];
@@ -361,10 +373,8 @@ class EnhanceCost {
   }
 
   static findPhase(strToTransfer) {
-    // fixme
     if (ENHANCE_COST_PHASE_PRESET.indexOf(strToTransfer) === -1) {
-      // TODO console.err()
-      console.error('ERROR DATA FOUND!!!!!!!!!');
+      console.error(`ERROR FOUND, invalid data - ${strToTransfer}`);
     }
     return ENHANCE_COST_PHASE_PRESET.indexOf(strToTransfer);
   }

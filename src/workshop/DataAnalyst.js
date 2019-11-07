@@ -38,57 +38,104 @@ class Extractor {
       if($tdSet.first().find('a').length > 0) {
 
         let eName = $tdSet.first().text();
-        // console.log(`   ${ idx++ }\t${ eName }`);
         e = Equip.register(eName);
         c.addEquip(e);
         e.initSupply($tdSet, true);
-        // done idx = [1, 6, 7, 8]
-        e.addEnhanceCost($tdSet, Equip.NEW_EQUIP);
-        // fixme idx = [10, 11, 12, 13, 14, 15, 16, 17]
-        //            \[9, 10, 11, 12, 13, 14, 15, 16]
-        e.addAccessDay($tdSet, true);
-        console.log(`${idx++}\t- ${chalk.redBright($tdSet.length)}\t- ${e.name}\n\t${chalk.greenBright('|->')} ${chalk.yellow(e.assistStatus())}`);
-
+        e.addEnhanceCost($tdSet, Equip.NEW_EQUIP);  // done [1,6,7,8]
+        e.addAccessDay($tdSet, true); // done [size - 9,...,size - 2]
       } else if ($tdSet.length === 4 || $tdSet.length === 5) {
 
-        // done idx = [0, 1, 2, 3]
-        e.addEnhanceCost($tdSet, Equip.OTHER);
+        e.addEnhanceCost($tdSet, Equip.OTHER);  // done [0,1,2,3]
       } else if ($tdSet.length === 8) {
 
-        // fixme idx = [0, 1, 2, 3, 4, 5, 6, 7]
-        e.addAccessDay($tdSet);
-        console.log(`\t${chalk.greenBright('|->')} ${chalk.yellow(e.assistStatus())}`);
+        e.addAccessDay($tdSet); // done [size - 8,...,size - 1]
       } else if ($tdSet.length === 12) {
 
-        // done idx = [0, 1, 2, 3]
-        e.addEnhanceCost($tdSet, Equip.OTHER);
-        // fixme idx = [4, 5, 6, 7, 8, 9, 10, 11]
-        e.addAccessDay($tdSet);
-        console.log(`\t${chalk.greenBright('|->')} ${chalk.yellow(e.assistStatus())}`);
+        e.addEnhanceCost($tdSet, Equip.OTHER);  // done [0,1,2,3]
+        e.addAccessDay($tdSet); // done [size - 8,...,size - 1]
       } else if ($tdSet.length === 17) {
 
         e.initSupply($tdSet);
-        // done idx = [0, 5, 6, 7]
-        e.addEnhanceCost($tdSet, Equip.NEW_UPGRADE);
-        // fixme idx = [8, 9, 10, 11, 12, 13, 14, 15]
-        e.addAccessDay($tdSet, true);
-        console.log(`\t${chalk.greenBright('|->')} ${chalk.yellow(e.assistStatus())}`);
+        e.addEnhanceCost($tdSet, Equip.NEW_UPGRADE);  // done [0,5,6,7]
+        e.addAccessDay($tdSet, true); // done [size - 9,...,size - 2]
       } else if ($tdSet.length === 18) {
 
         e.initSupply($tdSet);
-        // done idx = [0, 5, 6, 7]
-        e.addEnhanceCost($tdSet, Equip.NEW_UPGRADE);
-        // fixme idx = [9, 10, 11, 12, 13, 14, 15, 16]
-        e.addAccessDay($tdSet, true);
-        console.log(`\t${chalk.greenBright('|->')} ${chalk.yellow(e.assistStatus())}`);
+        e.addEnhanceCost($tdSet, Equip.NEW_UPGRADE); // done [0,5,6,7]
+        e.addAccessDay($tdSet, true); // done [size - 9,...,size - 2]
       }
-      // console.log('  ' + chalk.yellowBright(e.supply));
-      /*Equip.enhance.enhanceCost.stage没有getter, 需要在内部进行测试
-      console.log('    ' + chalk.yellowBright(e.enhance.length));*/
     });
     // DEBUG delete this if release;
     console.log(`category.size\t- ${CATEGORY_MAP.size}`);
     console.log(`equip.size\t- ${EQUIP_MAP.size}`);
+    new Debugger().displayEquip();
+  }
+}
+
+class Debugger {
+
+  displayEquip() {
+
+    let idx = 0;
+    EQUIP_MAP.forEach(function(e) {
+      let equipBrief = Formatter.equipBrief(e, idx++);
+      let equipSupply = Formatter.supplyBrief(e.debugSupply());
+      let enhanceCost = Formatter.enhanceCostBrief(e.debugEnhanceCost());
+      let assistBrief = Formatter.assistBrief(e.debugAssist());
+      console.log(
+        `${equipBrief.padEnd(24)}${equipSupply}${enhanceCost}${assistBrief}`);
+    })
+  }
+}
+
+const INDENT_EQUIP = ' |-';
+const INDENT_ENHANCE_COST = '\n     | ';
+const INDENT_ASSIST = '\n     |-> ';
+class Formatter {
+
+  static equipBrief(equip, idx) {
+    let str = '';
+    str += new String(idx).toString().padStart(4);
+    str += INDENT_EQUIP + equip.name;
+    return str;
+  }
+
+  static supplyBrief(arr) {
+    let str = '';
+    for(let supply of arr) {
+      str += '[';
+      str += chalk.blueBright(supply);
+      str += ']';
+    }
+    return str;
+  }
+
+  static enhanceCostBrief(enhanceArr) {
+    let str = '';
+    for(let ecArr of enhanceArr) {
+      str += INDENT_ENHANCE_COST;
+      for(let ec of ecArr) {
+        str += '[' + chalk.cyan(ec.debugCost()) + ']['
+        str += chalk.cyanBright(ec.debugPromiseCost()) + '] ';
+      }
+    }
+    return str;
+  }
+
+  static assistBrief(arr) {
+    let str = '';
+    for(let assistsSet of arr) {
+      if(assistsSet.length === 1) {
+        str += chalk.redBright(INDENT_ASSIST);
+        str += chalk.yellowBright(assistsSet);
+      } else {
+        for(let a of assistsSet) {
+          str += chalk.green(INDENT_ASSIST);
+          str += chalk.yellow(a);
+        }
+      }
+    }
+    return str;
   }
 }
 
