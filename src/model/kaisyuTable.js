@@ -103,7 +103,7 @@ class Equip {
   // fixme 需要确认是否出现在API中
   debugSupply() {
     let arr = [];
-    for(let e of this.#enhance) {
+    for (let e of this.#enhance) {
       arr.push(e.supplyCost);
     }
     return arr;
@@ -111,7 +111,7 @@ class Equip {
   // fixme 需要确认是否出现在API中
   debugEnhanceCost() {
     let arr = [];
-    for(let e of this.#enhance) {
+    for (let e of this.#enhance) {
       arr.push(e.enhanceCost);
     }
     return arr;
@@ -119,7 +119,7 @@ class Equip {
   // fixme 需要确认是否出现在API中
   debugAssist() {
     let arr = [];
-    for(let e of this.#enhance) {
+    for (let e of this.#enhance) {
       arr.push(e.debugAssist());
     }
     return arr;
@@ -149,7 +149,7 @@ class Equip {
   addEnhanceCost(cheerioObj, idxType) {
     this.#currEnhance.addEnhanceCost(cheerioObj, idxType);
   }
-  addAccessDay(cheerioObj, isNewAssist) {
+  addAssist(cheerioObj, isNewAssist) {
     this.#currEnhance.addAssist(cheerioObj, isNewAssist);
   }
 
@@ -214,7 +214,7 @@ class Enhance {
   // fixme 尚不确定是否需要存在于API
   debugAssist() {
     let arr = [];
-    for(let a of this.#assistShips) {
+    for (let a of this.#assistShips) {
       arr.push([a.canUpgrade, a.name, a.accessDay]);
     }
     return arr;
@@ -272,8 +272,8 @@ class Enhance {
       adBeginIdx = cheerioObj.length - 8;
       adEndIndex = cheerioObj.length - 1;
     }
-    for(let i = adBeginIdx, day = 0; i < adEndIndex; i++, day++) {
-      if (AssistShip.canAccess(cheerioObj.eq(i).text().trim())) {
+    for (let i = adBeginIdx, day = 0; i < adEndIndex; i++, day++) {
+      if  (AssistShip.canAccess(cheerioObj.eq(i).text().trim())) {
         ad.push(day);
       }
     }
@@ -466,7 +466,7 @@ function processEquipAmountRaw(beString) {
 
 function fixCostVal(beArr, dataIdx) {
 
-  if(Array.isArray(beArr)) {
+  if (Array.isArray(beArr)) {
     return beArr[dataIdx];
   } else {
     console.log('beArr is not array');

@@ -14,16 +14,7 @@ fetchPagePromise
     // save file, optional
     fetcher.save('promiseTest.html', $minmize.html());
 
-    let instance = new extractor.DataAnalyst();
-
+    let Analyst = extractor.Analyst;
+    let instance = new Analyst();
     instance.extract($minmize, $);
-
-  })
-  // fixme
-  .then((kaisyuPage) => {
-
-    // instance.instanceFunc('Foo');
-    // extractor.DataAnalyst.staticFunc('bar');
-    // extractor.DataAnalyst.collect(kaisyuPage);
-
   });
