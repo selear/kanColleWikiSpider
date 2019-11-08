@@ -58,10 +58,10 @@ function checkFilename(fileName) {
 
   const STRING_TYPE = '[object String]';
   // fixme
-  if(toString.call(fileName) != STRING_TYPE) {
+  if (toString.call(fileName) != STRING_TYPE) {
     throw new Error('Invalid filename param');
   }
-  if(fileName.length > MAX_FILENAME_LENGTH) {
+  if (fileName.length > MAX_FILENAME_LENGTH) {
     throw new Error(`Invalid filename length - ${fileName.length}`);
   }
 }

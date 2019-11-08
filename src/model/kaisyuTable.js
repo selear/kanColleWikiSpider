@@ -124,6 +124,13 @@ class Equip {
     }
     return arr;
   }
+  debugUpgrade() {
+    let arr = [];
+    for (let e of this.#enhance) {
+      arr.push([e.upgradeTo, e.remark]);
+    }
+    return arr;
+  }
 
   //setter
   set name(str) {
@@ -186,12 +193,15 @@ class Enhance {
   #enhanceCost;
   #supply;
 
+  #notInitialized;
   #currAssistUpgrade;
 
   constructor() {
     this.#assistShips = [];
     this.#enhanceCost = [];
     this.#currAssistUpgrade = undefined;
+    this.#notInitialized = true;
+    this.#upgradeTo = 'NO UPGRADE';
   }
 
   //getter
@@ -242,7 +252,7 @@ class Enhance {
   //           false时, 取EQUIP_SUPPLY_INDEX_PRESET.other
   initSupply(cheerioObj, isNewEquip) {
     let idx = EQUIP_SUPPLY_INDEX_PRESET.newEquip;
-    if(!isNewEquip) {
+    if (!isNewEquip) {
       idx = EQUIP_SUPPLY_INDEX_PRESET.other;
     }
     this.#supply = processSupplyRaw([cheerioObj.eq(idx[0]).text(),
@@ -259,11 +269,26 @@ class Enhance {
   }
   addAssist(cheerioObj, isNewAssist) {
 
+    // init upgradeTo, remark
+    if (this.#notInitialized) {
+
+      let remark = removeRef(cheerioObj.eq(cheerioObj.length - 1).text().trim());
+      if (AssistShip.canUpgrade(remark)) {
+        let upgradeSignIdx = remark.indexOf(UPGRADE_SIGN);
+        this.#upgradeTo = (remark.substring(upgradeSignIdx + 1)).replace(/\s+/, ' ');
+        this.#remark = remark.substring(0, upgradeSignIdx);
+      } else {
+        this.#remark = remark;
+      }
+      this.#notInitialized = false;
+    }
+
+    // init and add assist
     let adBeginIdx;
     let adEndIndex;
     let assist = new AssistShip();
     let ad = [];
-    if(isNewAssist) {
+    if (isNewAssist) {
       adBeginIdx = cheerioObj.length - 9;
       adEndIndex = cheerioObj.length - 2;
       this.#currAssistUpgrade = AssistShip.canUpgrade(
@@ -277,8 +302,7 @@ class Enhance {
         ad.push(day);
       }
     }
-    // init assist
-    assist.name = cheerioObj.eq(adEndIndex).text().trim();
+    assist.name = removeRef(cheerioObj.eq(adEndIndex).text().trim());
     assist.canUpgrade = this.#currAssistUpgrade;
     assist.accessDay = ad;
     this.#assistShips.push(assist);
@@ -472,6 +496,10 @@ function fixCostVal(beArr, dataIdx) {
     console.log('beArr is not array');
     return -1;
   }
+}
+
+function removeRef(arr) {
+  return arr.replace(/\*\d\d/, '');
 }
 
 module.exports = {

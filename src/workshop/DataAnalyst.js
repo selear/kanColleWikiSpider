@@ -51,9 +51,6 @@ class Analyst {
         e.addAssist($tdSet, true); // done [size - 9,...,size - 2]
       }
     });
-    // DEBUG delete this if release;
-    console.log(`category.size\t- ${CATEGORY_MAP.size}`);
-    console.log(`equip.size\t- ${EQUIP_MAP.size}`);
     new Debugger().displayEquip();
   }
 }
@@ -63,27 +60,29 @@ class Debugger {
   displayEquip() {
 
     let idx = 0;
-    EQUIP_MAP.forEach(function(e) {
-      let equipBrief = Formatter.equipBrief(e, idx++);
-      let equipSupply = Formatter.supplyBrief(e.debugSupply());
-      let enhanceCost = Formatter.enhanceCostBrief(e.debugEnhanceCost());
-      let assistBrief = Formatter.assistBrief(e.debugAssist());
-      console.log(
-        `${equipBrief.padEnd(24)}${equipSupply}${enhanceCost}${assistBrief}`);
-    })
+    EQUIP_MAP.forEach(function(equip) {
+      let equipBrief = Formatter.equipBrief(equip, idx++);
+      let equipSupply = Formatter.supplyBrief(equip.debugSupply());
+      let enhanceCost = Formatter.enhanceCostBrief(equip.debugEnhanceCost());
+      let assistBrief = Formatter.assistBrief(equip.debugAssist());
+      let upgradeBrief = Formatter.upgradeBrief(equip.debugUpgrade());
+      console.log(`${equipBrief}${equipSupply}${upgradeBrief}${enhanceCost}${assistBrief}`);
+    });
+    console.log(Formatter.totalBrief());
   }
 }
 
-const INDENT_EQUIP = ' |-';
+const INDENT_EQUIP        = '-->';
 const INDENT_ENHANCE_COST = '\n     | ';
-const INDENT_ASSIST = '\n     |-> ';
+const INDENT_ASSIST       = '\n     |--> ';
+const INDENT_UPGRADE      = '\n     | |-> ';
 class Formatter {
 
   static equipBrief(equip, idx) {
     let str = '';
     str += new String(idx).toString().padStart(4);
     str += INDENT_EQUIP + equip.name;
-    return str;
+    return str.padEnd(20);
   }
 
   static supplyBrief(arr) {
@@ -121,6 +120,22 @@ class Formatter {
         }
       }
     }
+    return str;
+  }
+
+  static upgradeBrief(arr) {
+    let str = '';
+    for (let upgradeRemark of arr) {
+      str += INDENT_UPGRADE + upgradeRemark[0];
+      str += INDENT_ENHANCE_COST + chalk.grey(upgradeRemark[1]);
+    }
+    return str;
+  }
+
+  static totalBrief() {
+    let str = '';
+    str += chalk.yellow(`category.size\t- ${CATEGORY_MAP.size}`);
+    str += '\t' + chalk.blueBright(`equip.size\t- ${EQUIP_MAP.size}`);
     return str;
   }
 }
