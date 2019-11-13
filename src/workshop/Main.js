@@ -19,9 +19,9 @@ fetchPagePromise
     instance.extract($minmize, $);
 
     // 显示category信息
-    instance.saveCategory();
+    instance.displayCategory();
 
     // 显示equip信息
-    instance.displayEquip();
+    // instance.displayEquip();
 
   });

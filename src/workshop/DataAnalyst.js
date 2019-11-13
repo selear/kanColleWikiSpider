@@ -51,11 +51,11 @@ class Analyst {
   }
 
   saveCategory() {
-    new Debugger().outputCategory();
+    new Debugger().saveCategory();
   }
 
   saveEquip() {
-    new Debugger().outputEquip();
+    new Debugger().saveEquip();
   }
 
   displayCategory() {
@@ -72,7 +72,7 @@ const PROJECT_ROOT = '/../../../kanColleEnhanceAssistor/lib/category.js';
 
 class Debugger {
 
-  outputCategory() {
+  saveCategory() {
     let categoryArr = [];
     CATEGORY_MAP.forEach(category => {
       categoryArr.push({ id: category.id, name: category.name, equipIdArr: category.equipIdArr });
@@ -82,25 +82,30 @@ class Debugger {
       if (!err) {
         console.log(`File >>> ${FILE_NAME} <<< saved`);
       } else {
-        console.error(err.name, err.message);
+        console.error(chalk.redBright(err.name, err.message));
       }
     });
   }
 
   // TODO
-  outputEquip() {
+  saveEquip() {
 
   }
 
   // TODO
   displayCategory() {
-
+    CATEGORY_MAP.forEach(category => {
+      let id = Formatter.highlightId(category.id);
+      let name = Formatter.highlightName(category.name);
+      let equipIdArr = Formatter.highLightArr(category.equipIdArr);
+      console.log(`${id}->  ${name}${equipIdArr}`);
+    });
   }
 
   displayEquip() {
 
     let idx = 0;
-    EQUIP_MAP.forEach(function (equip) {
+    EQUIP_MAP.forEach(equip => {
       let equipBrief = Formatter.equipBrief(equip, idx++);
       let equipSupply = Formatter.supplyBrief(equip.debugSupply());
       let enhanceCost = Formatter.enhanceCostBrief(equip.debugEnhanceCost());
@@ -112,6 +117,7 @@ class Debugger {
   }
 }
 
+const SUBGROUP_COUNT = 6;
 const INDENT_EQUIP = '-->';
 const INDENT_ENHANCE_COST = '\n     | ';
 const INDENT_ASSIST = '\n     |--> ';
@@ -141,7 +147,7 @@ class Formatter {
     for (let ecArr of enhanceArr) {
       str += INDENT_ENHANCE_COST;
       for (let ec of ecArr) {
-        str += '[' + chalk.cyan(ec.debugCost()) + ']['
+        str += '[' + chalk.cyan(ec.debugCost()) + '][';
         str += chalk.cyanBright(ec.debugPromiseCost()) + '] ';
       }
     }
@@ -177,6 +183,26 @@ class Formatter {
     let str = '';
     str += chalk.yellow(`category.size\t- ${CATEGORY_MAP.size}`);
     str += '\t' + chalk.blueBright(`equip.size\t- ${EQUIP_MAP.size}`);
+    return str;
+  }
+
+  static highlightId(id) {
+    return chalk.grey(String(id).padEnd(12));
+  }
+
+  static highlightName(name) {
+    return chalk.yellow(name);
+  }
+
+  static highLightArr(arr) {
+    let str = '';
+    for (let i = 0; i < arr.length; i++) {
+      if (i % SUBGROUP_COUNT === 0) {
+        str += '\n'.padEnd(19);
+      }
+      str += chalk.blueBright((arr[i]).padEnd(12)) + ', ';
+    }
+    str = str.substring(0, str.length - 2);
     return str;
   }
 }
