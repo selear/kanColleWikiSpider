@@ -17,4 +17,11 @@ fetchPagePromise
     let Analyst = extractor.Analyst;
     let instance = new Analyst();
     instance.extract($minmize, $);
+
+    // 显示category信息
+    instance.saveCategory();
+
+    // 显示equip信息
+    instance.displayEquip();
+
   });

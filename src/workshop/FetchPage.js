@@ -2,7 +2,7 @@ import fs from "fs";
 import req_promise from "request-promise";
 import cheerio from "cheerio";
 
-const BACK_TO_PROJECT_ROOT = '/../../';
+const PROJECT_ROOT = '/../../';
 const MAX_FILENAME_LENGTH = 256;
 
 let options = {
@@ -21,7 +21,7 @@ function fetch() {
 function save(filename, content) {
 
   checkFilename(filename);
-  fs.writeFile(__dirname + BACK_TO_PROJECT_ROOT + filename, content, (err) => {
+  fs.writeFile(__dirname + PROJECT_ROOT + filename, content, (err) => {
     if (err) {
       throw new Error(`Saving ${filename} occurs ERROR`);
     }
@@ -45,7 +45,7 @@ function minmize($) {
       $(this).remove();
       invalidRemovedCount++;
     } else if (thLength === 1 && th.text().length === 0) {
-        th.remove();
+      th.remove();
     }
   });
   console.log(`invalid removed count - ${invalidRemovedCount}`);

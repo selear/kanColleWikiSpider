@@ -59,6 +59,9 @@ class Category {
   get name() {
     return this.#name;
   }
+  get equipIdArr() {
+    return this.#equipIds;
+  }
 
   addEquip(equip) {
     this.#equipIds.push(equip.id);

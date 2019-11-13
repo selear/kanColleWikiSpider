@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const chalk = require('chalk').default;
 const MODEL = require('../model/kaisyuTable');
 
@@ -14,10 +16,10 @@ class Analyst {
     // Extract data; the instance will set into map automatically by using Category.register(cName) / Equip.register(eName)
     let c = undefined;
     let e = undefined;
-    kaisyu.find('table tr').each(function() {
+    kaisyu.find('table tr').each(function () {
 
       if ($(this).find('th').length === 1) {
-        c = Category.register($(this).text());
+        c = Category.register($(this).find('th').text());
       }
 
       let $tdSet = $(this).find('td');
@@ -39,28 +41,66 @@ class Analyst {
 
         e.addEnhanceCost($tdSet, Equip.OTHER);  // done [0,1,2,3]
         e.addAssist($tdSet); // done [size - 8,...,size - 1]
-      } else if ($tdSet.length === 17) {
+      } else if ($tdSet.length === 17 || $tdSet.length === 18) {
 
         e.initSupply($tdSet);
         e.addEnhanceCost($tdSet, Equip.NEW_UPGRADE);  // done [0,5,6,7]
         e.addAssist($tdSet, true); // done [size - 9,...,size - 2]
-      } else if ($tdSet.length === 18) {
-
-        e.initSupply($tdSet);
-        e.addEnhanceCost($tdSet, Equip.NEW_UPGRADE); // done [0,5,6,7]
-        e.addAssist($tdSet, true); // done [size - 9,...,size - 2]
       }
     });
+  }
+
+  saveCategory() {
+    new Debugger().outputCategory();
+  }
+
+  saveEquip() {
+    new Debugger().outputEquip();
+  }
+
+  displayCategory() {
+    new Debugger().displayCategory();
+  }
+
+  displayEquip() {
     new Debugger().displayEquip();
   }
 }
 
+const FILE_NAME = 'category.js';
+const PROJECT_ROOT = '/../../../kanColleEnhanceAssistor/lib/category.js';
+
 class Debugger {
+
+  outputCategory() {
+    let categoryArr = [];
+    CATEGORY_MAP.forEach(category => {
+      categoryArr.push({ id: category.id, name: category.name, equipIdArr: category.equipIdArr });
+    });
+
+    fs.writeFile(__dirname.concat(PROJECT_ROOT), JSON.stringify(categoryArr), err => {
+      if (!err) {
+        console.log(`File >>> ${FILE_NAME} <<< saved`);
+      } else {
+        console.error(err.name, err.message);
+      }
+    });
+  }
+
+  // TODO
+  outputEquip() {
+
+  }
+
+  // TODO
+  displayCategory() {
+
+  }
 
   displayEquip() {
 
     let idx = 0;
-    EQUIP_MAP.forEach(function(equip) {
+    EQUIP_MAP.forEach(function (equip) {
       let equipBrief = Formatter.equipBrief(equip, idx++);
       let equipSupply = Formatter.supplyBrief(equip.debugSupply());
       let enhanceCost = Formatter.enhanceCostBrief(equip.debugEnhanceCost());
@@ -72,15 +112,16 @@ class Debugger {
   }
 }
 
-const INDENT_EQUIP        = '-->';
+const INDENT_EQUIP = '-->';
 const INDENT_ENHANCE_COST = '\n     | ';
-const INDENT_ASSIST       = '\n     |--> ';
-const INDENT_UPGRADE      = '\n     | |-> ';
+const INDENT_ASSIST = '\n     |--> ';
+const INDENT_UPGRADE = '\n     | |-> ';
+
 class Formatter {
 
   static equipBrief(equip, idx) {
     let str = '';
-    str += new String(idx).toString().padStart(4);
+    str += String(idx).toString().padStart(4);
     str += INDENT_EQUIP + equip.name;
     return str.padEnd(20);
   }
@@ -147,5 +188,5 @@ class Decorator {
 }
 
 module.exports = {
-  'Analyst' : Analyst
+  'Analyst': Analyst
 };
