@@ -50,14 +50,6 @@ class Analyst {
     });
   }
 
-  saveCategory() {
-    new Debugger().saveCategory();
-  }
-
-  saveEquip() {
-    new Debugger().saveEquip();
-  }
-
   displayCategory() {
     new Debugger().displayCategory();
   }
@@ -65,34 +57,37 @@ class Analyst {
   displayEquip() {
     new Debugger().displayEquip();
   }
+
+  saveData() {
+    new Debugger().saveJSON();
+  }
 }
 
-const FILE_NAME = 'category.js';
-const PROJECT_ROOT = '/../../../kanColleEnhanceAssistor/lib/category.js';
+const FILE_NAME = 'equips.js';
+const TARGET_DIR = '/../../../kanColleEnhanceAssistor/lib/';
 
 class Debugger {
 
-  saveCategory() {
-    let categoryArr = [];
-    CATEGORY_MAP.forEach(category => {
-      categoryArr.push({ id: category.id, name: category.name, equipIdArr: category.equipIdArr });
-    });
+  convertCategory() {
+    return JSON.stringify([...CATEGORY_MAP]);
+  }
 
-    fs.writeFile(__dirname.concat(PROJECT_ROOT), JSON.stringify(categoryArr), err => {
+  convertEquip() {
+    return JSON.stringify([...EQUIP_MAP]);
+  }
+
+  saveJSON() {
+    let content = `const CATEGORY=new Map(JSON.parse('${this.convertCategory()}'));`;
+    content += `\nconst EQUIP=new Map(JSON.parse('${this.convertEquip()}'));`;
+    fs.writeFile(__dirname.concat(TARGET_DIR + FILE_NAME), content, err => {
       if (!err) {
-        console.log(`File >>> ${FILE_NAME} <<< saved`);
+        console.log(`File >>> ${chalk.red(FILE_NAME)} <<< saved`);
       } else {
         console.error(chalk.redBright(err.name, err.message));
       }
     });
   }
 
-  // TODO
-  saveEquip() {
-
-  }
-
-  // TODO
   displayCategory() {
     CATEGORY_MAP.forEach(category => {
       let id = Formatter.highlightId(category.id);
@@ -103,7 +98,6 @@ class Debugger {
   }
 
   displayEquip() {
-
     let idx = 0;
     EQUIP_MAP.forEach(equip => {
       let equipBrief = Formatter.equipBrief(equip, idx++);
@@ -200,10 +194,10 @@ class Formatter {
       if (i % SUBGROUP_COUNT === 0) {
         str += '\n'.padEnd(19);
       }
-      str += chalk.blueBright((arr[i]).padEnd(12)) + ', ';
+      str += chalk.blueBright((arr[i] + ',').padEnd(14));
     }
-    str = str.substring(0, str.length - 2);
-    return str;
+    return (str.substring(0, str.lastIndexOf(','))
+      + str.substring(str.lastIndexOf(',') + 1));
   }
 }
 

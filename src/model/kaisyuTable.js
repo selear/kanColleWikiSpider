@@ -41,7 +41,7 @@ const CATEGORY = new Map();
 const EQUIP = new Map();
 
 class Category {
-  
+
   #sid;
   #name;
   #equipIds;
@@ -56,9 +56,11 @@ class Category {
   get id() {
     return this.#sid;
   }
+
   get name() {
     return this.#name;
   }
+
   get equipIdArr() {
     return this.#equipIds;
   }
@@ -72,6 +74,13 @@ class Category {
     let c = new Category(cName);
     CATEGORY.set(c.id, c);
     return c;
+  }
+
+  toJSON() {
+    return {
+      name: this.#name,
+      equipIds: this.#equipIds
+    }
   }
 }
 
@@ -96,9 +105,11 @@ class Equip {
   get id() {
     return this.#sid;
   }
+
   get name() {
     return this.#name;
   }
+
   get enhance() {
     return this.#enhance;
   }
@@ -111,6 +122,7 @@ class Equip {
     }
     return arr;
   }
+
   // fixme 需要确认是否出现在API中
   debugEnhanceCost() {
     let arr = [];
@@ -119,6 +131,7 @@ class Equip {
     }
     return arr;
   }
+
   // fixme 需要确认是否出现在API中
   debugAssist() {
     let arr = [];
@@ -127,6 +140,7 @@ class Equip {
     }
     return arr;
   }
+
   debugUpgrade() {
     let arr = [];
     for (let e of this.#enhance) {
@@ -150,15 +164,18 @@ class Equip {
       //TODO log error:
     }
   }
+
   initSupply(cheerioObj, isNewEquip) {
     let enh = new Enhance();
     enh.initSupply(cheerioObj, isNewEquip);
     this.#enhance.push(enh);
     this.#currEnhance = enh;
   }
+
   addEnhanceCost(cheerioObj, idxType) {
     this.#currEnhance.addEnhanceCost(cheerioObj, idxType);
   }
+
   addAssist(cheerioObj, isNewAssist) {
     this.#currEnhance.addAssist(cheerioObj, isNewAssist);
   }
@@ -168,9 +185,11 @@ class Equip {
   static get NEW_EQUIP() {
     return NEW_EQUIP;
   }
+
   static get NEW_UPGRADE() {
     return NEW_UPGRADE;
   }
+
   static get OTHER() {
     return OTHER;
   }
@@ -181,13 +200,20 @@ class Equip {
     EQUIP.set(e.id, e);
     return e;
   }
+
+  toJSON() {
+    return {
+      name: this.#name,
+      enhancements: this.#enhance
+    }
+  }
 }
 
 //assistShips - [ <AssistShip> ]
 //upgradeTo   - null/equipName
 //remark      - remark
 //enhanceCost - [ <EnhanceCost> ]
-//develop     - array.length = 2
+//supply      - array.length = 7
 class Enhance {
 
   #assistShips;
@@ -211,15 +237,19 @@ class Enhance {
   get assistShips() {
     return this.#assistShips;
   }
+
   get upgradeTo() {
     return this.#upgradeTo;
   }
+
   get remark() {
     return this.#remark;
   }
+
   get enhanceCost() {
     return this.#enhanceCost;
   }
+
   get supplyCost() {
     return this.#supply;
   }
@@ -237,19 +267,18 @@ class Enhance {
   set assistShips(nameArray) {
     this.#assistShips = nameArray;
   }
+
   set upgradeTo(toNext) {
     this.#upgradeTo = toNext;
   }
+
   set remark(remark) {
     this.#remark = remark;
   }
+
   set enhanceCost(enhanceCost) {
     this.#enhanceCost = enhanceCost;
   }
-  // fixme 该方法可能用不到, 需要决定去留
-  // set supplyCost(arr) {
-  //   this.#supply = processSupplyRaw(arr);
-  // }
 
   // isNewEquip true时, 取EQUIP_SUPPLY_INDEX_PRESET.newEquip
   //           false时, 取EQUIP_SUPPLY_INDEX_PRESET.other
@@ -261,6 +290,7 @@ class Enhance {
     this.#supply = processSupplyRaw([cheerioObj.eq(idx[0]).text(),
       cheerioObj.eq(idx[1]).text(), cheerioObj.eq(idx[2]).text(), cheerioObj.eq(idx[3]).text()]);
   }
+
   addEnhanceCost(cheerioObj, idxType) {
     let idx = EQUIP_ENHANCE_COST_INDEX_PRESET[idxType];
     let ec = new EnhanceCost();
@@ -270,6 +300,7 @@ class Enhance {
     ec.enhanceCost = cheerioObj.eq(idx[2]).text();
     ec.equipAmount = cheerioObj.eq(idx[3]).text();
   }
+
   addAssist(cheerioObj, isNewAssist) {
 
     // init upgradeTo, remark
@@ -301,7 +332,7 @@ class Enhance {
       adEndIndex = cheerioObj.length - 1;
     }
     for (let i = adBeginIdx, day = 0; i < adEndIndex; i++, day++) {
-      if  (AssistShip.canAccess(cheerioObj.eq(i).text().trim())) {
+      if (AssistShip.canAccess(cheerioObj.eq(i).text().trim())) {
         ad.push(day);
       }
     }
@@ -309,6 +340,16 @@ class Enhance {
     assist.canUpgrade = this.#currAssistUpgrade;
     assist.accessDay = ad;
     this.#assistShips.push(assist);
+  }
+
+  toJSON() {
+    return {
+      assistShips: this.#assistShips,
+      upgradeTo: this.#upgradeTo,
+      remark: this.#remark,
+      enhanceCosts: this.#enhanceCost,
+      supply: this.#supply
+    };
   }
 }
 
@@ -322,9 +363,11 @@ class AssistShip {
   get name() {
     return this.#name;
   }
+
   get canUpgrade() {
     return this.#canUpgrade;
   }
+
   get accessDay() {
     return this.#accessDay;
   }
@@ -333,9 +376,11 @@ class AssistShip {
   set name(shipName) {
     this.#name = shipName;
   }
+
   set canUpgrade(flag) {
     this.#canUpgrade = flag;
   }
+
   set accessDay(dayArray) {
     this.#accessDay = dayArray;
   }
@@ -343,8 +388,17 @@ class AssistShip {
   static canAccess(dayStr) {
     return (dayStr === CAN);
   }
+
   static canUpgrade(remarkStr) {
     return (remarkStr.indexOf(UPGRADE_SIGN) !== NOT_FOUND);
+  }
+
+  toJSON() {
+    return {
+      name: this.#name,
+      canUpgrade: this.#canUpgrade,
+      accessDay: this.#accessDay
+    }
   }
 }
 
@@ -363,21 +417,26 @@ class EnhanceCost {
   get stage() {
     return this.#stage;
   }
+
   get developCost() {
     return this.#develop;
   }
+
   get enhanceCost() {
     return this.#enhance;
   }
+
   get equipAmount() {
     return this.#equip;
   }
+
   // fixme 尚不确定是否需要存在于API
   debugCost() {
     let develop = fixCostVal(this.#develop, 0);
     let enhance = fixCostVal(this.#enhance, 0);
     return [this.#stage, develop, enhance, this.#equip];
   }
+
   // fixme 尚不确定是否需要存在于API
   debugPromiseCost() {
     let develop = fixCostVal(this.#develop, 1);
@@ -389,12 +448,15 @@ class EnhanceCost {
   set stage(stage) {
     this.#stage = stage;
   }
+
   set developCost(strOrArr) {
     this.#develop = processDevelopEnhanceRaw(strOrArr);
   }
+
   set enhanceCost(strOrArr) {
     this.#enhance = processDevelopEnhanceRaw(strOrArr);
   }
+
   set equipAmount(str) {
     this.#equip = processEquipAmountRaw(str);
   }
@@ -404,6 +466,15 @@ class EnhanceCost {
       console.error(`ERROR FOUND, invalid data - ${strToTransfer}`);
     }
     return ENHANCE_COST_PHASE_PRESET.indexOf(strToTransfer);
+  }
+
+  toJSON() {
+    return {
+      stage: this.#stage,
+      risk: [this.#develop[0], this.#enhance[0]],
+      secure: [this.#develop[1], this.#enhance[1]],
+      equip: this.#equip
+    };
   }
 }
 

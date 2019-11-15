@@ -22,6 +22,8 @@ fetchPagePromise
     instance.displayCategory();
 
     // 显示equip信息
-    // instance.displayEquip();
+    instance.displayEquip();
 
+    // 保存category与equip的信息;
+    instance.saveData();
   });
