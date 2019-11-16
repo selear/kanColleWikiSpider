@@ -11,7 +11,7 @@ const Equip = MODEL.Equip;
 class Analyst {
 
   extract(kaisyu, $) {
-    console.log(chalk.yellowBright(Decorator.banner(`Content length - ${kaisyu.html().length / 1024}KB`)));
+    console.log(chalk.yellowBright(Decorator.banner(`Content length - ${ kaisyu.html().length / 1024 }KB`)));
 
     // Extract data; the instance will set into map automatically by using Category.register(cName) / Equip.register(eName)
     let c = undefined;
@@ -59,7 +59,7 @@ class Analyst {
   }
 
   saveData() {
-    new Debugger().saveJSON();
+    new Debugger().saveStr();
   }
 }
 
@@ -76,12 +76,11 @@ class Debugger {
     return JSON.stringify([...EQUIP_MAP]);
   }
 
-  saveJSON() {
-    let content = `const CATEGORY=new Map(JSON.parse('${this.convertCategory()}'));`;
-    content += `\nconst EQUIP=new Map(JSON.parse('${this.convertEquip()}'));`;
+  saveStr() {
+    let content = `const META=['${ this.convertCategory() }','${ this.convertEquip() }'];`;
     fs.writeFile(__dirname.concat(TARGET_DIR + FILE_NAME), content, err => {
       if (!err) {
-        console.log(`File >>> ${chalk.red(FILE_NAME)} <<< saved`);
+        console.log(`File >>> ${ chalk.red(FILE_NAME) } <<< saved`);
       } else {
         console.error(chalk.redBright(err.name, err.message));
       }
@@ -93,7 +92,7 @@ class Debugger {
       let id = Formatter.highlightId(category.id);
       let name = Formatter.highlightName(category.name);
       let equipIdArr = Formatter.highLightArr(category.equipIdArr);
-      console.log(`${id}->  ${name}${equipIdArr}`);
+      console.log(`${ id }->  ${ name }${ equipIdArr }`);
     });
   }
 
@@ -105,17 +104,17 @@ class Debugger {
       let enhanceCost = Formatter.enhanceCostBrief(equip.debugEnhanceCost());
       let assistBrief = Formatter.assistBrief(equip.debugAssist());
       let upgradeBrief = Formatter.upgradeBrief(equip.debugUpgrade());
-      console.log(`${equipBrief}${equipSupply}${upgradeBrief}${enhanceCost}${assistBrief}`);
+      console.log(`${ equipBrief }${ equipSupply }${ upgradeBrief }${ enhanceCost }${ assistBrief }`);
     });
     console.log(Formatter.totalBrief());
   }
 }
 
-const SUBGROUP_COUNT = 6;
-const INDENT_EQUIP = '-->';
+const SUBGROUP_COUNT      = 6;
+const INDENT_EQUIP        = '-->';
 const INDENT_ENHANCE_COST = '\n     | ';
-const INDENT_ASSIST = '\n     |--> ';
-const INDENT_UPGRADE = '\n     | |-> ';
+const INDENT_ASSIST       = '\n     |--> ';
+const INDENT_UPGRADE      = '\n     | |-> ';
 
 class Formatter {
 
@@ -175,8 +174,8 @@ class Formatter {
 
   static totalBrief() {
     let str = '';
-    str += chalk.yellow(`category.size\t- ${CATEGORY_MAP.size}`);
-    str += '\t' + chalk.blueBright(`equip.size\t- ${EQUIP_MAP.size}`);
+    str += chalk.yellow(`category.size\t- ${ CATEGORY_MAP.size }`);
+    str += '\t' + chalk.blueBright(`equip.size\t- ${ EQUIP_MAP.size }`);
     return str;
   }
 
@@ -203,7 +202,7 @@ class Formatter {
 
 class Decorator {
   static banner(content) {
-    return `--- ${content} ---`;
+    return `--- ${ content } ---`;
   }
 }
 

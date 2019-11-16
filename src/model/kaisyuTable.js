@@ -463,7 +463,7 @@ class EnhanceCost {
 
   static findPhase(strToTransfer) {
     if (ENHANCE_COST_PHASE_PRESET.indexOf(strToTransfer) === -1) {
-      console.error(`ERROR FOUND, invalid data - ${strToTransfer}`);
+      console.error(`ERROR FOUND, invalid data - ${ strToTransfer }`);
     }
     return ENHANCE_COST_PHASE_PRESET.indexOf(strToTransfer);
   }

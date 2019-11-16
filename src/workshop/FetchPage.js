@@ -23,9 +23,9 @@ function save(filename, content) {
   checkFilename(filename);
   fs.writeFile(__dirname + PROJECT_ROOT + filename, content, (err) => {
     if (err) {
-      throw new Error(`Saving ${filename} occurs ERROR`);
+      throw new Error(`Saving ${ filename } occurs ERROR`);
     }
-    console.log(`File >>> ${filename} <<< has been saved.`);
+    console.log(`File >>> ${ filename } <<< has been saved.`);
   });
 }
 
@@ -48,7 +48,7 @@ function minmize($) {
       th.remove();
     }
   });
-  console.log(`invalid removed count - ${invalidRemovedCount}`);
+  console.log(`invalid removed count - ${ invalidRemovedCount }`);
   // DEBUG
   // console.log(`<tr> - length ${table.find('tbody>tr>th').length}`);
   return table;
@@ -62,7 +62,7 @@ function checkFilename(fileName) {
     throw new Error('Invalid filename param');
   }
   if (fileName.length > MAX_FILENAME_LENGTH) {
-    throw new Error(`Invalid filename length - ${fileName.length}`);
+    throw new Error(`Invalid filename length - ${ fileName.length }`);
   }
 }
 
