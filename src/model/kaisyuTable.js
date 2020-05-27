@@ -39,6 +39,7 @@ const ENHANCE_COST_PHASE_PRESET = ['初期', '★6', '★max'];
 
 const CATEGORY = new Map();
 const EQUIP = new Map();
+const TBL_ASSIST = new Set();
 
 class Category {
 
@@ -177,7 +178,7 @@ class Equip {
   }
 
   addAssist(cheerioObj, isNewAssist) {
-    this.#currEnhance.addAssist(cheerioObj, isNewAssist);
+    this.#currEnhance.addAssist(cheerioObj, isNewAssist, this.#sid);
   }
 
   // outsiders will think they are CONSTANTS of a class;
@@ -301,7 +302,7 @@ class Enhance {
     ec.equipAmount = cheerioObj.eq(idx[3]).text();
   }
 
-  addAssist(cheerioObj, isNewAssist) {
+  addAssist(cheerioObj, isNewAssist, shortId) {
 
     // init upgradeTo, remark
     if (this.#notInitialized) {
@@ -340,6 +341,15 @@ class Enhance {
     assist.canUpgrade = this.#currAssistUpgrade;
     assist.accessDay = ad;
     this.#assistShips.push(assist);
+
+    // 产生一个方便IndexedDB使用的数据, 放入TBL_ASSIST
+    let assistData = {
+      name: assist.name,
+      canUpgrade: assist.canUpgrade,
+      accessDay: assist.accessDay,
+      equipId: shortId
+    };
+    TBL_ASSIST.add(assistData);
   }
 
   toJSON() {
@@ -580,5 +590,6 @@ module.exports = {
   'Category': Category,
   'Equip': Equip,
   'CATEGORY_MAP': CATEGORY,
-  'EQUIP_MAP': EQUIP
+  'EQUIP_MAP': EQUIP,
+  'TBL_ASSIST_SET': TBL_ASSIST
 };

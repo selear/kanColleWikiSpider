@@ -3,9 +3,15 @@ const fs = require('fs');
 const chalk = require('chalk').default;
 const MODEL = require('../model/kaisyuTable');
 
+// Map
 const CATEGORY_MAP = MODEL.CATEGORY_MAP;
-const Category = MODEL.Category;
 const EQUIP_MAP = MODEL.EQUIP_MAP;
+
+// Tbl data for IndexedDB
+const TBL_ASSIST_SET = MODEL.TBL_ASSIST_SET;
+
+// data structure
+const Category = MODEL.Category;
 const Equip = MODEL.Equip;
 
 class Analyst {
@@ -68,16 +74,15 @@ const TARGET_DIR = '/../../../kanColleEnhanceAssistor/lib/';
 
 class Debugger {
 
-  convertCategory() {
-    return JSON.stringify([...CATEGORY_MAP]);
-  }
-
-  convertEquip() {
-    return JSON.stringify([...EQUIP_MAP]);
+  // container 应当是 Set或 Map
+  convertToJSON(container) {
+    return JSON.stringify([...container]);
   }
 
   saveStr() {
-    let content = `const META=['${ this.convertCategory() }','${ this.convertEquip() }'];`;
+    let content = `const META=['${ this.convertToJSON(CATEGORY_MAP) }','${ this.convertToJSON(EQUIP_MAP) }'];`;
+    let tbl = `\nconst TBL_ASSIST_SET=${ this.convertToJSON(TBL_ASSIST_SET) }`;
+    content = content.concat(tbl);
     fs.writeFile(__dirname.concat(TARGET_DIR + FILE_NAME), content, err => {
       if (!err) {
         console.log(`File >>> ${ chalk.red(FILE_NAME) } <<< saved`);
