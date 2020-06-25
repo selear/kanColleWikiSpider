@@ -13,7 +13,6 @@
 /test/regexTest.js
 
 /kaisyu-table-fixed.html
-/promiseTest.html
 /output.html
 /gitCommitMsg.txt
 /gitTagMsg.txt
@@ -23,6 +22,7 @@
 /formatter.js
 /fetchPage.js
 /main.js
+/filtered-table.html
 
 # README暂时不进行跟踪
 README

@@ -17,15 +17,15 @@ function fetch() {
   return req_promise(options);
 }
 
-
-function save(filename, content) {
+function write(filename, content) {
 
   checkFilename(filename);
   fs.writeFile(__dirname + PROJECT_ROOT + filename, content, (err) => {
-    if (err) {
+    if (!err) {
+      console.log(`File >>> ${ filename } <<< saved.`);
+    } else {
       throw new Error(`Saving ${ filename } occurs ERROR`);
     }
-    console.log(`File >>> ${ filename } <<< has been saved.`);
   });
 }
 
@@ -69,7 +69,7 @@ function checkFilename(fileName) {
 module.exports = {
   'fetch': fetch,
   'minmize': minmize,
-  'save': save
+  'saveFilteredPage': write
 };
 
 

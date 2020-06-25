@@ -3,6 +3,8 @@ const extractor = require('./DataAnalyst');
 
 let fetchPagePromise = fetcher.fetch();
 
+const FILENAME = 'filtered-table.html';
+
 fetchPagePromise
   .then(($) => {
 
@@ -10,9 +12,6 @@ fetchPagePromise
     let $minmize = fetcher.minmize($);
     // TODO for debugging, could delete in release
     // console.log(`Minmized page size: ${$minmize.html().length / 1024}KB.`);
-
-    // save temp file, optional
-    fetcher.save('promiseTest.html', $minmize.html());
 
     let Analyst = extractor.Analyst;
     let instance = new Analyst();
@@ -26,4 +25,7 @@ fetchPagePromise
 
     // 保存category与equip的信息;
     instance.saveData();
+
+    // 抓取页面数据后, 过滤冗余格式的数据并保存
+    fetcher.saveFilteredPage(FILENAME, $minmize.html());
   });
