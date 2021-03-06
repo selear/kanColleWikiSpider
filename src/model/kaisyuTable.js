@@ -2,7 +2,12 @@
 //Category
 //Equip
 
-let shortId = require('shortid');
+let IdGenerator = require('../utility/IdGenerator');
+
+const GENERATOR = {
+  "CATEGORY": new IdGenerator(2),
+  "EQUIP": new IdGenerator(3)
+};
 
 const TYPE = {
   STRING: (() => {
@@ -48,7 +53,7 @@ class Category {
   #equipIds;
 
   constructor(cName) {
-    this.#sid = shortId.generate();
+    this.#sid = GENERATOR.CATEGORY.next();
     this.#name = cName;
     this.#equipIds = [];
   }
@@ -97,7 +102,7 @@ class Equip {
   #currEnhance;
 
   constructor(name) {
-    this.#sid = shortId.generate();
+    this.#sid = GENERATOR.EQUIP.next();
     this.#name = name;
     this.#enhance = [];
   }
@@ -302,7 +307,7 @@ class Enhance {
     ec.equipAmount = cheerioObj.eq(idx[3]).text();
   }
 
-  addAssist(cheerioObj, isNewAssist, shortId) {
+  addAssist(cheerioObj, isNewAssist, equipId) {
 
     // init upgradeTo, remark
     if (this.#notInitialized) {
@@ -347,7 +352,7 @@ class Enhance {
       name: assist.name,
       canUpgrade: assist.canUpgrade,
       accessDay: assist.accessDay,
-      equipId: shortId
+      equipId: equipId
     };
     TBL_ASSIST.add(assistData);
   }

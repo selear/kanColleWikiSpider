@@ -1,3 +1,9 @@
+const chalk = require('chalk').default;
+
+const redWarp = function (head, content, foot) {
+  return chalk.red(head.concat(content).concat(foot));
+};
+
 class IdGenerator {
 
   #currId;
@@ -19,13 +25,13 @@ class IdGenerator {
   }
 
   debug() {
-    console.debug(`生成器最大长度为[${ this.#idLen }], 生成范围是[1, ${ this.#maxVal })`);
+    console.debug(`生成器最大长度为${ redWarp('[', this.#idLen, ']') }, 生成范围是${ redWarp('[1, ', this.#maxVal, ')') }`);
   }
 
   next() {
     let curr = ++this.#currId;
     if (curr >= this.#maxVal) {
-      console.warn(`生成器生成的id超出设计, curr_id = ${ curr }`);
+      console.warn(chalk.redBright(`        生成器生成的id超出设计, curr_id = ${ curr }`));
     }
     return curr;
   }

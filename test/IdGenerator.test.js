@@ -13,34 +13,26 @@ describe('IdGenerator单元测试', function () {
     });
   });
 
-  context('生成器功能测试', function () {
+  context('生成器功能测试, 遍历测试内容依据id最大值动态变化', function () {
 
-    it('默认id长度 = 2, id最大值为99', function () {
+    const generatorInstancePkg = [
+      { name: "default", instance: new IdGenerator() },
+      { name: "length2", instance: new IdGenerator(2) },
+      { name: "length3", instance: new IdGenerator(3) },
+      { name: "length4", instance: new IdGenerator(4) }
+    ];
 
-      let defaultGenerator = new IdGenerator();
-      should.equal(defaultGenerator.maxId, 100, '新实例id最大值 不符合预期');
-      should.equal(defaultGenerator.now(), 0, '新实例生成 id != 0');
-      should.equal(defaultGenerator.next(), 1, '新实例首个 id != 1');
+    generatorInstancePkg.forEach(({ name, instance }) => {
 
-      for (let i = defaultGenerator.now(); i < 5; i++) {
-        defaultGenerator.next();
-      }
-      should.equal(defaultGenerator.now(), 5, 'id != 5');
-      should.equal(defaultGenerator.next(), 6, 'id != 6');
-
-      for (let i = defaultGenerator.now(); i < 20; i++) {
-        defaultGenerator.next();
-      }
-      should.equal(defaultGenerator.now(), 20, 'id != 20');
-      should.equal(defaultGenerator.next(), 21, 'id != 21');
-
-      for (let i = defaultGenerator.now(); i < defaultGenerator.maxId - 1; i++) {
-        defaultGenerator.next();
-      }
-      should.equal(defaultGenerator.now(), 99, 'id != 99');
-      should.equal(defaultGenerator.next(), 100, 'id != 100');
-      should.equal(defaultGenerator.next(), 101, 'id != 101');
-      // (function () { defaultGenerator.next() }).should.throw('生成器生成的id超出设计, curr_id = 100');
+      it(`实例'${ name }', 合规id范围[1, ${ instance.maxId })`, function () {
+        (instance.now()).should.equal(0);
+        for (let i = 1; i < instance.maxId; i++) {
+          (instance.next()).should.equal(i);
+        }
+        (instance.next()).should.equal(instance.maxId);
+        (instance.next()).should.equal(instance.maxId + 1);
+      });
     });
   });
+
 });
