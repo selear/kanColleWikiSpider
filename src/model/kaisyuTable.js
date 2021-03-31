@@ -42,25 +42,26 @@ const EQUIP_ENHANCE_COST_INDEX_PRESET = {
 
 const ENHANCE_COST_PHASE_PRESET = ['初期', '★6', '★max'];
 
-const CATEGORY = new Map();
-const EQUIP = new Map();
+const CATEGORY_MAP = new Map();
+const EQUIP_MAP = new Map();
 const TBL_ASSIST = new Set();
+const TBL_EQUIP_NAME = new Set();
 
 class Category {
 
-  #sid;
+  #id;
   #name;
   #equipIds;
 
   constructor(cName) {
-    this.#sid = GENERATOR.CATEGORY.next();
+    this.#id = GENERATOR.CATEGORY.next();
     this.#name = cName;
     this.#equipIds = [];
   }
 
   //getter
   get id() {
-    return this.#sid;
+    return this.#id;
   }
 
   get name() {
@@ -78,7 +79,7 @@ class Category {
   // 根据名字创建实例，并将实例写入到CategoryMap中；其他模块调用时，无需额外再写入Map一次
   static register(cName) {
     let c = new Category(cName);
-    CATEGORY.set(c.id, c);
+    CATEGORY_MAP.set(c.id, c);
     return c;
   }
 
@@ -94,7 +95,7 @@ class Category {
 //enhance - [ <Enhance> ]
 class Equip {
 
-  #sid;
+  #id;
   #name;
   #enhance;
 
@@ -102,14 +103,14 @@ class Equip {
   #currEnhance;
 
   constructor(name) {
-    this.#sid = GENERATOR.EQUIP.next();
+    this.#id = GENERATOR.EQUIP.next();
     this.#name = name;
     this.#enhance = [];
   }
 
   //gettter
   get id() {
-    return this.#sid;
+    return this.#id;
   }
 
   get name() {
@@ -183,7 +184,7 @@ class Equip {
   }
 
   addAssist(cheerioObj, isNewAssist) {
-    this.#currEnhance.addAssist(cheerioObj, isNewAssist, this.#sid);
+    this.#currEnhance.addAssist(cheerioObj, isNewAssist, this.#id);
   }
 
   // outsiders will think they are CONSTANTS of a class;
@@ -203,7 +204,15 @@ class Equip {
   // 根据名字创建实例，并将实例写入到CategoryMap中；其他模块调用时，无需额外再写入Map一次
   static register(eName) {
     let e = new Equip(eName);
-    EQUIP.set(e.id, e);
+    EQUIP_MAP.set(e.id, e);
+
+    // 产生一个方便IndexedDB使用的数据, 放入TBL_EQUIP
+    let equipName = {
+      id: e.id,
+      name: e.name
+    };
+    TBL_EQUIP_NAME.add(equipName);
+
     return e;
   }
 
@@ -594,7 +603,8 @@ function removeRef(arr) {
 module.exports = {
   'Category': Category,
   'Equip': Equip,
-  'CATEGORY_MAP': CATEGORY,
-  'EQUIP_MAP': EQUIP,
-  'TBL_ASSIST_SET': TBL_ASSIST
+  'CATEGORY_MAP': CATEGORY_MAP,
+  'EQUIP_MAP': EQUIP_MAP,
+  'TBL_ASSIST_SET': TBL_ASSIST,
+  'TBL_EQUIP_NAME_SET': TBL_EQUIP_NAME
 };

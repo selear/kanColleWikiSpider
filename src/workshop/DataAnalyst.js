@@ -9,6 +9,7 @@ const EQUIP_MAP = MODEL.EQUIP_MAP;
 
 // Tbl data for IndexedDB
 const TBL_ASSIST_SET = MODEL.TBL_ASSIST_SET;
+const TBL_EQUIP_NAME_SET = MODEL.TBL_EQUIP_NAME_SET;
 
 // data structure
 const Category = MODEL.Category;
@@ -81,8 +82,9 @@ class Debugger {
 
   saveStr() {
     let content = `const META=['${ this.convertToJSON(CATEGORY_MAP) }','${ this.convertToJSON(EQUIP_MAP) }'];`;
-    let tbl = `\nconst TBL_ASSIST_SET=${ this.convertToJSON(TBL_ASSIST_SET) }`;
-    content = content.concat(tbl);
+    let tblAssist = `\nconst TBL_ASSIST_SET=${ this.convertToJSON(TBL_ASSIST_SET) }`;
+    let tblEquipName = `\nconst TBL_EQUIP_NAME_SET=${ this.convertToJSON(TBL_EQUIP_NAME_SET) }`;
+    content = content.concat(tblAssist, tblEquipName);
     fs.writeFile(__dirname.concat(TARGET_DIR + FILE_NAME), content, err => {
       if (!err) {
         console.log(`File >>> ${ chalk.red(FILE_NAME) } <<< saved`);
