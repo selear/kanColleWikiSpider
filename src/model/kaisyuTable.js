@@ -208,8 +208,8 @@ class Equip {
 
     // 产生一个方便IndexedDB使用的数据, 放入TBL_EQUIP
     let equipName = {
-      id: e.id,
-      name: e.name
+      eid: e.id,
+      equipName: e.name
     };
     TBL_EQUIP_NAME.add(equipName);
 
@@ -358,10 +358,10 @@ class Enhance {
 
     // 产生一个方便IndexedDB使用的数据, 放入TBL_ASSIST
     let assistData = {
-      name: assist.name,
+      assistName: assist.name,
       canUpgrade: assist.canUpgrade,
       accessDay: assist.accessDay,
-      equipId: equipId
+      eid: equipId
     };
     TBL_ASSIST.add(assistData);
   }
