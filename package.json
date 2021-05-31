@@ -1,6 +1,6 @@
 {
   "name": "kanColleWikiSpider",
-  "version": "1.0.1",
+  "version": "0.2.1",
   "author": "selear <selear@gmail.com> (https://github.com/selear)",
   "description": "extract data from kanColle Wiki, data source is in HTML",
   "keywords": [
