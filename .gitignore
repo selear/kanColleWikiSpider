@@ -14,8 +14,8 @@
 
 /kaisyu-table-fixed.html
 /output.html
-/GIT_COMMIT_MSG.txt
-/GIT_TAG_MSG.txt
+/git-commit-msg
+/git-tag-msg
 /package-lock.json
 /analisysPage.js
 /cheerioTest.js
